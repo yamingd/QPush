@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by zhza4586 on 14-8-8.
+ * Created by yaming_deng on 14-8-8.
  */
 public class DisruptorExceptionHandler implements ExceptionHandler {
 

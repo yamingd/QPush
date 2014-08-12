@@ -42,7 +42,7 @@ public class DisruptorContext implements InitializingBean, ApplicationContextAwa
     private PayloadQueue defaultQueue;
 
     @Autowired
-    @Qualifier("publisherConfig")
+    @Qualifier("appConfig")
     private Properties conf;
 
     @Override

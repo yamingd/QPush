@@ -23,7 +23,7 @@ for i in $RESV_HOME/lib/*.jar; do
     CLASSPATH=$i:$CLASSPATH;
 done
 
-CLASSPATH=$RESV_HOME/bin:$CLASSPATH
+CLASSPATH=$RESV_HOME/classes:$CLASSPATH
 
 DEBUG_INFO=" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n"
 DEBUG=""

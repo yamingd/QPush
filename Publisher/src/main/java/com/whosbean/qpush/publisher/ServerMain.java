@@ -71,7 +71,7 @@ public class ServerMain {
      */
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring-publisher.xml");
-        Properties prop = context.getBean("publisherConfig", Properties.class);
+        Properties prop = context.getBean("appConfig", Properties.class);
         start(prop);
     }
 

@@ -31,7 +31,7 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
     public static DispatcherRunner instance;
 
     @Autowired
-    @Qualifier("serverConfig")
+    @Qualifier("appConfig")
     private Properties serverConfig;
 
     @Autowired

@@ -1,6 +1,8 @@
 package com.whosbean.qpush.gateway.handler;
 
 import com.whosbean.qpush.core.GsonUtils;
+import com.whosbean.qpush.core.MetricBuilder;
+import com.whosbean.qpush.core.entity.ClientType;
 import com.whosbean.qpush.gateway.Commands;
 import com.whosbean.qpush.gateway.Connection;
 import com.whosbean.qpush.gateway.ServerMetrics;
@@ -26,7 +28,7 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
     public PushConnHandler(){
         poolTaskExecutor = new ThreadPoolTaskExecutor();
         poolTaskExecutor.setCorePoolSize(10);
-        poolTaskExecutor.setMaxPoolSize(100);
+        poolTaskExecutor.setMaxPoolSize(1000);
         poolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         poolTaskExecutor.afterPropertiesSet();
     }
@@ -45,6 +47,8 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         logger.info("channelRead: " + ctx.channel().hashCode());
+        MetricBuilder.requestMeter.mark();
+
         ByteBuf b = (ByteBuf)msg;
         byte[] dd = new byte[b.readableBytes()];
         b.readBytes(dd);
@@ -55,6 +59,13 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
         ServerMetrics.incrMessageTotal();
 
         ClientPayload cc = GsonUtils.asT(ClientPayload.class, jsonString);
+
+        if (cc.getTypeId().intValue() == ClientType.Android){
+            MetricBuilder.clientAndroidMeter.mark();
+        }else if (cc.getTypeId().intValue() == ClientType.iOS){
+            MetricBuilder.clientIOSMeter.mark();
+        }
+
         if(cc.getCmd().intValue() == Commands.GO_ONLINE){
             ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), new Connection(ctx.channel()));
             poolTaskExecutor.submit(new OnNewlyAddThread(cc));

@@ -43,6 +43,8 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             ClientService.instance.updateOnlineTs(client.getId());
         }
 
+
+
         return true;
     }
 }

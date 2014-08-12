@@ -1,5 +1,6 @@
 package com.whosbean.qpush.gateway.dispatch;
 
+import com.whosbean.qpush.core.MetricBuilder;
 import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.PayloadService;
@@ -36,6 +37,8 @@ public class OneSendThread implements Callable<Boolean> {
             for (String client : message.getClients()){
                 Connection c = ConnectionKeeper.get(product.getKey(), client);
                 ok = c.send(message);
+                MetricBuilder.pushMeter.mark();
+                MetricBuilder.pushSingleMeter.mark();
             }
             PayloadService.instance.addHisotry(message, null, message.getClients().size(), ok);
         }

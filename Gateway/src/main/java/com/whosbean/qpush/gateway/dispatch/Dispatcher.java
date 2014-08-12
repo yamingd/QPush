@@ -72,8 +72,11 @@ public class Dispatcher extends Thread {
 
         while (!this.stopping) {
 
-            doSinglePush();
-            doBroadcastPush();
+            int total = ClientKeeper.count(product.getKey());
+            if(total > 0) {
+                doSinglePush();
+                doBroadcastPush();
+            }
 
             try {
                 Thread.sleep(min * 1000);

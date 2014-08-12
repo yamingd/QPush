@@ -5,10 +5,25 @@ package com.whosbean.qpush.gateway.handler;
  */
 public class ClientPayload {
 
+    /**
+     * 操作
+     */
     private Integer cmd;
+    /**
+     * 用户设备APNS令牌
+     */
     private String token;
+    /**
+     * 应用唯一标示
+     */
     private String appKey;
+    /**
+     * 用户id
+     */
     private String userId;
+    /**
+     * 设备类型. 参考ClientType枚举定义.
+     */
     private Integer typeId;
 
     public Integer getCmd() {
@@ -47,6 +62,10 @@ public class ClientPayload {
         return typeId;
     }
 
+    /**
+     * @see com.whosbean.qpush.core.entity.ClientType
+     * @param typeId
+     */
     public void setTypeId(Integer typeId) {
         this.typeId = typeId;
     }

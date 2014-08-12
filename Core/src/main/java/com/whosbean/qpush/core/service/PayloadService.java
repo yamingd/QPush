@@ -67,15 +67,15 @@ public class PayloadService extends BaseService {
                     Connection connection) throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql,
                         Statement.RETURN_GENERATED_KEYS);
-                ps.setObject(0, payload.getTitle());
-                ps.setObject(1, payload.getBadge());
-                ps.setObject(2, payload.getExtras());
-                ps.setObject(3, payload.getSound());
-                ps.setObject(4, payload.getProductId());
-                ps.setObject(5, payload.getTotalUsers());
-                ps.setObject(6, new Date().getTime()/1000);
-                ps.setObject(7, PayloadStatus.Pending);
-                ps.setObject(8, payload.getBroadcast());
+                ps.setObject(1, payload.getTitle());
+                ps.setObject(2, payload.getBadge());
+                ps.setObject(3, payload.getExtras());
+                ps.setObject(4, payload.getSound());
+                ps.setObject(5, payload.getProductId());
+                ps.setObject(6, payload.getTotalUsers());
+                ps.setObject(7, new Date().getTime()/1000);
+                ps.setObject(8, PayloadStatus.Pending);
+                ps.setObject(9, payload.getBroadcast());
                 return ps;
             }
         }, holder);

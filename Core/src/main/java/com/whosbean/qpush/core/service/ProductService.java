@@ -51,12 +51,12 @@ public class ProductService extends BaseService {
                     Connection connection) throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql,
                         Statement.RETURN_GENERATED_KEYS);
-                ps.setObject(0, product.getTitle());
-                ps.setObject(1, product.getKey());
-                ps.setObject(2, product.getSecret());
-                ps.setObject(3, product.getClientTypeid());
-                ps.setObject(4, product.getCertPath());
-                ps.setObject(5, product.getDevCertPath());
+                ps.setObject(1, product.getTitle());
+                ps.setObject(2, product.getKey());
+                ps.setObject(3, product.getSecret());
+                ps.setObject(4, product.getClientTypeid());
+                ps.setObject(5, product.getCertPath());
+                ps.setObject(6, product.getDevCertPath());
                 return ps;
             }
         }, holder);

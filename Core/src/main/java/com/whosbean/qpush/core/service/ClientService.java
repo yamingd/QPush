@@ -44,12 +44,12 @@ public class ClientService extends BaseService {
                     Connection connection) throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql,
                         Statement.RETURN_GENERATED_KEYS);
-                ps.setObject(0, client.getProductId());
-                ps.setObject(1, client.getUserId());
-                ps.setObject(2, client.getDeviceToken());
-                ps.setObject(3, new Date());
-                ps.setObject(4, ClientStatus.NewlyAdd);
-                ps.setObject(5, client.getTypeId());
+                ps.setObject(1, client.getProductId());
+                ps.setObject(2, client.getUserId());
+                ps.setObject(3, client.getDeviceToken());
+                ps.setObject(4, new Date());
+                ps.setObject(5, ClientStatus.NewlyAdd);
+                ps.setObject(6, client.getTypeId());
                 return ps;
             }
         }, holder);

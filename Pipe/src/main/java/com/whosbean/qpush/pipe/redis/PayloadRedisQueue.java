@@ -8,8 +8,8 @@ import com.whosbean.qpush.pipe.PayloadQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
 
@@ -18,8 +18,7 @@ import java.util.List;
 /**
  * Created by yaming_deng on 14-8-11.
  */
-@Component("payloadRedisQueue")
-public class PayloadRedisQueue implements PayloadQueue {
+public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
     public static final String QPUSH_PENDING = "qpush:pending";
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -107,4 +106,8 @@ public class PayloadRedisQueue implements PayloadQueue {
     }
 
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        init();
+    }
 }

@@ -27,8 +27,8 @@
     </bean>
 
     <bean id="jedis.shardInfo" class="redis.clients.jedis.JedisShardInfo">
-        <constructor-arg index="0" value="127.0.0.1" />
-        <constructor-arg index="1" value="6379" />
+        <constructor-arg index="0" value="${redis.host}" />
+        <constructor-arg index="1" value="${redis.port}" />
     </bean>
 
     <bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool">
@@ -39,5 +39,7 @@
             </list>
         </constructor-arg>
     </bean>
+
+    <bean id="payloadRedisQueue" class="com.whosbean.qpush.pipe.redis.PayloadRedisQueue" />
 
 </beans>

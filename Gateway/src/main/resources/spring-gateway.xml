@@ -21,5 +21,7 @@
     </bean>
 
     <import resource="classpath:spring-db.xml" />
+    <!-- enable redis to queue message -->
+    <import resource="classpath:spring-redis.xml" />
 
 </beans>

@@ -37,7 +37,11 @@ public class OfflineSendThread implements Callable<Boolean> {
                 Connection c = ConnectionKeeper.get(product.getKey(), client);
                 ok = c.send(message);
             }
-            PayloadService.instance.addHisotry(message, null, message.getClients().size(), ok);
+            try {
+                PayloadService.instance.addHisotry(message, null, message.getClients().size(), ok);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return ok;
     }

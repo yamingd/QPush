@@ -31,7 +31,11 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             client.setUserId(cc.getUserId());
             client.setTypeId(cc.getTypeId()); //
             client.setDeviceToken(cc.getToken());
-            ClientService.instance.add(client);
+            try {
+                ClientService.instance.add(client);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             isnew = true;
         }
         //推送旧消息
@@ -40,7 +44,11 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             if (dispatcher != null) {
                 dispatcher.pushOfflinePayload(cc.getUserId());
             }
-            ClientService.instance.updateOnlineTs(client.getId());
+            try {
+                ClientService.instance.updateOnlineTs(client.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
 

@@ -53,7 +53,11 @@ public class BrocastThread implements Callable<Boolean> {
                 }
             }
 
-            PayloadService.instance.addHisotry(message, null, limit, true);
+            try {
+                PayloadService.instance.addHisotry(message, null, limit, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             MetricBuilder.pushMeter.mark();
             MetricBuilder.boradcastMeter.mark();

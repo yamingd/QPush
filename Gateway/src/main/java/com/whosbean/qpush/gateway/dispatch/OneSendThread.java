@@ -40,7 +40,11 @@ public class OneSendThread implements Callable<Boolean> {
                 MetricBuilder.pushMeter.mark();
                 MetricBuilder.pushSingleMeter.mark();
             }
-            PayloadService.instance.addHisotry(message, null, message.getClients().size(), ok);
+            try {
+                PayloadService.instance.addHisotry(message, null, message.getClients().size(), ok);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return ok;
     }

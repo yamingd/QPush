@@ -8,14 +8,41 @@ import java.util.Date;
  */
 public class Client {
 
+    /**
+     * 客户端.
+     */
     private Long id;
+    /**
+     * 产品id
+     */
     private Integer productId;
+    /**
+     * 用户标示
+     */
     private String userId;
+    /**
+     * 设备令牌
+     */
     private String deviceToken;
+    /**
+     * 创建时间.
+     */
     private Date createAt;
+    /**
+     * 客户端状态.
+     */
     private Integer statusId;
+    /**
+     * 客户端类型.
+     */
     private Integer typeId;
+    /**
+     * 最后推送时间.
+     */
     private Date lastSendAt;
+    /**
+     * 最后在线时间
+     */
     private Date lastOnline;
 
     public Long getId() {
@@ -30,6 +57,10 @@ public class Client {
         return productId;
     }
 
+    /**
+     * @see com.whosbean.qpush.core.entity.Product
+     * @param productId
+     */
     public void setProductId(Integer productId) {
         this.productId = productId;
     }
@@ -62,6 +93,10 @@ public class Client {
         return statusId;
     }
 
+    /**
+     * @see com.whosbean.qpush.core.entity.ClientStatus
+     * @param statusId
+     */
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }
@@ -70,6 +105,10 @@ public class Client {
         return typeId;
     }
 
+    /**
+     * @see com.whosbean.qpush.core.entity.ClientType
+     * @param typeId
+     */
     public void setTypeId(Integer typeId) {
         this.typeId = typeId;
     }

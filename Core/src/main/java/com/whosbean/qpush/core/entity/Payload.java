@@ -9,14 +9,41 @@ import java.util.Map;
  */
 public class Payload {
 
+    /**
+     * 消息id
+     */
     private Long id;
+    /**
+     * 在客户端信息中心显示的标题
+     */
     private String title;
+    /**
+     * 消息提示数. 显示在应用图标上.
+     */
     private Integer badge;
+    /**
+     * 扩展信息.
+     */
     private String extras;
+    /**
+     * 提示音
+     */
     private String sound;
+    /**
+     * 产品id
+     */
     private Integer productId;
+    /**
+     * 要推送到的用户数.
+     */
     private Integer totalUsers;
+    /**
+     * 创建时间.
+     */
     private Long createAt;
+    /**
+     * 发送状态.
+     */
     private Integer statusId;
     /**
      * 要接收的客户端
@@ -41,6 +68,10 @@ public class Payload {
         return statusId;
     }
 
+    /**
+     * @see com.whosbean.qpush.core.entity.PayloadStatus
+     * @param statusId
+     */
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }

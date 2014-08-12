@@ -6,12 +6,33 @@ package com.whosbean.qpush.core.entity;
  */
 public class Product {
 
+    /**
+     * 产品应用唯一标示
+     */
     private Integer id;
+    /**
+     * 产品显示名称
+     */
     private String title;
+    /**
+     * 产品客户端唯一码
+     */
     private String key;
+    /**
+     * 产品客户端信息加密串
+     */
     private String secret;
+    /**
+     * 客户端类型
+     */
     private Integer clientTypeid;
+    /**
+     * iOS APNS生产证书路径
+     */
     private String certPath;
+    /**
+     * iOS APNS开发证书路径
+     */
     private String devCertPath;
 
     public Integer getId() {
@@ -66,6 +87,10 @@ public class Product {
         return clientTypeid;
     }
 
+    /**
+     * @see com.whosbean.qpush.core.entity.ClientType
+     * @param clientTypeid
+     */
     public void setClientTypeid(Integer clientTypeid) {
         this.clientTypeid = clientTypeid;
     }

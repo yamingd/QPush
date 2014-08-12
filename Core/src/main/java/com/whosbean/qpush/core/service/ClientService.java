@@ -66,4 +66,8 @@ public class ClientService extends BaseService {
         return null;
     }
 
+    public void updateOnlineTs(long id){
+        String sql = "update client set lastOnline=? where id = ?";
+        this.mainJdbc.update(sql, new Date(), id);
+    }
 }

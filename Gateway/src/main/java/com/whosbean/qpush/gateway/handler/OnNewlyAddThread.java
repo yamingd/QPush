@@ -40,6 +40,7 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             if (dispatcher != null) {
                 dispatcher.pushOfflinePayload(cc.getUserId());
             }
+            ClientService.instance.updateOnlineTs(client.getId());
         }
 
         return true;

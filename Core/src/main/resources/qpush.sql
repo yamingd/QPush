@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2014-08-11 13:10:18
+Date: 2014-08-12 16:35:39
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -67,6 +67,7 @@ CREATE TABLE `payload_client` (
   `id` bigint(20) NOT NULL,
   `userId` varchar(255) NOT NULL,
   `productId` int(11) DEFAULT NULL,
+  `statusId` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`,`userId`),
   KEY `ix_payload_client_pu` (`productId`,`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

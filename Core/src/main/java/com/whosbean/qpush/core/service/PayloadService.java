@@ -110,11 +110,14 @@ public class PayloadService extends BaseService {
 
         sql = "update payload set statusId=? where id = ?";
         this.mainJdbc.update(sql, PayloadStatus.Sent, message.getId());
+
+        sql = "update payload_client set statusId=? where id = ?";
+        this.mainJdbc.update(sql, PayloadStatus.Sent, message.getId());
     }
 
     public Payload findLatest(int productId, String userId){
-        String sql = "select id from payload_client where productId=? and userId = ? order by id desc limit 1, 0";
-        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId);
+        String sql = "select id from payload_client where productId=? and userId = ? and statusId=? order by id desc limit 1, 0";
+        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, PayloadStatus.Pending);
         if (list.size() == 0){
             return null;
         }

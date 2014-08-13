@@ -66,8 +66,16 @@ public class ClientService extends BaseService {
         return null;
     }
 
+    public List<Client> findOfflineByType(Integer productId, Integer typeId, Integer page, Integer limit){
+        long now = new Date().getTime()/1000 - 600;
+        int offset = (page - 1) * limit;
+        String sql = "select * from client where productId = ? and typeId = ? and lastOnline >= ? order by id limit ?, ?";
+        List<Client> list = this.mainJdbc.query(sql, Client_ROWMAPPER, productId, typeId, now, offset, limit);
+        return list;
+    }
+
     public void updateOnlineTs(long id){
         String sql = "update client set lastOnline=? where id = ?";
-        this.mainJdbc.update(sql, new Date(), id);
+        this.mainJdbc.update(sql, new Date().getTime()/1000, id);
     }
 }

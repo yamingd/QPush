@@ -79,7 +79,7 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
 
         //回复客户端.
         final ByteBuf data = ctx.alloc().buffer(2); // (2)
-        data.writeBytes("OK".getBytes());
+        data.writeBytes((cc.getCmd()+"").getBytes());
         ChannelFuture cf = ctx.channel().writeAndFlush(data);
         if(cf.isDone() && cf.cause() != null){
             cf.cause().printStackTrace();

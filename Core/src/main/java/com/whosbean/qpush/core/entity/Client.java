@@ -39,11 +39,11 @@ public class Client {
     /**
      * 最后推送时间.
      */
-    private Date lastSendAt;
+    private Long lastSendAt;
     /**
      * 最后在线时间
      */
-    private Date lastOnline;
+    private Long lastOnline;
 
     public Long getId() {
         return id;
@@ -113,19 +113,19 @@ public class Client {
         this.typeId = typeId;
     }
 
-    public Date getLastSendAt() {
+    public Long getLastSendAt() {
         return lastSendAt;
     }
 
-    public void setLastSendAt(Date lastSendAt) {
+    public void setLastSendAt(Long lastSendAt) {
         this.lastSendAt = lastSendAt;
     }
 
-    public Date getLastOnline() {
+    public Long getLastOnline() {
         return lastOnline;
     }
 
-    public void setLastOnline(Date lastOnline) {
+    public void setLastOnline(Long lastOnline) {
         this.lastOnline = lastOnline;
     }
 }

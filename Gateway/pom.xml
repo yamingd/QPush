@@ -64,6 +64,12 @@
             <version>3.0.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.notnoop.apns</groupId>
+            <artifactId>apns</artifactId>
+            <version>0.2.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

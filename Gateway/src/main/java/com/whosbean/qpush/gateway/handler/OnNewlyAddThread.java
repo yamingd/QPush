@@ -51,8 +51,6 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             }
         }
 
-
-
         return true;
     }
 }

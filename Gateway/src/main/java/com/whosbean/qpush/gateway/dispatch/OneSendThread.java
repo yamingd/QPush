@@ -52,6 +52,9 @@ public class OneSendThread implements Callable<Boolean> {
                     ok = c.send(message);
                     total ++;
                 }else{
+                    if (product.getClientTypeid().intValue() != ClientType.iOS){
+                        continue;
+                    }
                     Client cc = ClientService.instance.findByUserId(client);
                     if (cc == null){
                         logger.warn("Client not found. client=" + client);

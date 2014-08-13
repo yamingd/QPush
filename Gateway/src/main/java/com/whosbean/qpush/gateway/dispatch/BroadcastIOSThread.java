@@ -18,16 +18,16 @@ import java.util.concurrent.Callable;
  * iOS广播推送.
  * Created by yaming_deng on 14-8-8.
  */
-public class BrocastIOSThread implements Callable<Boolean> {
+public class BroadcastIOSThread implements Callable<Boolean> {
 
-    protected static Logger logger = LoggerFactory.getLogger(BrocastIOSThread.class);
+    protected static Logger logger = LoggerFactory.getLogger(BroadcastIOSThread.class);
 
     private long messageId;
     private int start = 0;
     private int limit = 100;
     private Product product;
 
-    public BrocastIOSThread(Product product, long messageId, int start, int limit) {
+    public BroadcastIOSThread(Product product, long messageId, int start, int limit) {
         super();
         this.messageId = messageId;
         this.start = start;

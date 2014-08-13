@@ -141,7 +141,7 @@ public class Dispatcher extends Thread {
             pages ++;
         }
         for(int i=0; i<pages; i++){
-            this.broadcastPool.submit(new BrocastThread(this.product, messageId, i, limit));
+            this.broadcastPool.submit(new BroadcastThread(this.product, messageId, i, limit));
         }
     }
 
@@ -155,7 +155,7 @@ public class Dispatcher extends Thread {
             pages ++;
         }
         for(int i=0; i<pages; i++){
-            this.broadcastPool.submit(new BrocastIOSThread(this.product, messageId, i, limit));
+            this.broadcastPool.submit(new BroadcastIOSThread(this.product, messageId, i, limit));
         }
     }
 

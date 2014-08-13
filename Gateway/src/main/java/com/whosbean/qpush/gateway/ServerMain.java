@@ -65,6 +65,7 @@ public class ServerMain {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring-gateway.xml");
         Properties prop = context.getBean("appConfig", Properties.class);
+        ServerConfig.setConf(prop);
         start(prop);
     }
 }

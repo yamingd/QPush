@@ -2,7 +2,9 @@ package com.whosbean.qpush.gateway.handler;
 
 import com.whosbean.qpush.core.GsonUtils;
 import com.whosbean.qpush.core.MetricBuilder;
+import com.whosbean.qpush.core.entity.Client;
 import com.whosbean.qpush.core.entity.ClientType;
+import com.whosbean.qpush.core.service.ClientService;
 import com.whosbean.qpush.gateway.Commands;
 import com.whosbean.qpush.gateway.Connection;
 import com.whosbean.qpush.gateway.ServerMetrics;
@@ -58,7 +60,7 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
         ReferenceCountUtil.release(msg);
         ServerMetrics.incrMessageTotal();
 
-        ClientPayload cc = GsonUtils.asT(ClientPayload.class, jsonString);
+        final ClientPayload cc = GsonUtils.asT(ClientPayload.class, jsonString);
 
         if (cc.getTypeId().intValue() == ClientType.Android){
             MetricBuilder.clientAndroidMeter.mark();
@@ -69,14 +71,29 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
         if(cc.getCmd().intValue() == Commands.GO_ONLINE){
             ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), new Connection(ctx.channel()));
             poolTaskExecutor.submit(new OnNewlyAddThread(cc));
+            ack(ctx, cc);
         }else if(cc.getCmd().intValue() == Commands.KEEP_ALIVE){
             //心跳
-
+            ack(ctx, cc);
         }else if(cc.getCmd().intValue() == Commands.PUSH_ACK){
             //推送反馈
-
+            ack(ctx, cc);
+        }else if(cc.getCmd().intValue() == Commands.GO_OFFLINE){
+            //离线
+            poolTaskExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    Client c0 = ClientService.instance.findByUserId(cc.getUserId());
+                    if (c0 != null){
+                        ClientService.instance.updateOnlineTs(c0.getId());
+                    }
+                }
+            });
         }
 
+    }
+
+    private void ack(ChannelHandlerContext ctx, ClientPayload cc) {
         //回复客户端.
         final ByteBuf data = ctx.alloc().buffer(2); // (2)
         data.writeBytes((cc.getCmd()+"").getBytes());
@@ -85,7 +102,6 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
             cf.cause().printStackTrace();
             ctx.close();
         }
-
     }
 
     @Override

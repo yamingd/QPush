@@ -7,6 +7,8 @@ import com.whosbean.qpush.core.service.PayloadService;
 import com.whosbean.qpush.gateway.Connection;
 import com.whosbean.qpush.gateway.keeper.ClientKeeper;
 import com.whosbean.qpush.gateway.keeper.ConnectionKeeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -16,6 +18,8 @@ import java.util.concurrent.Callable;
  * Created by yaming_deng on 14-8-8.
  */
 public class BrocastThread implements Callable<Boolean> {
+
+    protected static Logger logger = LoggerFactory.getLogger(BrocastThread.class);
 
     private long messageId;
     private int start = 0;
@@ -54,13 +58,15 @@ public class BrocastThread implements Callable<Boolean> {
             }
 
             try {
-                PayloadService.instance.addHisotry(message, null, limit, true);
+                PayloadService.instance.addHisotry(message, null, t0, true);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            MetricBuilder.pushMeter.mark();
-            MetricBuilder.boradcastMeter.mark();
+            if (t0 > 0) {
+                MetricBuilder.pushMeter.mark(t0);
+                MetricBuilder.boradcastMeter.mark(t0);
+            }
         }
 
         return true;

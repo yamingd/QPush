@@ -8,9 +8,6 @@ import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by yaming_deng on 14-8-6.
  */
@@ -27,14 +24,7 @@ public class Connection {
     public boolean send(Payload message) throws Exception {
         // 组装消息包
         if(channel.isOpen()){
-            Map<String, Object> map = new HashMap<String, Object>();
-            Map<String, Object> aps = new HashMap<String, Object>();
-            aps.put("alert", message.getTitle());
-            aps.put("badge", message.getBadge());
-            aps.put("sound", message.getSound());
-            map.put("aps", aps);
-            map.put("userInfo", GsonUtils.asT(Map.class, message.getExtras()));
-            byte[] msg = GsonUtils.toJson(map).getBytes("UTF-8");
+            byte[] msg = GsonUtils.toJson(message.asStdMap()).getBytes("UTF-8");
             return send(msg);
         }else{
             logger.error("Send Error. Channel is closed.");

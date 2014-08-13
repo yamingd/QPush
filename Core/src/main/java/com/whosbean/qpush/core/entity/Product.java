@@ -30,10 +30,12 @@ public class Product {
      * iOS APNS生产证书路径
      */
     private String certPath;
+    private String certPass;
     /**
      * iOS APNS开发证书路径
      */
     private String devCertPath;
+    private String devCertPass;
 
     public Integer getId() {
         return id;
@@ -93,6 +95,22 @@ public class Product {
      */
     public void setClientTypeid(Integer clientTypeid) {
         this.clientTypeid = clientTypeid;
+    }
+
+    public String getCertPass() {
+        return certPass;
+    }
+
+    public void setCertPass(String certPass) {
+        this.certPass = certPass;
+    }
+
+    public String getDevCertPass() {
+        return devCertPass;
+    }
+
+    public void setDevCertPass(String devCertPass) {
+        this.devCertPass = devCertPass;
     }
 
     @Override

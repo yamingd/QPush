@@ -1,6 +1,8 @@
 package com.whosbean.qpush.gateway.dispatch;
 
+import com.whosbean.qpush.core.entity.ClientType;
 import com.whosbean.qpush.core.entity.Product;
+import com.whosbean.qpush.core.service.ClientService;
 import com.whosbean.qpush.gateway.keeper.ClientKeeper;
 import com.whosbean.qpush.pipe.PayloadCursor;
 import com.whosbean.qpush.pipe.PayloadQueue;
@@ -105,6 +107,9 @@ public class Dispatcher extends Thread {
         logger.info("Dispatcher Broadcast, " + product + ", total = " + items.size());
         for(Long id : items){
             this.doBoradcast(id);
+            if (this.product.getClientTypeid().intValue() == ClientType.iOS) {
+                this.doBoradcastIOS(id);
+            }
         }
         if (items.size() > 0){
             int size = items.size();
@@ -137,6 +142,20 @@ public class Dispatcher extends Thread {
         }
         for(int i=0; i<pages; i++){
             this.broadcastPool.submit(new BrocastThread(this.product, messageId, i, limit));
+        }
+    }
+
+    protected void doBoradcastIOS(Long messageId){
+        long total = ClientService.instance.countOfflineByType(this.product.getId(), ClientType.iOS);
+        logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
+        //每个线程发送100个客户端.
+        int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
+        long pages = total / limit;
+        if(total % limit > 0){
+            pages ++;
+        }
+        for(int i=0; i<pages; i++){
+            this.broadcastPool.submit(new BrocastIOSThread(this.product, messageId, i, limit));
         }
     }
 

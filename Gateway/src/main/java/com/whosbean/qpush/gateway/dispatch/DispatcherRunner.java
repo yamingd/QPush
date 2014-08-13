@@ -3,6 +3,7 @@ package com.whosbean.qpush.gateway.dispatch;
 import com.google.common.collect.Lists;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ProductService;
+import com.whosbean.qpush.gateway.keeper.APNSKeeper;
 import com.whosbean.qpush.gateway.keeper.ClientKeeper;
 import com.whosbean.qpush.gateway.keeper.ConnectionKeeper;
 import com.whosbean.qpush.pipe.PayloadQueue;
@@ -114,6 +115,7 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
         for (Product prod : prods){
             //注册产品
             ClientKeeper.registry(prod.getKey());
+            APNSKeeper.get(prod);
             //启动推送器
             Dispatcher dispatcher = new Dispatcher(serverConfig, prod, payloadQueue);
             dispatcherList.add(dispatcher);

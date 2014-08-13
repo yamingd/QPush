@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2014-08-12 16:35:39
+Date: 2014-08-13 15:30:19
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -103,7 +103,9 @@ CREATE TABLE `product` (
   `key` varchar(255) DEFAULT NULL,
   `secret` varchar(255) DEFAULT NULL,
   `clientTypeid` tinyint(2) DEFAULT NULL,
+  `certPass` varchar(255) DEFAULT NULL,
   `certPath` varchar(255) DEFAULT NULL,
+  `devCertPass` varchar(255) DEFAULT NULL,
   `devCertPath` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_product_key` (`key`)

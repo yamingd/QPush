@@ -54,7 +54,7 @@ public class Payload {
      */
     private Integer broadcast;
     /**
-     * 推送到的客户端表示（如是广播请忽略)
+     * 推送到的客户端用户(通常是用户id)标示（如是广播请忽略)
      */
     private List<String> clients;
     /**

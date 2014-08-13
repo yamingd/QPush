@@ -1,5 +1,8 @@
 package com.whosbean.qpush.core.entity;
 
+import com.whosbean.qpush.core.GsonUtils;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -162,5 +165,16 @@ public class Payload {
 
     public void setAppkey(String appkey) {
         this.appkey = appkey;
+    }
+
+    public Map asStdMap(){
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> aps = new HashMap<String, Object>();
+        aps.put("alert", this.getTitle());
+        aps.put("badge", this.getBadge());
+        aps.put("sound", this.getSound());
+        map.put("aps", aps);
+        map.put("userInfo", GsonUtils.asT(Map.class, this.getExtras()));
+        return map;
     }
 }

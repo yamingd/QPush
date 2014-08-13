@@ -128,4 +128,8 @@ public class Client {
     public void setLastOnline(Long lastOnline) {
         this.lastOnline = lastOnline;
     }
+
+    public boolean isDevice(int typeId){
+        return typeId == this.typeId.intValue();
+    }
 }

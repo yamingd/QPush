@@ -1,7 +1,5 @@
 package com.whosbean.qpush.gateway.dispatch;
 
-import com.notnoop.apns.ApnsService;
-import com.whosbean.qpush.core.GsonUtils;
 import com.whosbean.qpush.core.MetricBuilder;
 import com.whosbean.qpush.core.entity.Client;
 import com.whosbean.qpush.core.entity.ClientType;
@@ -46,7 +44,7 @@ public class BrocastIOSThread implements Callable<Boolean> {
         if(message.getClients() == null || message.getClients().size() == 0){
             List<Client> clients = ClientService.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
             for (Client c : clients){
-                this.pushToApple(c, message);
+                APNSKeeper.push(this.product, c, message);
             }
             try {
                 PayloadService.instance.addHisotry(message, null, clients.size(), true);
@@ -62,13 +60,4 @@ public class BrocastIOSThread implements Callable<Boolean> {
 
         return true;
     }
-
-    private void pushToApple(Client cc, Payload message){
-        String json = GsonUtils.toJson(message.asStdMap());
-        ApnsService service = APNSKeeper.get(this.product);
-        if (service != null){
-            service.push(cc.getDeviceToken(), json);
-        }
-    }
-
 }

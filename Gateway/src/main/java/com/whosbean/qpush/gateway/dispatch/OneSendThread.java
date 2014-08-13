@@ -1,7 +1,5 @@
 package com.whosbean.qpush.gateway.dispatch;
 
-import com.notnoop.apns.ApnsService;
-import com.whosbean.qpush.core.GsonUtils;
 import com.whosbean.qpush.core.MetricBuilder;
 import com.whosbean.qpush.core.entity.Client;
 import com.whosbean.qpush.core.entity.ClientType;
@@ -67,7 +65,7 @@ public class OneSendThread implements Callable<Boolean> {
                         logger.error("Client's deviceToken not found. client=" + client);
                         continue;
                     }
-                    this.pushToApple(cc, message);
+                    APNSKeeper.push(this.product, cc, message);
                     total ++;
                 }
             }
@@ -85,11 +83,4 @@ public class OneSendThread implements Callable<Boolean> {
         return ok;
     }
 
-    private void pushToApple(Client cc, Payload message){
-        String json = GsonUtils.toJson(message.asStdMap());
-        ApnsService service = APNSKeeper.get(this.product);
-        if (service != null){
-            service.push(cc.getDeviceToken(), json);
-        }
-    }
 }

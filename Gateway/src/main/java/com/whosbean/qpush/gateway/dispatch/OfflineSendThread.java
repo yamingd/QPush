@@ -33,12 +33,16 @@ public class OfflineSendThread implements Callable<Boolean> {
         }
         boolean ok = false;
         if(message.getClients()!=null){
+            int total = 0;
             for (String client : message.getClients()){
                 Connection c = ConnectionKeeper.get(product.getKey(), client);
-                ok = c.send(message);
+                if(c != null) {
+                    ok = c.send(message);
+                    total ++;
+                }
             }
             try {
-                PayloadService.instance.addHisotry(message, null, message.getClients().size(), ok);
+                PayloadService.instance.addHisotry(message, null, total, ok);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -4,7 +4,10 @@ import com.google.common.collect.Maps;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.ApnsServiceBuilder;
+import com.whosbean.qpush.core.GsonUtils;
+import com.whosbean.qpush.core.entity.Client;
 import com.whosbean.qpush.core.entity.ClientType;
+import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.gateway.ServerConfig;
 
@@ -37,5 +40,22 @@ public class APNSKeeper {
             mapping.put(product.getId(), service);
         }
         return service;
+    }
+
+    public static void push(Product product, Client cc, Payload message){
+        String json = GsonUtils.toJson(message.asStdMap());
+        ApnsService service = get(product);
+        if (service != null){
+            try
+            {
+                System.out.println("Pushing notification.");
+                service.push(cc.getDeviceToken(), json);
+            }
+            catch(Exception e)
+            {
+                //TODO error handling
+                System.out.println("Push failed.");
+            }
+        }
     }
 }

@@ -36,10 +36,9 @@ public class ConnectionKeeper {
         int t = 0;
         Collection<Integer> cs = ClientKeeper.gets(productId);
         for (Integer cid : cs){
-            Connection c = pools.get(cid);
+            Connection c = pools.remove(cid);
             if (c != null) {
                 c.close();
-                pools.remove(cid);
                 t++;
             }
         }
@@ -60,7 +59,7 @@ public class ConnectionKeeper {
         Integer cid = ClientKeeper.get(productId, token);
         if ( cid != null){
             //关闭旧连接.
-            Connection c = pools.get(cid);
+            Connection c = pools.remove(cid);
             if (c != null) {
                 c.close();
                 ServerMetrics.decrConnection();

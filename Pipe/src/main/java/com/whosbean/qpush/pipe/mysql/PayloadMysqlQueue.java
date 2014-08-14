@@ -27,12 +27,12 @@ public class PayloadMysqlQueue implements PayloadQueue {
     }
 
     @Override
-    public List<Long> getNormalItems(PayloadCursor cursor) {
+    public List<Payload> getNormalItems(PayloadCursor cursor) {
         return this.payloadService.findNormalList(cursor.getProduct().getId(), cursor.getStartId(), cursor.getPage(), cursor.getLimit());
     }
 
     @Override
-    public List<Long> getBroadcastItems(PayloadCursor cursor) {
+    public List<Payload> getBroadcastItems(PayloadCursor cursor) {
         return this.payloadService.findBrodcastList(cursor.getProduct().getId(), cursor.getStartId(), cursor.getPage(), cursor.getLimit());
     }
 

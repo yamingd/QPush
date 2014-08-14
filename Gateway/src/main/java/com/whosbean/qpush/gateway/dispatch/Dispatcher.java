@@ -1,6 +1,7 @@
 package com.whosbean.qpush.gateway.dispatch;
 
 import com.whosbean.qpush.core.entity.ClientType;
+import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ClientService;
 import com.whosbean.qpush.gateway.keeper.ClientKeeper;
@@ -103,9 +104,9 @@ public class Dispatcher extends Thread {
     }
 
     protected void doBroadcastPush() {
-        List<Long> items = queue.getBroadcastItems(this.broadcastCursor);
+        List<Payload> items = queue.getBroadcastItems(this.broadcastCursor);
         logger.info("Dispatcher Broadcast, " + product + ", total = " + items.size());
-        for(Long id : items){
+        for(Payload id : items){
             this.doBoradcast(id);
             if (this.product.getClientTypeid().intValue() == ClientType.iOS) {
                 this.doBoradcastIOS(id);
@@ -113,25 +114,25 @@ public class Dispatcher extends Thread {
         }
         if (items.size() > 0){
             int size = items.size();
-            broadcastCursor.setStartId(items.get(size - 1));
+            broadcastCursor.setStartId(items.get(size - 1).getId());
             broadcastCursor.setTs(new Date());
         }
     }
 
     protected void doSinglePush() {
-        List<Long> items = queue.getNormalItems(this.singleCursor);
+        List<Payload> items = queue.getNormalItems(this.singleCursor);
         logger.info("Dispatcher Single, " + product + ", total = " + items.size());
-        for(Long id : items){
+        for(Payload id : items){
             this.singlePool.submit(new OneSendThread(this.product, id));
         }
         if (items.size() > 0){
             int size = items.size();
-            singleCursor.setStartId(items.get(size - 1));
+            singleCursor.setStartId(items.get(size - 1).getId());
             singleCursor.setTs(new Date());
         }
     }
 
-    protected void doBoradcast(Long messageId){
+    protected void doBoradcast(Payload message){
         int total = ClientKeeper.count(this.product.getKey());
         logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
         //每个线程发送100个客户端.
@@ -141,11 +142,11 @@ public class Dispatcher extends Thread {
             pages ++;
         }
         for(int i=0; i<pages; i++){
-            this.broadcastPool.submit(new BroadcastThread(this.product, messageId, i, limit));
+            this.broadcastPool.submit(new BroadcastThread(this.product, message, i, limit));
         }
     }
 
-    protected void doBoradcastIOS(Long messageId){
+    protected void doBoradcastIOS(Payload message){
         long total = ClientService.instance.countOfflineByType(this.product.getId(), ClientType.iOS);
         logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
         //每个线程发送100个客户端.
@@ -155,7 +156,7 @@ public class Dispatcher extends Thread {
             pages ++;
         }
         for(int i=0; i<pages; i++){
-            this.broadcastPool.submit(new BroadcastIOSThread(this.product, messageId, i, limit));
+            this.broadcastPool.submit(new BroadcastIOSThread(this.product, message, i, limit));
         }
     }
 

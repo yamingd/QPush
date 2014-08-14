@@ -92,16 +92,16 @@ public class PayloadService extends BaseService {
         }
     }
 
-    public List<Long> findNormalList(int productId, long start, int page, int limit){
+    public List<Payload> findNormalList(int productId, long start, int page, int limit){
         String sql = "select id from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
-        return mainJdbc.queryForList(sql, Long.class, productId, 0, PayloadStatus.Pending, start, offset, limit);
+        return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 0, PayloadStatus.Pending, start, offset, limit);
     }
 
-    public List<Long> findBrodcastList(int productId, long start, int page, int limit){
+    public List<Payload> findBrodcastList(int productId, long start, int page, int limit){
         String sql = "select id from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
-        return mainJdbc.queryForList(sql, Long.class, productId, 1, PayloadStatus.Pending, start, offset, limit);
+        return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 1, PayloadStatus.Pending, start, offset, limit);
     }
 
     public void addHisotry(Payload message, String userId, int counting, boolean ok) {

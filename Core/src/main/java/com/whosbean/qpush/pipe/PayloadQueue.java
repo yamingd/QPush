@@ -19,14 +19,14 @@ public interface PayloadQueue {
      * @param cursor
      * @return
      */
-    List<Long> getNormalItems(PayloadCursor cursor);
+    List<Payload> getNormalItems(PayloadCursor cursor);
 
     /**
      * 广播消息
      * @param cursor
      * @return
      */
-    List<Long> getBroadcastItems(PayloadCursor cursor);
+    List<Payload> getBroadcastItems(PayloadCursor cursor);
 
     /**
      * 添加项.

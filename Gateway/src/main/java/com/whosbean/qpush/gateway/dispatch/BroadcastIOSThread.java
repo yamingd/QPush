@@ -22,14 +22,14 @@ public class BroadcastIOSThread implements Callable<Boolean> {
 
     protected static Logger logger = LoggerFactory.getLogger(BroadcastIOSThread.class);
 
-    private long messageId;
+    private Payload message;
     private int start = 0;
     private int limit = 100;
     private Product product;
 
-    public BroadcastIOSThread(Product product, long messageId, int start, int limit) {
+    public BroadcastIOSThread(final Product product, final Payload message, int start, int limit) {
         super();
-        this.messageId = messageId;
+        this.message = message;
         this.start = start;
         this.limit = limit;
         this.product = product;
@@ -37,7 +37,6 @@ public class BroadcastIOSThread implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
-        Payload message = PayloadService.instance.get(this.messageId);
         if(message == null){
             return true;
         }

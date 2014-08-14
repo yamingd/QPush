@@ -29,7 +29,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     @Autowired
     private ShardedJedisPool shardedJedisPool;
 
-    private List<Long> emptyList = Lists.newArrayList();
+    private List<Payload> emptyList = Lists.newArrayList();
 
     @Override
     public void init() {
@@ -37,17 +37,17 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     }
 
     @Override
-    public List<Long> getNormalItems(PayloadCursor cursor) {
+    public List<Payload> getNormalItems(PayloadCursor cursor) {
         ShardedJedis jedis =  shardedJedisPool.getResource();
         try {
             String key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 0);
-            List<Long> ids = Lists.newArrayList();
+            List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
                 String t = jedis.lpop(key);
                 if (StringUtils.isBlank(t)){
                     break;
                 }
-                ids.add(Long.parseLong(t));
+                ids.add(payloadService.get(Long.parseLong(t)));
             }
             if (ids.size() > 0){
                 jedis.decrBy(QPUSH_PENDING, ids.size());
@@ -63,17 +63,17 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     }
 
     @Override
-    public List<Long> getBroadcastItems(PayloadCursor cursor) {
+    public List<Payload> getBroadcastItems(PayloadCursor cursor) {
         ShardedJedis jedis =  shardedJedisPool.getResource();
         try {
             String key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 1);
-            List<Long> ids = Lists.newArrayList();
+            List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
                 String t = jedis.lpop(key);
                 if (StringUtils.isBlank(t)){
                     break;
                 }
-                ids.add(Long.parseLong(t));
+                ids.add(payloadService.get(Long.parseLong(t)));
             }
             if (ids.size() > 0){
                 jedis.decrBy(QPUSH_PENDING, ids.size());

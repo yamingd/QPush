@@ -26,18 +26,17 @@ public class OneSendThread implements Callable<Boolean> {
 
     protected static Logger logger = LoggerFactory.getLogger(OneSendThread.class);
 
-    private long messageId;
+    private Payload message;
     private Product product;
 
-    public OneSendThread(Product product, long messageId) {
+    public OneSendThread(final Product product, final Payload message) {
         super();
-        this.messageId = messageId;
+        this.message = message;
         this.product = product;
     }
 
     @Override
     public Boolean call() throws Exception {
-        Payload message = PayloadService.instance.get(this.messageId);
         if(message == null){
             return true;
         }

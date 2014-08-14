@@ -5,6 +5,7 @@ import com.whosbean.qpush.core.entity.Payload;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ public class Connection {
             logger.error("Send Error.", cf.cause());
             return false;
         }
+        ReferenceCountUtil.release(data);
         long total = ServerMetrics.incrPushTotal(true);
         logger.error("Send OK. totalPush=" + total);
         return true;

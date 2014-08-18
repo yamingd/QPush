@@ -51,13 +51,15 @@ public class BroadcastThread implements Callable<Boolean> {
                 int cid = temp[s+i];
                 Connection c = ConnectionKeeper.get(cid);
                 if(c!=null){
-                    c.send(message);
-                    t0++;
+                    boolean ok = c.send(message);
+                    if(ok) {
+                        t0++;
+                    }
                 }
             }
 
             try {
-                PayloadService.instance.addHisotry(message, null, t0, true);
+                PayloadService.instance.updateSendStatus(message, t0);
             } catch (Exception e) {
                 e.printStackTrace();
             }

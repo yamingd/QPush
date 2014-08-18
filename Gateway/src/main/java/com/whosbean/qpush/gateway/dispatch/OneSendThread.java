@@ -47,7 +47,9 @@ public class OneSendThread implements Callable<Boolean> {
                 Connection c = ConnectionKeeper.get(product.getKey(), client);
                 if(c != null) {
                     ok = c.send(message);
-                    total ++;
+                    if(ok) {
+                        total++;
+                    }
                 }else{
                     if (product.getClientTypeid().intValue() != ClientType.iOS){
                         continue;
@@ -74,7 +76,7 @@ public class OneSendThread implements Callable<Boolean> {
             }
 
             try {
-                PayloadService.instance.addHisotry(message, null, total, ok);
+                PayloadService.instance.updateSendStatus(message, total);
             } catch (Exception e) {
                 e.printStackTrace();
             }

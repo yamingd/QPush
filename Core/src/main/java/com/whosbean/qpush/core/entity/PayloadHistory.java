@@ -8,11 +8,10 @@ package com.whosbean.qpush.core.entity;
 public class PayloadHistory {
 
     private Long id;
-    private String title;
+    private Integer status;
     private Integer productId;
     private String userId;
-    private Integer totalUsers;
-    private Long sendAt;
+    private Long createAt;
 
     public Long getId() {
         return id;
@@ -20,14 +19,6 @@ public class PayloadHistory {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public Integer getProductId() {
@@ -46,19 +37,19 @@ public class PayloadHistory {
         this.userId = userId;
     }
 
-    public Long getSendAt() {
-        return sendAt;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setSendAt(Long sendAt) {
-        this.sendAt = sendAt;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    public Integer getTotalUsers() {
-        return totalUsers;
+    public Long getCreateAt() {
+        return createAt;
     }
 
-    public void setTotalUsers(Integer totalUsers) {
-        this.totalUsers = totalUsers;
+    public void setCreateAt(Long createAt) {
+        this.createAt = createAt;
     }
 }

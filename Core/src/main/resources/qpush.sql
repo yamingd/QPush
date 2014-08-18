@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2014-08-13 15:30:19
+Date: 2014-08-18 11:07:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -47,10 +47,11 @@ CREATE TABLE `payload` (
   `extras` varchar(255) DEFAULT NULL,
   `sound` varchar(255) DEFAULT NULL,
   `productId` int(11) DEFAULT NULL,
-  `totalUsers` int(11) DEFAULT NULL,
+  `totalUsers` int(11) DEFAULT '0',
   `createAt` int(11) DEFAULT NULL,
   `statusId` tinyint(2) DEFAULT NULL,
   `broadcast` tinyint(1) DEFAULT NULL,
+  `sentDate` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_payload_list` (`productId`,`broadcast`,`statusId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -82,10 +83,10 @@ CREATE TABLE `payload_client` (
 DROP TABLE IF EXISTS `payload_history`;
 CREATE TABLE `payload_history` (
   `id` bigint(20) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL,
   `productId` int(11) DEFAULT NULL,
-  `totalUsers` int(11) DEFAULT NULL,
-  `sendAt` bigint(20) DEFAULT NULL,
+  `status` tinyint(2) DEFAULT NULL,
+  `createAt` int(11) DEFAULT NULL,
   KEY `ix_payload_history_id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

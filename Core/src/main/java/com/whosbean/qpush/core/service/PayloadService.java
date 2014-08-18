@@ -1,6 +1,7 @@
 package com.whosbean.qpush.core.service;
 
 import com.google.common.collect.Lists;
+import com.whosbean.qpush.core.MetricBuilder;
 import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.PayloadHistory;
 import com.whosbean.qpush.core.entity.PayloadStatus;
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -32,6 +34,7 @@ public class PayloadService extends BaseService {
     protected static final RowMapper<PayloadHistory> PayloadHistory_ROWMAPPER = new BeanPropertyRowMapper<PayloadHistory>(
             PayloadHistory.class);
 
+    private ThreadPoolTaskExecutor jdbcExecutor = null;
 
     public Payload get(long id){
         String sql = "select * from payload where id = ?";
@@ -54,11 +57,6 @@ public class PayloadService extends BaseService {
         }
 
         final String sql = "insert into payload(title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast)values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        if (payload.getClients() != null){
-            payload.setTotalUsers(payload.getClients().size());
-        }else{
-            payload.setTotalUsers(-1);
-        }
 
         KeyHolder holder = new GeneratedKeyHolder();
         this.mainJdbc.update(new PreparedStatementCreator() {
@@ -72,7 +70,7 @@ public class PayloadService extends BaseService {
                 ps.setObject(3, payload.getExtras());
                 ps.setObject(4, payload.getSound());
                 ps.setObject(5, payload.getProductId());
-                ps.setObject(6, payload.getTotalUsers());
+                ps.setObject(6, 0);
                 ps.setObject(7, new Date().getTime()/1000);
                 ps.setObject(8, PayloadStatus.Pending);
                 ps.setObject(9, payload.getBroadcast());
@@ -104,15 +102,23 @@ public class PayloadService extends BaseService {
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 1, PayloadStatus.Pending, start, offset, limit);
     }
 
-    public void addHisotry(Payload message, String userId, int counting, boolean ok) {
-        String sql = "insert into payload_history(id, title, productId, userId, totalUsers, sendAt)values(?, ?, ?, ?, ?, ?)";
-        this.mainJdbc.update(sql, message.getId(), message.getTitle(), message.getProductId(), userId, counting, new Date().getTime()/1000);
+    public void updateSendStatus(final Payload message, final int counting) {
 
-        sql = "update payload set statusId=? where id = ?";
-        this.mainJdbc.update(sql, PayloadStatus.Sent, message.getId());
+        jdbcExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
 
-        sql = "update payload_client set statusId=? where id = ?";
-        this.mainJdbc.update(sql, PayloadStatus.Sent, message.getId());
+                String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
+                mainJdbc.update(sql, PayloadStatus.Sent, counting, new Date().getTime()/1000, message.getId());
+
+                sql = "update payload_client set statusId=? where id = ?";
+                mainJdbc.update(sql, PayloadStatus.Sent, message.getId());
+
+                MetricBuilder.jdbcUpdateMeter.mark(2);
+            }
+        });
+
+
     }
 
     public Payload findLatest(int productId, String userId){
@@ -127,5 +133,13 @@ public class PayloadService extends BaseService {
     @Override
     public void afterPropertiesSet() throws Exception {
         instance = this;
+        int limit = Integer.parseInt(appConfigs.getProperty("jdbc.executors", "100"));
+
+        //实际扫描线程池
+        jdbcExecutor = new ThreadPoolTaskExecutor();
+        jdbcExecutor.setCorePoolSize(limit/5);
+        jdbcExecutor.setMaxPoolSize(limit);
+        jdbcExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        jdbcExecutor.afterPropertiesSet();
     }
 }

@@ -58,6 +58,7 @@ public class Payload {
      * 是否是广播(1/0)
      */
     private Integer broadcast;
+    private long sentDate;
 
     public Long getId() {
         return id;
@@ -165,6 +166,14 @@ public class Payload {
 
     public void setAppkey(String appkey) {
         this.appkey = appkey;
+    }
+
+    public long getSentDate() {
+        return sentDate;
+    }
+
+    public void setSentDate(long sentDate) {
+        this.sentDate = sentDate;
     }
 
     public Map asStdMap(){

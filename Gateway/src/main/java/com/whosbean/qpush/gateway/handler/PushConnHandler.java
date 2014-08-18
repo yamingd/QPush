@@ -7,6 +7,7 @@ import com.whosbean.qpush.core.entity.ClientType;
 import com.whosbean.qpush.core.service.ClientService;
 import com.whosbean.qpush.gateway.Commands;
 import com.whosbean.qpush.gateway.Connection;
+import com.whosbean.qpush.gateway.ServerConfig;
 import com.whosbean.qpush.gateway.ServerMetrics;
 import com.whosbean.qpush.gateway.keeper.ConnectionKeeper;
 import io.netty.buffer.ByteBuf;
@@ -28,9 +29,11 @@ public class PushConnHandler extends ChannelInboundHandlerAdapter {
     private ThreadPoolTaskExecutor poolTaskExecutor;
 
     public PushConnHandler(){
+        int limit = Integer.parseInt(ServerConfig.getConf().getProperty("handler.executors", "100"));
+
         poolTaskExecutor = new ThreadPoolTaskExecutor();
-        poolTaskExecutor.setCorePoolSize(10);
-        poolTaskExecutor.setMaxPoolSize(1000);
+        poolTaskExecutor.setCorePoolSize(limit/10);
+        poolTaskExecutor.setMaxPoolSize(limit);
         poolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         poolTaskExecutor.afterPropertiesSet();
     }

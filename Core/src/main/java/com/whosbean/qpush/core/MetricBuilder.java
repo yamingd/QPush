@@ -28,6 +28,7 @@ public class MetricBuilder {
 
     }
 
+    public static final Meter jdbcUpdateMeter = MetricBuilder.registry.meter(MetricRegistry.name("qpush.jdbc", "update"));
     /**
      * 所有推送
      */

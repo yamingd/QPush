@@ -46,7 +46,7 @@ public class BroadcastIOSThread implements Callable<Boolean> {
                 APNSKeeper.push(this.product, c, message);
             }
             try {
-                PayloadService.instance.addHisotry(message, null, clients.size(), true);
+                PayloadService.instance.updateSendStatus(message, clients.size());
             } catch (Exception e) {
                 e.printStackTrace();
             }

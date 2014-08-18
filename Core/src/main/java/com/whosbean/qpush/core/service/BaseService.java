@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import java.util.Properties;
+
 /**
  * Created by yaming_deng on 14-8-8.
  */
@@ -22,4 +24,7 @@ public abstract class BaseService implements InitializingBean {
     @Autowired
     @Qualifier("mainJdbcNamed")
     protected NamedParameterJdbcTemplate mainJdbcNamed;
+
+    @Autowired
+    protected Properties appConfigs;
 }

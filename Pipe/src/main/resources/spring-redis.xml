@@ -42,4 +42,6 @@
 
     <bean id="payloadRedisQueue" class="com.whosbean.qpush.pipe.redis.PayloadRedisQueue" />
 
+    <bean id="payloadRedisDQueue" class="com.whosbean.qpush.pipe.redis.PayloadRedisDQueue" />
+
 </beans>

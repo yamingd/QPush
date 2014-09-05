@@ -31,7 +31,7 @@
         <constructor-arg index="1" value="${redis.port}" />
     </bean>
 
-    <bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool">
+    <bean id="redisBucket" class="com.whosbean.qpush.pipe.redis.RedisBucket">
         <constructor-arg index="0" ref="jedisPoolConfig" />
         <constructor-arg index="1">
             <list>

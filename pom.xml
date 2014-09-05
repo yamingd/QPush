@@ -70,5 +70,11 @@
             <version>1.0.13</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack</artifactId>
+            <version>0.6.8</version>
+        </dependency>
+
     </dependencies>
 </project>

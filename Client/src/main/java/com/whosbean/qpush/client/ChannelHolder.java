@@ -1,14 +1,14 @@
 package com.whosbean.qpush.client;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.whosbean.qpush.core.entity.Payload;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +31,7 @@ public class ChannelHolder {
     private static AtomicInteger seq = new AtomicInteger();
     private static final Bootstrap b = new Bootstrap(); // (1)
     private static EventLoopGroup workerGroup;
+    private static MessagePack messagePack = new MessagePack();
 
     static{
         try {
@@ -99,9 +100,9 @@ public class ChannelHolder {
         channelList.remove(c);
     }
 
-    public static boolean send(Payload payload){
+    public static boolean send(Payload payload) throws IOException {
         Channel c = get();
-        byte[] bytes = toJson(payload).getBytes();
+        byte[] bytes = toBytes(payload);
         final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
         data.writeBytes(bytes);
         ChannelFuture cf = c.writeAndFlush(data);
@@ -117,12 +118,8 @@ public class ChannelHolder {
         return false;
     }
 
-    public static String toJson(Object obj) {
-        //创建GsonBuilder
-        GsonBuilder builder = new GsonBuilder();
-        //创建Gson并进行转换
-        Gson gson = builder.create();
-        return gson.toJson(obj);
+    public static byte[] toBytes(Object obj) throws IOException {
+        return messagePack.write(obj);
     }
 
     public static void close(){

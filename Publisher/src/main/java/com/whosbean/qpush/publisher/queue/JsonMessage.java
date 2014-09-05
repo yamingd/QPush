@@ -1,5 +1,7 @@
 package com.whosbean.qpush.publisher.queue;
 
+import com.whosbean.qpush.core.entity.Payload;
+
 import java.io.Serializable;
 
 /**
@@ -7,13 +9,13 @@ import java.io.Serializable;
  */
 public class JsonMessage implements Serializable {
 
-    private String body;
+    private Payload body;
 
-    public String getBody() {
+    public Payload getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(Payload body) {
         this.body = body;
     }
 }

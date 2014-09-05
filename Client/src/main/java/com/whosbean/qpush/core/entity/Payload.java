@@ -1,6 +1,11 @@
-package com.whosbean.qpush.client;
+package com.whosbean.qpush.core.entity;
 
 
+import com.whosbean.qpush.client.ChannelHolder;
+import org.msgpack.annotation.Message;
+
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +18,8 @@ import java.util.Map;
  *
  * Created by yaming_deng on 14-8-11.
  */
-public class Payload {
+@Message
+public class Payload implements Serializable {
 
     /**
      * {
@@ -119,7 +125,7 @@ public class Payload {
     }
 
 
-    public boolean send(){
+    public boolean send() throws IOException {
         return ChannelHolder.send(this);
     }
 }

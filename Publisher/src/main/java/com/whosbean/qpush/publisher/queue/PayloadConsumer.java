@@ -1,7 +1,6 @@
 package com.whosbean.qpush.publisher.queue;
 
 import com.lmax.disruptor.EventHandler;
-import com.whosbean.qpush.core.GsonUtils;
 import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ProductService;
@@ -51,7 +50,7 @@ public class PayloadConsumer implements EventHandler<JsonMessage> {
          *  }
          */
 
-        Payload payload = GsonUtils.asT(Payload.class, event.getBody());
+        Payload payload = event.getBody();
         Product product = ProductService.instance.findByKey(payload.getAppkey());
         if (product != null) {
             payload.setProductId(product.getId());

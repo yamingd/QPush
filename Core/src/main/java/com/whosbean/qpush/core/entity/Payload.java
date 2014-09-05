@@ -1,7 +1,9 @@
 package com.whosbean.qpush.core.entity;
 
 import com.whosbean.qpush.core.GsonUtils;
+import org.msgpack.annotation.Message;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,8 @@ import java.util.Map;
  * 消息结构体. 参考苹果消息规范
  * Created by yaming_deng on 14-8-6.
  */
-public class Payload {
+@Message
+public class Payload implements Serializable {
 
     /**
      * 消息id

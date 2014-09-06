@@ -9,7 +9,9 @@ QPush has two major parts. one is **Gateway** which is for maintain connection b
 
 QPush uses **MySQL** as storage. and also uses **Redis** to pipeline the messages out to **Gateway**
 
-![A Simple diagram of QPush](https://raw.githubusercontent.com/yamingd/QPush/master/Overall.png)
+
+![A Simple diagram of QPush](https://raw.githubusercontent.com/yamingd/QPush/master/Overall-02.png)
+
 
 Payload follows Apple's APNS message structure. as following
 ```

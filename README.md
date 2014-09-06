@@ -4,8 +4,19 @@ QPush
 a push server for mobile apps.
 it is based on Netty. 
 
-QPush has two major parts. one is **Gateway** which is for maintain connection between mobile apps and Netty. the other is
-**Publisher** which is receiving incoming message or payload from app server.
+QPush has four major parts. 
+* first of all, it is **Gateway** which is the most important part, and for maintain connection between mobile apps and Netty. 
+* the second part is the **Publisher**, which is receiving incoming message or payload from app server.
+* the third is **Pipe**, it flows the message from **Publisher** to **Gateway** and to the mobile phone at the end.
+* the last one is **Client**, it connects to **Publisher** and keept this connection. **Your App Server** can use **Client** to send message 
+to **Publisher** directly, by providing some simple configuration such as the **Publisher** ip address. 
+the overall as following( from qpush_client.properties)
+```
+host=127.0.0.1
+port=8082
+thread_pool=100
+```
+
 
 QPush uses **MySQL** as storage. and also uses **Redis** to pipeline the messages out to **Gateway**
 

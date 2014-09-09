@@ -36,7 +36,15 @@ public class ChannelHolder {
     static{
         try {
             props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("qpush_client.properties"));
-            connect();
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("connecting to QPush server.");
+                    connect();
+                }
+            });
+            thread.start();
+
         } catch (FileNotFoundException e) {
             logger.error("配置文件未找到", e);
         } catch (IOException e) {

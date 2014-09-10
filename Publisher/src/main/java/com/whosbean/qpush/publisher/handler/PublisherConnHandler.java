@@ -36,9 +36,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
 
         MetricBuilder.recvMeter.mark();
 
-        ByteBuf b = (ByteBuf)msg;
-        byte[] dd = new byte[b.readableBytes()];
-        b.readBytes(dd);
+        byte[] dd = (byte[])msg;
 
         try {
             PayloadMessage message = MessageUtils.asT(PayloadMessage.class, dd);

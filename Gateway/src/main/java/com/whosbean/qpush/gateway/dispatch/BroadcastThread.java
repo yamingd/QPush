@@ -58,7 +58,11 @@ public class BroadcastThread implements Callable<Integer> {
                 }
             }
 
-            progress.getCountDownLatch().wait();
+            try {
+                progress.getCountDownLatch().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             int t0 = progress.getSuccess().get();
 

@@ -69,7 +69,7 @@ public class OneSendThread implements Callable<Integer> {
             }
 
             try {
-                progress.getCountDownLatch().wait();
+                progress.getCountDownLatch().await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -48,7 +48,11 @@ public class BroadcastIOSThread implements Callable<Integer> {
                 APNSKeeper.push(progress, this.product, c, message);
             }
 
-            progress.getCountDownLatch().wait();
+            try {
+                progress.getCountDownLatch().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             int total = progress.getSuccess().get();
             try {

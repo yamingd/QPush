@@ -175,4 +175,22 @@ public class Payload implements Serializable {
         this.extras = MessageUtils.toJson(message.ext);
         this.broadcast = message.broadcast ? 1 : 0;
     }
+
+    @Override
+    public String toString() {
+        return "Payload{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", badge=" + badge +
+                ", extras='" + extras + '\'' +
+                ", sound='" + sound + '\'' +
+                ", productId=" + productId +
+                ", totalUsers=" + totalUsers +
+                ", createAt=" + createAt +
+                ", statusId=" + statusId +
+                ", clients=" + clients +
+                ", broadcast=" + broadcast +
+                ", sentDate=" + sentDate +
+                '}';
+    }
 }

@@ -11,6 +11,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.bytes.ByteArrayDecoder;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
@@ -44,16 +49,14 @@ public class MobileApp {
         }
 
         protected void printMsg(ChannelHandlerContext ctx, Object msg){
-            ByteBuf b = (ByteBuf)msg;
-            byte[] dd = new byte[b.readableBytes()];
-            b.readBytes(dd);
-
+            byte[] dd = (byte[])msg;
+            System.out.println("message size: " + dd.length);
             try {
                 APNSMessage event = MessageUtils.asT(APNSMessage.class, dd);
                 if (event != null && event.aps != null) {
-                    System.out.println("channelRead: " + ctx.channel() + " @ " + event);
+                    System.out.println("channelRead: " + dd.length + " @ " + event);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -65,8 +68,13 @@ public class MobileApp {
 
             printMsg(ctx, msg);
 
-            ctx.fireChannelRead(msg);
+            ReferenceCountUtil.release(msg);
+        }
 
+        @Override
+        public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+            super.channelReadComplete(ctx);
+            ctx.flush();
         }
 
         @Override
@@ -118,12 +126,6 @@ public class MobileApp {
 
         pingThread.start();
 
-        try {
-            Thread.sleep(10 * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void ping() throws IOException {
@@ -170,7 +172,15 @@ public class MobileApp {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new MobileAppClientHandler());
+
+                    ChannelPipeline pipeline = ch.pipeline();
+                    pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                    pipeline.addLast("bytesDecoder",new ByteArrayDecoder());
+
+                    pipeline.addLast("frameEncoder", new LengthFieldPrepender(4, false));
+                    pipeline.addLast("bytesEncoder", new ByteArrayEncoder());
+
+                    pipeline.addLast("handler", new MobileAppClientHandler());
                 }
             });
 

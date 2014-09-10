@@ -15,6 +15,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
@@ -58,20 +59,16 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         logger.info("channelRead: " + ctx.channel().hashCode());
         MetricBuilder.requestMeter.mark();
 
-        ByteBuf b = (ByteBuf)msg;
-        byte[] dd = new byte[b.readableBytes()];
-        b.readBytes(dd);
-
-        ctx.fireChannelRead(msg);
-
         final APNSEvent cc;
         try {
-            cc = MessageUtils.asT(APNSEvent.class, dd);
+            cc = MessageUtils.asT(APNSEvent.class, (byte[])msg);
         } catch (IOException e) {
             logger.error("Invalid Data Package.", e);
             ack(ctx, null);
             return;
         }
+
+        ReferenceCountUtil.release(msg);
 
         if (cc.typeId.intValue() == ClientType.Android){
             MetricBuilder.clientAndroidMeter.mark();
@@ -134,6 +131,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         logger.info("channelReadComplete: " + ctx.channel().hashCode());
+        ctx.flush();
     }
 
     /**

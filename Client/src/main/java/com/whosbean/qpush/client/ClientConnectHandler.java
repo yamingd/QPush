@@ -1,6 +1,5 @@
 package com.whosbean.qpush.client;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -15,23 +14,11 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         QPushClient.save(ctx.channel());
     }
 
-    protected void printMsg(Object msg){
-        ByteBuf b = (ByteBuf)msg;
-        byte[] dd = new byte[b.readableBytes()];
-        b.readBytes(dd);
-        String jsonString = new String(dd);
-        System.out.println(jsonString);
-    }
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
-        System.out.println("channelRead: " + ctx.channel());
-
-        printMsg(msg);
-
+        String jsonString = new String((byte[])msg);
+        System.out.println("channelRead: " + ctx.channel() + " --> " + jsonString);
         ctx.fireChannelRead(msg);
-
     }
 
     @Override

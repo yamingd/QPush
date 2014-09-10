@@ -94,7 +94,7 @@ public class DisruptorContext implements InitializingBean, ApplicationContextAwa
         logger.info("Disruptor Queue. BufferSize=" + bufferSize);
 
         // Construct the Disruptor
-        disruptor = new Disruptor(factory, bufferSize,
+        disruptor = new Disruptor<JsonMessage>(factory, bufferSize,
                 executor,
                 ProducerType.SINGLE,
                 new com.lmax.disruptor.BusySpinWaitStrategy()); //多核

@@ -5,6 +5,7 @@ import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.PayloadService;
 import com.whosbean.qpush.gateway.Connection;
+import com.whosbean.qpush.gateway.SentProgress;
 import com.whosbean.qpush.gateway.keeper.ClientKeeper;
 import com.whosbean.qpush.gateway.keeper.ConnectionKeeper;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import java.util.concurrent.Callable;
  * 广播推送.
  * Created by yaming_deng on 14-8-8.
  */
-public class BroadcastThread implements Callable<Boolean> {
+public class BroadcastThread implements Callable<Integer> {
 
     protected static Logger logger = LoggerFactory.getLogger(BroadcastThread.class);
 
@@ -35,28 +36,31 @@ public class BroadcastThread implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Integer call() throws Exception {
         if(message == null){
-            return true;
+            return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){
-            Collection<Integer> cids = ClientKeeper.gets(product.getKey());
+            Collection<Integer> cids = ClientKeeper.gets(product.getAppKey());
             int s = start * limit;
             if(cids.size() < limit){
                 limit = cids.size();
             }
             Integer[] temp = cids.toArray(new Integer[0]);
-            int t0 = 0;
+            SentProgress progress = new SentProgress(limit);
             for(int i=0; i<limit; i++){
                 int cid = temp[s+i];
                 Connection c = ConnectionKeeper.get(cid);
                 if(c!=null){
-                    boolean ok = c.send(message);
-                    if(ok) {
-                        t0++;
-                    }
+                    c.send(progress, message);
+                }else{
+                    progress.incrFailed();
                 }
             }
+
+            progress.getCountDownLatch().wait();
+
+            int t0 = progress.getSuccess().get();
 
             try {
                 PayloadService.instance.updateSendStatus(message, t0);
@@ -68,9 +72,11 @@ public class BroadcastThread implements Callable<Boolean> {
                 MetricBuilder.pushMeter.mark(t0);
                 MetricBuilder.boradcastMeter.mark(t0);
             }
+
+            return t0;
         }
 
-        return true;
+        return 0;
     }
 
 }

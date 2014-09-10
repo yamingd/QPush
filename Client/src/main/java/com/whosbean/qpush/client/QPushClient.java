@@ -1,7 +1,6 @@
 package com.whosbean.qpush.client;
 
 import com.google.common.collect.Lists;
-import com.whosbean.qpush.core.entity.Payload;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -22,9 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by yaming_deng on 14-8-11.
  */
-public class ChannelHolder {
+public class QPushClient {
 
-    protected static Logger logger = LoggerFactory.getLogger(ChannelHolder.class);
+    protected static Logger logger = LoggerFactory.getLogger(QPushClient.class);
 
     private static Properties props = new Properties();
     private static List<Channel> channelList = Lists.newArrayList();
@@ -34,17 +33,11 @@ public class ChannelHolder {
     private static MessagePack messagePack = new MessagePack();
 
     static{
+
+        messagePack.register(AppPayload.class);
+
         try {
             props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("qpush_client.properties"));
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("connecting to QPush server.");
-                    connect();
-                }
-            });
-            thread.start();
-
         } catch (FileNotFoundException e) {
             logger.error("配置文件未找到", e);
         } catch (IOException e) {
@@ -52,10 +45,31 @@ public class ChannelHolder {
         }
     }
 
+    public static void start(){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                connect();
+            }
+        });
+
+        thread.start();
+
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private static void connect(){
         final int port = Integer.parseInt(props.getProperty("port", "8081"));
         final int pool = Integer.parseInt(props.getProperty("thread_pool", "10"));
         final String host = props.getProperty("host", "127.0.0.1");
+
+        logger.info("QPush server. connecting... host=" + host + "/" + port);
+
         workerGroup = new NioEventLoopGroup(pool);
         try {
             b.group(workerGroup); // (2)
@@ -80,15 +94,16 @@ public class ChannelHolder {
                 fs.add(f);
              }
 
-            for(int i=0; i<fs.size(); i++){
-                ChannelFuture f = fs.get(i); // (5)
-                if(f.isDone()){
+             for (ChannelFuture f : fs){
+                 if (!f.isDone()) {
+                     f.get();
+                 }
+             }
 
-                }
-            }
+             System.out.println("QPush server. connected.");
 
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error("QPush server connect error.", e);
             workerGroup.shutdownGracefully();
         }
     }
@@ -108,9 +123,9 @@ public class ChannelHolder {
         channelList.remove(c);
     }
 
-    public static boolean send(Payload payload) throws IOException {
+    public static boolean send(AppPayload payload) throws IOException {
         Channel c = get();
-        byte[] bytes = toBytes(payload);
+        byte[] bytes = messagePack.write(payload);
         final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
         data.writeBytes(bytes);
         ChannelFuture cf = c.writeAndFlush(data);
@@ -124,10 +139,6 @@ public class ChannelHolder {
             return true;
         }
         return false;
-    }
-
-    public static byte[] toBytes(Object obj) throws IOException {
-        return messagePack.write(obj);
     }
 
     public static void close(){

@@ -1,0 +1,44 @@
+package com.whosbean.qpush.client;
+
+import org.msgpack.annotation.Message;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by yaming_deng on 14-9-10.
+ */
+@Message
+public class AppPayload implements Serializable {
+
+    /**
+     * 在客户端信息中心显示的标题
+     */
+    public String title;
+    /**
+     * 消息提示数. 显示在应用图标上.
+     */
+    public Integer badge;
+    /**
+     * 提示音
+     */
+    public String sound;
+    /**
+     * 要接收的客户端
+     */
+    public List<String> clients;
+    /**
+     * 扩展信息
+     */
+    public Map<String, String> ext;
+    /**
+     * 应用标示.
+     */
+    public String appkey;
+    /**
+     * 是否广播
+     */
+    public Boolean broadcast;
+
+}

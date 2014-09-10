@@ -1,11 +1,11 @@
 package com.whosbean.qpush.pipe.redis;
 
 import com.google.common.collect.Lists;
+import com.whosbean.qpush.core.MessageUtils;
 import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.service.PayloadService;
 import com.whosbean.qpush.pipe.PayloadCursor;
 import com.whosbean.qpush.pipe.PayloadQueue;
-import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,8 +31,6 @@ public class PayloadRedisDQueue implements PayloadQueue, InitializingBean {
 
     private List<Payload> emptyList = Lists.newArrayList();
 
-    private MessagePack messagePack = new MessagePack();
-
     @Override
     public void init() {
 
@@ -50,7 +48,7 @@ public class PayloadRedisDQueue implements PayloadQueue, InitializingBean {
                     break;
                 }
                 try {
-                    Payload item = messagePack.read(t, Payload.class);
+                    Payload item = MessageUtils.asT(Payload.class, t);
                     ids.add(item);
                 } catch (IOException e) {
                     logger.error("解析消息错误", e);
@@ -80,7 +78,7 @@ public class PayloadRedisDQueue implements PayloadQueue, InitializingBean {
                 if (t == null || t.length == 0){
                     break;
                 }
-                Payload item = messagePack.read(t, Payload.class);
+                Payload item = MessageUtils.asT(Payload.class, t);
                 ids.add(item);
             }
             if (ids.size() > 0){
@@ -101,7 +99,7 @@ public class PayloadRedisDQueue implements PayloadQueue, InitializingBean {
         BinaryShardedJedis jedis =  redisBucket.getResource();
         try {
             String key = String.format("qpush:{%s:%s}.q", payload.getProductId(), payload.getBroadcast());
-            jedis.rpush(key.getBytes(), messagePack.write(payload));
+            jedis.rpush(key.getBytes(), MessageUtils.asBytes(payload));
             long total = jedis.incr(QPUSH_PENDING);
             redisBucket.returnResource(jedis);
             logger.info("qpush.pending total = " + total);

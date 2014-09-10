@@ -27,7 +27,7 @@ public class ProductService extends BaseService {
             Product.class);
 
     public Product findByKey(String key){
-        String sql = "select * from product where key = ?";
+        String sql = "select * from product where appKey = ?";
         List<Product> list = this.mainJdbc.query(sql, Product_ROWMAPPER, key);
         if (list.size() > 0){
             return list.get(0);
@@ -40,7 +40,7 @@ public class ProductService extends BaseService {
             return;
         }
 
-        product.setKey(UUID.randomUUID().toString().replace("-", ""));
+        product.setAppKey(UUID.randomUUID().toString().replace("-", ""));
         product.setSecret(UUID.randomUUID().toString().replace("-", ""));
 
         final String sql = "insert into product(title, key, secret, clientTypeid, certPath, devCertPath)values(?, ?, ?, ?, ?, ?)";
@@ -52,7 +52,7 @@ public class ProductService extends BaseService {
                 PreparedStatement ps = connection.prepareStatement(sql,
                         Statement.RETURN_GENERATED_KEYS);
                 ps.setObject(1, product.getTitle());
-                ps.setObject(2, product.getKey());
+                ps.setObject(2, product.getAppKey());
                 ps.setObject(3, product.getSecret());
                 ps.setObject(4, product.getClientTypeid());
                 ps.setObject(5, product.getCertPath());

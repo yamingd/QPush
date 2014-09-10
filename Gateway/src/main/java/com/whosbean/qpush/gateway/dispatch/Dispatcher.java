@@ -75,7 +75,7 @@ public class Dispatcher extends Thread {
 
         while (!this.stopping) {
 
-            int total = ClientKeeper.count(product.getKey());
+            int total = ClientKeeper.count(product.getAppKey());
             if(total > 0) {
                 doSinglePush();
                 doBroadcastPush();
@@ -105,7 +105,6 @@ public class Dispatcher extends Thread {
 
     protected void doBroadcastPush() {
         List<Payload> items = queue.getBroadcastItems(this.broadcastCursor);
-        logger.info("Dispatcher Broadcast, " + product + ", total = " + items.size());
         for(Payload id : items){
             this.doBoradcast(id);
             if (this.product.getClientTypeid().intValue() == ClientType.iOS) {
@@ -116,12 +115,13 @@ public class Dispatcher extends Thread {
             int size = items.size();
             broadcastCursor.setStartId(items.get(size - 1).getId());
             broadcastCursor.setTs(new Date());
+        }else{
+            logger.info("Dispatcher Broadcast, " + product + ", total = " + items.size());
         }
     }
 
     protected void doSinglePush() {
         List<Payload> items = queue.getNormalItems(this.singleCursor);
-        logger.info("Dispatcher Single, " + product + ", total = " + items.size());
         for(Payload id : items){
             this.singlePool.submit(new OneSendThread(this.product, id));
         }
@@ -129,12 +129,17 @@ public class Dispatcher extends Thread {
             int size = items.size();
             singleCursor.setStartId(items.get(size - 1).getId());
             singleCursor.setTs(new Date());
+        }else{
+            logger.info("Dispatcher Single, " + product + ", total = " + items.size());
         }
     }
 
     protected void doBoradcast(Payload message){
-        int total = ClientKeeper.count(this.product.getKey());
-        logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
+        int total = ClientKeeper.count(this.product.getAppKey());
+        if (total == 0){
+            logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
+            return;
+        }
         //每个线程发送100个客户端.
         int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
         int pages = total / limit;
@@ -148,7 +153,10 @@ public class Dispatcher extends Thread {
 
     protected void doBoradcastIOS(Payload message){
         long total = ClientService.instance.countOfflineByType(this.product.getId(), ClientType.iOS);
-        logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
+        if (total == 0){
+            logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
+            return;
+        }
         //每个线程发送100个客户端.
         int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
         long pages = total / limit;

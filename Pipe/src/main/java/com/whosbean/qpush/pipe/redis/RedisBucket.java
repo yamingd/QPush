@@ -1,40 +1,45 @@
 package com.whosbean.qpush.pipe.redis;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
-import redis.clients.jedis.BinaryShardedJedis;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.ShardedJedis;
+import org.springframework.beans.factory.InitializingBean;
+import redis.clients.jedis.*;
 import redis.clients.util.Hashing;
 import redis.clients.util.Pool;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
  * Created by yaming_deng on 14-9-5.
  */
-public class RedisBucket extends Pool<BinaryShardedJedis> {
+public class RedisBucket extends Pool<BinaryShardedJedis> implements InitializingBean {
 
-    public RedisBucket(final GenericObjectPool.Config poolConfig,
-                            List<JedisShardInfo> shards) {
-        this(poolConfig, shards, Hashing.MURMUR_HASH);
+    private Properties jedisConfig;
+
+    private JedisPoolConfig jedisPoolConfig;
+    private JedisShardInfo jedisShardInfo;
+
+    public RedisBucket(Properties jedisConfig){
+        this.jedisConfig = jedisConfig;
     }
 
-    public RedisBucket(final GenericObjectPool.Config poolConfig,
-                            List<JedisShardInfo> shards, Hashing algo) {
-        this(poolConfig, shards, algo, null);
-    }
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setMaxActive(Integer.parseInt(jedisConfig.getProperty("maxActive", "50")));
+        jedisPoolConfig.setMaxIdle(Integer.parseInt(jedisConfig.getProperty("maxIdle", "10")));
+        jedisPoolConfig.setMaxWait(Integer.parseInt(jedisConfig.getProperty("maxWait", "5000")));
 
-    public RedisBucket(final GenericObjectPool.Config poolConfig,
-                            List<JedisShardInfo> shards, Pattern keyTagPattern) {
-        this(poolConfig, shards, Hashing.MURMUR_HASH, keyTagPattern);
-    }
+        String host = jedisConfig.getProperty("host");
+        int port = Integer.parseInt(jedisConfig.getProperty("port", "6379"));
+        jedisShardInfo = new JedisShardInfo(host, port);
 
-    public RedisBucket(final GenericObjectPool.Config poolConfig,
-                            List<JedisShardInfo> shards, Hashing algo, Pattern keyTagPattern) {
-        super(poolConfig, new ShardedJedisFactory(shards, algo, keyTagPattern));
+        List<JedisShardInfo> shards = Lists.newArrayList();
+        shards.add(jedisShardInfo);
+
+        this.initPool(jedisPoolConfig, new ShardedJedisFactory(shards, Hashing.MURMUR_HASH, null));
     }
 
     /**

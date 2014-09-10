@@ -1,6 +1,6 @@
 package com.whosbean.qpush.gateway;
 
-import com.whosbean.qpush.gateway.handler.PushConnHandler;
+import com.whosbean.qpush.gateway.handler.MobileMessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -39,7 +39,7 @@ public class ServerMain {
                         @Override
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
-                            ch.pipeline().addLast(new PushConnHandler());
+                            ch.pipeline().addLast(new MobileMessageHandler());
                         }
                     });
 

@@ -24,6 +24,7 @@
         <processorPath useClasspath="true" />
         <module name="Client" />
         <module name="Core" />
+        <module name="Demo" />
         <module name="Gateway" />
         <module name="Gateway.Queue" />
         <module name="Pipe" />

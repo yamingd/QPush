@@ -1,6 +1,7 @@
 package com.whosbean.qpush.publisher.queue;
 
 import com.lmax.disruptor.EventHandler;
+import com.whosbean.qpush.client.PayloadMessage;
 import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ProductService;
@@ -50,13 +51,14 @@ public class PayloadConsumer implements EventHandler<JsonMessage> {
          *  }
          */
 
-        Payload payload = event.getBody();
-        Product product = ProductService.instance.findByKey(payload.getAppkey());
+        PayloadMessage message = event.getBody();
+        Product product = ProductService.instance.findByKey(message.appkey);
         if (product != null) {
+            Payload payload = new Payload(message);
             payload.setProductId(product.getId());
             this.payloadQueue.add(payload);
         }else{
-            logger.error("Product not found. appkey=" + payload.getAppkey());
+            logger.error("Product not found. appkey=" + message.appkey);
         }
 
         long duration = new Date().getTime() - startTs;

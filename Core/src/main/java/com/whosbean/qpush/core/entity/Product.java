@@ -17,7 +17,7 @@ public class Product {
     /**
      * 产品客户端唯一码
      */
-    private String key;
+    private String appKey;
     /**
      * 产品客户端信息加密串
      */
@@ -53,12 +53,12 @@ public class Product {
         this.title = title;
     }
 
-    public String getKey() {
-        return key;
+    public String getAppKey() {
+        return appKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
     }
 
     public String getSecret() {

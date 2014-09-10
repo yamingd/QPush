@@ -70,7 +70,7 @@ public class PayloadCursor implements Serializable {
     @Override
     public String toString() {
         return "PayloadCursor{" +
-                "productKey='" + product.getKey() + '\'' +
+                "productKey='" + product.getAppKey() + '\'' +
                 ", startId=" + startId +
                 ", page=" + page +
                 ", limit=" + limit +

@@ -1,8 +1,8 @@
 package com.whosbean.qpush.publisher.queue;
 
 import com.lmax.disruptor.RingBuffer;
+import com.whosbean.qpush.client.PayloadMessage;
 import com.whosbean.qpush.core.MetricBuilder;
-import com.whosbean.qpush.core.entity.Payload;
 
 /**
  * Created by yaming_deng on 14-8-8.
@@ -15,7 +15,7 @@ public class PayloadProducer {
         this.ringBuffer = ringBuffer;
     }
 
-    public void push(Payload data) {
+    public void push(PayloadMessage data) {
         MetricBuilder.recvMeter.mark();
 
         long sequence = ringBuffer.next();  // Grab the next sequence
@@ -25,7 +25,10 @@ public class PayloadProducer {
             // for the sequence
             event.setBody(data);
 
-        } finally {
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        finally {
             ringBuffer.publish(sequence);
         }
 

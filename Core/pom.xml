@@ -41,7 +41,11 @@
             <artifactId>spring-jdbc</artifactId>
             <version>4.0.0.RELEASE</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.mysql</groupId>
+            <artifactId>mysql-connector</artifactId>
+            <version>5.1.18</version>
+        </dependency>
         <dependency>
             <groupId>com.jolbox</groupId>
             <artifactId>bonecp</artifactId>

@@ -11,6 +11,7 @@
         <module>Core</module>
         <module>Pipe</module>
         <module>Client</module>
+        <module>Demo</module>
     </modules>
     <packaging>pom</packaging>
 

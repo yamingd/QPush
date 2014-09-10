@@ -1,12 +1,12 @@
 package com.whosbean.qpush.core.entity;
 
-import com.whosbean.qpush.core.GsonUtils;
+import com.whosbean.qpush.apns.APNSMessage;
+import com.whosbean.qpush.client.PayloadMessage;
+import com.whosbean.qpush.core.MessageUtils;
 import org.msgpack.annotation.Message;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 消息结构体. 参考苹果消息规范
@@ -14,7 +14,6 @@ import java.util.Map;
  */
 @Message
 public class Payload implements Serializable {
-
     /**
      * 消息id
      */
@@ -55,13 +54,11 @@ public class Payload implements Serializable {
      * 要接收的客户端
      */
     private List<String> clients;
-    private Map<String, Object> ext;
-    private String appkey;
     /**
      * 是否是广播(1/0)
      */
     private Integer broadcast;
-    private long sentDate;
+    private Long sentDate;
 
     public Long getId() {
         return id;
@@ -155,38 +152,27 @@ public class Payload implements Serializable {
         this.broadcast = broadcast;
     }
 
-    public Map<String, Object> getExt() {
-        return ext;
-    }
-
-    public void setExt(Map<String, Object> ext) {
-        this.ext = ext;
-    }
-
-    public String getAppkey() {
-        return appkey;
-    }
-
-    public void setAppkey(String appkey) {
-        this.appkey = appkey;
-    }
-
-    public long getSentDate() {
+    public Long getSentDate() {
         return sentDate;
     }
 
-    public void setSentDate(long sentDate) {
+    public void setSentDate(Long sentDate) {
         this.sentDate = sentDate;
     }
 
-    public Map asStdMap(){
-        Map<String, Object> map = new HashMap<String, Object>();
-        Map<String, Object> aps = new HashMap<String, Object>();
-        aps.put("alert", this.getTitle());
-        aps.put("badge", this.getBadge());
-        aps.put("sound", this.getSound());
-        map.put("aps", aps);
-        map.put("userInfo", GsonUtils.asT(Map.class, this.getExtras()));
-        return map;
+    public APNSMessage asAPNSMessage(){
+        return new APNSMessage(this);
+    }
+
+    public Payload() {
+    }
+
+    public Payload(PayloadMessage message){
+        this.title = message.title;
+        this.badge = message.badge;
+        this.sound = message.sound;
+        this.clients = message.clients;
+        this.extras = MessageUtils.toJson(message.ext);
+        this.broadcast = message.broadcast ? 1 : 0;
     }
 }

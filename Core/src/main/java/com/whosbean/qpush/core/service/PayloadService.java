@@ -91,13 +91,13 @@ public class PayloadService extends BaseService {
     }
 
     public List<Payload> findNormalList(int productId, long start, int page, int limit){
-        String sql = "select id from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
+        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 0, PayloadStatus.Pending, start, offset, limit);
     }
 
     public List<Payload> findBrodcastList(int productId, long start, int page, int limit){
-        String sql = "select id from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
+        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 1, PayloadStatus.Pending, start, offset, limit);
     }
@@ -109,10 +109,10 @@ public class PayloadService extends BaseService {
             public void run() {
 
                 String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
-                mainJdbc.update(sql, PayloadStatus.Sent, counting, new Date().getTime()/1000, message.getId());
+                mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime()/1000, message.getId());
 
                 sql = "update payload_client set statusId=? where id = ?";
-                mainJdbc.update(sql, PayloadStatus.Sent, message.getId());
+                mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, message.getId());
 
                 MetricBuilder.jdbcUpdateMeter.mark(2);
             }

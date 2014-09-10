@@ -3,7 +3,6 @@ package com.whosbean.qpush.client;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 
 /**
  * Created by yaming_deng on 14-8-11.
@@ -13,7 +12,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channelActive: " + ctx.channel());
-        ChannelHolder.save(ctx.channel());
+        QPushClient.save(ctx.channel());
     }
 
     protected void printMsg(Object msg){
@@ -31,13 +30,13 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
 
         printMsg(msg);
 
-        ReferenceCountUtil.release(msg);
+        ctx.fireChannelRead(msg);
 
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ChannelHolder.remove(ctx.channel());
+        QPushClient.remove(ctx.channel());
         cause.printStackTrace();
         ctx.close();
     }
@@ -46,7 +45,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.fireChannelInactive();
         System.out.println("channelInactive: " + ctx.channel());
-        ChannelHolder.remove(ctx.channel());
+        QPushClient.remove(ctx.channel());
     }
 
 }

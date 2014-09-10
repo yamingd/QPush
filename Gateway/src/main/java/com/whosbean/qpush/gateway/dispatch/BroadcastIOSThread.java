@@ -7,6 +7,7 @@ import com.whosbean.qpush.core.entity.Payload;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ClientService;
 import com.whosbean.qpush.core.service.PayloadService;
+import com.whosbean.qpush.gateway.SentProgress;
 import com.whosbean.qpush.gateway.keeper.APNSKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.util.concurrent.Callable;
  * iOS广播推送.
  * Created by yaming_deng on 14-8-8.
  */
-public class BroadcastIOSThread implements Callable<Boolean> {
+public class BroadcastIOSThread implements Callable<Integer> {
 
     protected static Logger logger = LoggerFactory.getLogger(BroadcastIOSThread.class);
 
@@ -36,27 +37,35 @@ public class BroadcastIOSThread implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Integer call() throws Exception {
         if(message == null){
-            return true;
+            return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){
             List<Client> clients = ClientService.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
+            SentProgress progress = new SentProgress(clients.size());
             for (Client c : clients){
-                APNSKeeper.push(this.product, c, message);
+                APNSKeeper.push(progress, this.product, c, message);
             }
+
+            progress.getCountDownLatch().wait();
+
+            int total = progress.getSuccess().get();
             try {
-                PayloadService.instance.updateSendStatus(message, clients.size());
+                PayloadService.instance.updateSendStatus(message, total);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (clients.size() > 0) {
-                MetricBuilder.pushMeter.mark(clients.size());
-                MetricBuilder.boradcastMeter.mark(clients.size());
+
+            if (total > 0) {
+                MetricBuilder.pushMeter.mark(total);
+                MetricBuilder.boradcastMeter.mark(total);
             }
-            logger.info("push to Apple. total = " + clients.size());
+            logger.info("push to Apple. total = " + total);
+
+            return total;
         }
 
-        return true;
+        return 0;
     }
 }

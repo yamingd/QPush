@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <Encoding>utf-8</Encoding>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                %date [%thread] %-5level %logger{50} - %msg%n
+            </pattern>
+        </layout>
+    </appender>
+
+
+    <appender name="R" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Prudent>true</Prudent>
+        <Encoding>UTF-8</Encoding>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                logs/gateway.%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+        </rollingPolicy>
+        <MaxHistory>30</MaxHistory>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{HH:mm:ss} [%thread] %-5level %logger{80} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="org.springframework">
+        <level value="WARN" />
+    </logger>
+    <logger name="org.elasticsearch.client.transport">
+        <level value="DEBUG" />
+    </logger>
+    <logger name="org.apache.zookeeper">
+        <level value="INFO" />
+    </logger>
+    <logger name="com.couchbase">
+        <level value="DEBUG" />
+    </logger>
+    <logger name="com.argo">
+        <level value="DEBUG" />
+    </logger>
+    <root>
+        <level value="DEBUG" />
+        <appender-ref ref="stdout" />
+        <appender-ref ref="R" />
+    </root>
+
+</configuration>

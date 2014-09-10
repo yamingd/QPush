@@ -14,21 +14,6 @@ public class ServerMetrics {
 
     private static AtomicLong totalConnections = new AtomicLong();
     private static AtomicLong totalConnectionsHistory = new AtomicLong();
-    private static AtomicLong totalMessages = new AtomicLong();
-    private static AtomicLong totalPush = new AtomicLong();
-    private static AtomicLong totalPushFailed = new AtomicLong();
-
-    public static long incrMessageTotal() {
-        return totalMessages.getAndIncrement();
-    }
-
-    public static long incrPushTotal(boolean ok) {
-        if (ok) {
-            return totalPush.getAndIncrement();
-        } else {
-            return totalPushFailed.getAndIncrement();
-        }
-    }
 
     public static long getTotalConnections() {
         return totalConnections.get();
@@ -51,8 +36,6 @@ public class ServerMetrics {
             while (true) {
                 logger.info("totalConnections: " + totalConnections.get());
                 logger.info("totalConnectionsHistory: " + totalConnectionsHistory.get());
-                logger.info("totalMessages: " + totalMessages.get());
-                logger.info("totalPush: " + totalPush.get());
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {

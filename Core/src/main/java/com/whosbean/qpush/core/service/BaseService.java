@@ -26,5 +26,10 @@ public abstract class BaseService implements InitializingBean {
     protected NamedParameterJdbcTemplate mainJdbcNamed;
 
     @Autowired
+    @Qualifier("appConfig")
     protected Properties appConfigs;
+
+    @Autowired
+    @Qualifier("jdbcConfig")
+    protected Properties jdbcConfig;
 }

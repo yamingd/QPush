@@ -8,6 +8,7 @@ import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ClientService;
 import com.whosbean.qpush.core.service.PayloadService;
 import com.whosbean.qpush.gateway.Connection;
+import com.whosbean.qpush.gateway.SentProgress;
 import com.whosbean.qpush.gateway.keeper.APNSKeeper;
 import com.whosbean.qpush.gateway.keeper.ConnectionKeeper;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,7 @@ import java.util.concurrent.Callable;
  *
  * Created by yaming_deng on 14-8-8.
  */
-public class OneSendThread implements Callable<Boolean> {
+public class OneSendThread implements Callable<Integer> {
 
     protected static Logger logger = LoggerFactory.getLogger(OneSendThread.class);
 
@@ -36,20 +37,17 @@ public class OneSendThread implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Integer call() throws Exception {
         if(message == null){
-            return true;
+            return 0;
         }
-        boolean ok = false;
+
         if(message.getClients()!=null){
-            int total = 0;
+            SentProgress progress = new SentProgress(message.getClients().size());
             for (String client : message.getClients()){
-                Connection c = ConnectionKeeper.get(product.getKey(), client);
+                Connection c = ConnectionKeeper.get(product.getAppKey(), client);
                 if(c != null) {
-                    ok = c.send(message);
-                    if(ok) {
-                        total++;
-                    }
+                    c.send(progress, message);
                 }else{
                     if (product.getClientTypeid().intValue() != ClientType.iOS){
                         continue;
@@ -66,10 +64,18 @@ public class OneSendThread implements Callable<Boolean> {
                         logger.error("Client's deviceToken not found. client=" + client);
                         continue;
                     }
-                    APNSKeeper.push(this.product, cc, message);
-                    total ++;
+                    APNSKeeper.push(progress, this.product, cc, message);
                 }
             }
+
+            try {
+                progress.getCountDownLatch().wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            int total = progress.getSuccess().get();
+
             if (total > 0) {
                 MetricBuilder.pushMeter.mark(total);
                 MetricBuilder.pushSingleMeter.mark(total);
@@ -80,8 +86,11 @@ public class OneSendThread implements Callable<Boolean> {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            return total;
         }
-        return ok;
+
+        return 0;
     }
 
 }

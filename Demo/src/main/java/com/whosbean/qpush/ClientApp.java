@@ -16,9 +16,6 @@ public class ClientApp
 
     public static void main( String[] args )
     {
-
-        QPushClient.start();
-
         int i = 0;
         while (i < 10 * 1000){
             send(i);

@@ -14,7 +14,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channelActive: " + ctx.channel());
-        QPushClient.save(ctx.channel());
+        ClientProxyDelegate.instance.save(ctx.channel());
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        QPushClient.remove(ctx.channel());
+        ClientProxyDelegate.instance.remove(ctx.channel());
         cause.printStackTrace();
         ctx.close();
         reconnect();
@@ -36,20 +36,20 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.fireChannelInactive();
         System.out.println("channelInactive: " + ctx.channel());
-        QPushClient.remove(ctx.channel());
+        ClientProxyDelegate.instance.remove(ctx.channel());
         reconnect();
     }
 
     private void reconnect() {
-        if (QPushClient.isStopped()){
+        if (ClientProxyDelegate.instance.isStopped()){
             return;
         }
 
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                ChannelFuture f = QPushClient.newChannel();
-                if (QPushClient.isStopped()){
+                ChannelFuture f = ClientProxyDelegate.instance.newChannel();
+                if (ClientProxyDelegate.instance.isStopped()){
                     return;
                 }
                 try {

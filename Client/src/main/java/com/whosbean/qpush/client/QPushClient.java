@@ -35,6 +35,9 @@ public class QPushClient {
     private static final Bootstrap b = new Bootstrap(); // (1)
     private static EventLoopGroup workerGroup;
     private static MessagePack messagePack = new MessagePack();
+    private static String host;
+    private static Integer port;
+    private static volatile boolean stopping = false;
 
     static{
 
@@ -68,9 +71,9 @@ public class QPushClient {
     }
 
     private static void connect(){
-        final int port = Integer.parseInt(props.getProperty("port", "8081"));
+        port = Integer.parseInt(props.getProperty("port", "8081"));
         final int pool = Integer.parseInt(props.getProperty("thread_pool", "10"));
-        final String host = props.getProperty("host", "127.0.0.1");
+        host = props.getProperty("host", "127.0.0.1");
 
         logger.info("QPush server. connecting... host=" + host + "/" + port);
 
@@ -98,12 +101,10 @@ public class QPushClient {
             final List<ChannelFuture> fs = new ArrayList<ChannelFuture>();
             // Start the client.
             for(int i=0; i<pool; i++){
-                ChannelFuture f = b.connect(host, port); // (5)
-                if(f.cause() != null){
-                    f.cause().printStackTrace();
-                    continue;
+                ChannelFuture f = newChannel();
+                if (f!=null) {
+                    fs.add(f);
                 }
-                fs.add(f);
              }
 
              for (ChannelFuture f : fs){
@@ -118,6 +119,15 @@ public class QPushClient {
             logger.error("QPush server connect error.", e);
             workerGroup.shutdownGracefully();
         }
+    }
+
+    public static ChannelFuture newChannel(){
+        ChannelFuture f = b.connect(host, port); // (5)
+        if(f.cause() != null){
+            f.cause().printStackTrace();
+            return null;
+        }
+        return f;
     }
 
     public static void save(Channel c){
@@ -154,7 +164,12 @@ public class QPushClient {
     }
 
     public static void close(){
+        stopping = true;
         workerGroup.shutdownGracefully();
+    }
+
+    public static boolean isStopped(){
+        return stopping;
     }
 
     static {

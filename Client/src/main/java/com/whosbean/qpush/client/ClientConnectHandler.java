@@ -1,7 +1,10 @@
 package com.whosbean.qpush.client;
 
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by yaming_deng on 14-8-11.
@@ -26,6 +29,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         QPushClient.remove(ctx.channel());
         cause.printStackTrace();
         ctx.close();
+        reconnect();
     }
 
     @Override
@@ -33,6 +37,31 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelInactive();
         System.out.println("channelInactive: " + ctx.channel());
         QPushClient.remove(ctx.channel());
+        reconnect();
+    }
+
+    private void reconnect() {
+        if (QPushClient.isStopped()){
+            return;
+        }
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ChannelFuture f = QPushClient.newChannel();
+                if (QPushClient.isStopped()){
+                    return;
+                }
+                try {
+                    f.get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
     }
 
 }

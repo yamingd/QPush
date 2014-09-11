@@ -41,4 +41,16 @@ public class AppPayload implements Serializable {
      */
     public Boolean broadcast;
 
+    @Override
+    public String toString() {
+        return "AppPayload{" +
+                "title='" + title + '\'' +
+                ", badge=" + badge +
+                ", sound='" + sound + '\'' +
+                ", clients=" + clients +
+                ", ext=" + ext +
+                ", appkey='" + appkey + '\'' +
+                ", broadcast=" + broadcast +
+                '}';
+    }
 }

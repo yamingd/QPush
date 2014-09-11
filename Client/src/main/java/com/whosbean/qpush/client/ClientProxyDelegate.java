@@ -53,6 +53,7 @@ public class ClientProxyDelegate {
         }
 
         ClientProxyDelegate.instance.start();
+
     }
 
     public void start(){
@@ -71,6 +72,7 @@ public class ClientProxyDelegate {
             e.printStackTrace();
         }
 
+        logger.info("ClientProxyDelegate.instance DONE.");
     }
 
     private void connect(){

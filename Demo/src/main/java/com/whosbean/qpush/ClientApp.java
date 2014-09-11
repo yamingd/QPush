@@ -17,7 +17,7 @@ public class ClientApp
     public static void main( String[] args )
     {
 
-        QPushClient.start();
+        QPushClient.connect();
 
         int i = 0;
         while (i < 10 * 1000){

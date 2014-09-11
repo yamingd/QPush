@@ -17,7 +17,7 @@ public class QPushClient {
 
     protected static Logger logger = LoggerFactory.getLogger(QPushClient.class);
 
-    public static void start() {
+    public static void connect() {
         ClientProxyDelegate.instance.start();
     }
 

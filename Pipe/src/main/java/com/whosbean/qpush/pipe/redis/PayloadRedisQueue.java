@@ -1,7 +1,9 @@
 package com.whosbean.qpush.pipe.redis;
 
 import com.google.common.collect.Lists;
+import com.whosbean.qpush.core.MessageUtils;
 import com.whosbean.qpush.core.entity.Payload;
+import com.whosbean.qpush.core.entity.PayloadStatus;
 import com.whosbean.qpush.core.service.PayloadService;
 import com.whosbean.qpush.pipe.PayloadCursor;
 import com.whosbean.qpush.pipe.PayloadQueue;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.BinaryShardedJedis;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +22,9 @@ import java.util.List;
  */
 public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
-    public static final String QPUSH_PENDING = "qpush:pending";
+    public static final byte[] QPUSH_PENDING = "qpush:pending".getBytes();
+    public static final byte[] QPUSH_PK = "pk:payload".getBytes();
+
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -38,22 +44,27 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     public List<Payload> getNormalItems(PayloadCursor cursor) {
         BinaryShardedJedis jedis =  redisBucket.getResource();
         try {
-            String key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 0);
+            byte[] key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 0).getBytes();
             List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
-                byte[] t = jedis.lpop(key.getBytes());
+                byte[] t = jedis.lpop(key);
                 if (t==null || t.length == 0){
                     break;
                 }
-                ids.add(payloadService.get(Long.parseLong(new String(t))));
+                try {
+                    Payload item = MessageUtils.asT(Payload.class, t);
+                    ids.add(item);
+                } catch (IOException e) {
+                    logger.error("解析消息错误", e);
+                }
             }
             if (ids.size() > 0){
-                jedis.decrBy(QPUSH_PENDING.getBytes(), ids.size());
+                jedis.decrBy(QPUSH_PENDING, ids.size());
             }
             redisBucket.returnResource(jedis);
             return ids;
         } catch (Exception e) {
-            logger.error("添加消息进Redis错误", e);
+            logger.error("读取消息错误", e);
             redisBucket.returnBrokenResource(jedis);
         }
 
@@ -64,22 +75,23 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     public List<Payload> getBroadcastItems(PayloadCursor cursor) {
         BinaryShardedJedis jedis =  redisBucket.getResource();
         try {
-            String key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 1);
+            byte[] key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 1).getBytes();
             List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
-                byte[] t = jedis.lpop(key.getBytes());
-                if (t==null || t.length == 0){
+                byte[] t = jedis.lpop(key);
+                if (t == null || t.length == 0){
                     break;
                 }
-                ids.add(payloadService.get(Long.parseLong(new String(t))));
+                Payload item = MessageUtils.asT(Payload.class, t);
+                ids.add(item);
             }
             if (ids.size() > 0){
-                jedis.decrBy(QPUSH_PENDING.getBytes(), ids.size());
+                jedis.decrBy(QPUSH_PENDING, ids.size());
             }
             redisBucket.returnResource(jedis);
             return ids;
         } catch (Exception e) {
-            logger.error("添加消息进Redis错误", e);
+            logger.error("读取消息错误", e);
             redisBucket.returnBrokenResource(jedis);
         }
 
@@ -88,19 +100,22 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
     @Override
     public void add(Payload payload) {
-        PayloadService.instance.add(payload);
-
         BinaryShardedJedis jedis =  redisBucket.getResource();
         try {
+            long id = jedis.incr(QPUSH_PK);
+            payload.setId(id);
+            payload.setStatusId(PayloadStatus.Pending0);
+            payload.setCreateAt(new Date().getTime()/1000);
             String key = String.format("qpush:{%s:%s}.q", payload.getProductId(), payload.getBroadcast());
-            jedis.rpush(key.getBytes(), String.valueOf(payload.getId()).getBytes());
-            long total = jedis.incr(QPUSH_PENDING.getBytes());
+            jedis.rpush(key.getBytes(), MessageUtils.asBytes(payload));
+            long total = jedis.incr(QPUSH_PENDING);
             redisBucket.returnResource(jedis);
             logger.info("qpush.pending total = " + total);
         } catch (Exception e) {
             logger.error("添加消息进Redis错误", e);
             redisBucket.returnBrokenResource(jedis);
         }
+
     }
 
 

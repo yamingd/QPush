@@ -1,9 +1,13 @@
 package com.whosbean.qpush.gateway.dispatch;
 
+import com.whosbean.qpush.core.MetricBuilder;
 import com.whosbean.qpush.core.entity.ClientType;
 import com.whosbean.qpush.core.entity.Payload;
+import com.whosbean.qpush.core.entity.PayloadStatus;
 import com.whosbean.qpush.core.entity.Product;
 import com.whosbean.qpush.core.service.ClientService;
+import com.whosbean.qpush.core.service.PayloadService;
+import com.whosbean.qpush.gateway.SentProgress;
 import com.whosbean.qpush.gateway.keeper.ClientKeeper;
 import com.whosbean.qpush.pipe.PayloadCursor;
 import com.whosbean.qpush.pipe.PayloadQueue;
@@ -71,22 +75,53 @@ public class Dispatcher extends Thread {
 
         logger.info("Dispatcher start to run. " + this.product);
 
-        int min = Integer.parseInt(this.conf.getProperty(DISPATCHER_INTERVAL, "1"));
+        final int min = Integer.parseInt(this.conf.getProperty(DISPATCHER_INTERVAL, "1000"));
 
-        while (!this.stopping) {
+        // p2p 推送
+        Thread thread1 = new Thread(new Runnable() {
 
-            int total = ClientKeeper.count(product.getAppKey());
-            if(total > 0) {
-                doSinglePush();
-                doBroadcastPush();
+            @Override
+            public void run() {
+                while (!stopping) {
+                    int total = doSinglePush();
+                    //如果有消息，则把等待时间缩短.
+                    int ts = min;
+                    if (total > 0){
+                        ts = min / 2;
+                    }
+                    try {
+                        Thread.sleep(ts);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+        });
+        thread1.start();
 
-            try {
-                Thread.sleep(min * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        // 广播 推送
+        Thread thread2 = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (!stopping) {
+                    int total = doBroadcastPush();
+                    //如果有消息，则把等待时间缩短.
+                    int ts = min;
+                    if (total > 0){
+                        ts = min / 2;
+                    }
+                    try {
+                        Thread.sleep(ts);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        });
+        thread2.start();
+
+        //TODO: 离线
 
         logger.info("Dispatcher stop running. " + this.product);
     }
@@ -103,43 +138,99 @@ public class Dispatcher extends Thread {
         this.singlePool.submit(new OfflineSendThread(this.product, userId));
     }
 
-    protected void doBroadcastPush() {
+    protected int doBroadcastPush() {
         List<Payload> items = queue.getBroadcastItems(this.broadcastCursor);
-        for(Payload id : items){
-            this.doBoradcast(id);
-            if (this.product.getClientTypeid().intValue() == ClientType.iOS) {
-                this.doBoradcastIOS(id);
-            }
+        if (items.size() == 0){
+            return 0;
         }
-        if (items.size() > 0){
-            int size = items.size();
-            broadcastCursor.setStartId(items.get(size - 1).getId());
-            broadcastCursor.setTs(new Date());
-        }else{
-            logger.info("Dispatcher Broadcast, " + product + ", total = " + items.size());
+
+        logger.info("Dispatcher Broadcast, " + product + ", total = " + items.size());
+
+        final SentProgress overall = new SentProgress(items.size());
+
+        for(final Payload item : items){
+            //every item for one thread.
+            this.broadcastPool.submit(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    int total0 = ClientKeeper.count(product.getAppKey());
+                    int total1 = 0;
+                    if (product.getClientTypeid().intValue() == ClientType.iOS) {
+                        total1 = ClientService.instance.countOfflineByType(product.getId(), ClientType.iOS);
+                    }
+                    if (total0 + total1 == 0) {
+                        saveBoradcastStatus(item, 0);
+                    } else {
+                        //sending progress
+                        SentProgress progress1 = new SentProgress(total0 + total1);
+                        //step1
+                        if (total0 > 0) {
+                            doBoradcastToClients(item, total0, progress1);
+                        }
+                        //step2
+                        if (total1 >0) {
+                            doBoradcastToIOSClients(item, total1, progress1);
+                        }
+                        //wait to be finished.
+                        try {
+                            progress1.getCountDownLatch().await();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //step4
+                        saveBoradcastStatus(item, progress1.getSuccess().get());
+                        logger.info("Broadcast Summary. id=" + item.getId() + ", " + progress1);
+                    }
+
+                    overall.incrSuccess();
+                }
+            });
+
         }
+
+        try {
+            overall.getCountDownLatch().await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int size = items.size();
+        broadcastCursor.setStartId(items.get(size - 1).getId());
+        broadcastCursor.setTs(new Date());
+
+        return size;
     }
 
-    protected void doSinglePush() {
+    protected int doSinglePush() {
         List<Payload> items = queue.getNormalItems(this.singleCursor);
-        for(Payload id : items){
-            this.singlePool.submit(new OneSendThread(this.product, id));
+        if (items.size() == 0){
+            return 0;
         }
-        if (items.size() > 0){
-            int size = items.size();
-            singleCursor.setStartId(items.get(size - 1).getId());
-            singleCursor.setTs(new Date());
-        }else{
-            logger.info("Dispatcher Single, " + product + ", total = " + items.size());
+
+        logger.info("Dispatcher Single, " + product + ", total = " + items.size());
+
+        SentProgress overall = new SentProgress(items.size());
+        for(Payload item : items){
+            // create a single thread for a single message.
+            this.singlePool.submit(new OneSendThread(this.product, item, overall));
         }
+
+        try {
+            overall.getCountDownLatch().await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int size = items.size();
+        singleCursor.setStartId(items.get(size - 1).getId());
+        singleCursor.setTs(new Date());
+
+        return size;
     }
 
-    protected void doBoradcast(Payload message){
-        int total = ClientKeeper.count(this.product.getAppKey());
-        if (total == 0){
-            logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
-            return;
-        }
+    protected void doBoradcastToClients(Payload message, int total, SentProgress progress){
         //每个线程发送100个客户端.
         int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
         int pages = total / limit;
@@ -147,16 +238,31 @@ public class Dispatcher extends Thread {
             pages ++;
         }
         for(int i=0; i<pages; i++){
-            this.broadcastPool.submit(new BroadcastThread(this.product, message, i, limit));
+            this.broadcastPool.submit(new BroadcastThread(this.product, message, i, limit, progress));
         }
     }
 
-    protected void doBoradcastIOS(Payload message){
-        long total = ClientService.instance.countOfflineByType(this.product.getId(), ClientType.iOS);
-        if (total == 0){
-            logger.info("Dispatcher Broadcast, " + product + ", total Client = " + total);
-            return;
+    private void saveBoradcastStatus(Payload message, int total) {
+        try {
+            if (message.getStatusId().intValue() == PayloadStatus.Pending0){
+                message.setTotalUsers(total);
+                message.setSentDate(new Date().getTime()/1000);
+                message.setStatusId(PayloadStatus.Sent);
+                PayloadService.instance.saveWithId(message);
+            }else {
+                PayloadService.instance.updateSendStatus(message, total);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        if (total > 0) {
+            MetricBuilder.pushMeter.mark(total);
+            MetricBuilder.boradcastMeter.mark(total);
+        }
+    }
+
+    protected void doBoradcastToIOSClients(Payload message, int total, SentProgress progress){
         //每个线程发送100个客户端.
         int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
         long pages = total / limit;
@@ -164,7 +270,7 @@ public class Dispatcher extends Thread {
             pages ++;
         }
         for(int i=0; i<pages; i++){
-            this.broadcastPool.submit(new BroadcastIOSThread(this.product, message, i, limit));
+            this.broadcastPool.submit(new BroadcastIOSThread(this.product, message, i, limit, progress));
         }
     }
 

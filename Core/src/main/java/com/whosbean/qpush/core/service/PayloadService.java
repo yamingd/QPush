@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by yaming_deng on 14-8-8.
@@ -35,6 +36,7 @@ public class PayloadService extends BaseService {
             PayloadHistory.class);
 
     private ThreadPoolTaskExecutor jdbcExecutor = null;
+    private AtomicLong jdbcPending = new AtomicLong();
 
     public Payload get(long id){
         String sql = "select * from payload where id = ?";
@@ -90,6 +92,67 @@ public class PayloadService extends BaseService {
         }
     }
 
+    private void updatePendingCount(boolean incr){
+        long count = incr ? jdbcPending.incrementAndGet() : jdbcPending.decrementAndGet();
+        logger.info("JdbcExecutor Pending. total=" + count);
+    }
+
+    public void saveWithId(final Payload payload) throws Exception {
+        if (payload == null){
+            return;
+        }
+
+        if (payload.getId() == null || payload.getId().intValue() == 0){
+            throw new Exception("saveWithId needs payload to be having id value.");
+        }
+
+        jdbcExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+
+                final String sql = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                mainJdbc.update(new PreparedStatementCreator() {
+                    @Override
+                    public PreparedStatement createPreparedStatement(
+                            Connection connection) throws SQLException {
+                        PreparedStatement ps = connection.prepareStatement(sql,
+                                Statement.RETURN_GENERATED_KEYS);
+                        ps.setObject(1, payload.getId());
+                        ps.setObject(2, payload.getTitle());
+                        ps.setObject(3, payload.getBadge());
+                        ps.setObject(4, payload.getExtras());
+                        ps.setObject(5, payload.getSound());
+                        ps.setObject(6, payload.getProductId());
+                        ps.setObject(7, payload.getTotalUsers());
+                        ps.setObject(8, payload.getCreateAt());
+                        ps.setObject(9, payload.getStatusId());
+                        ps.setObject(10, payload.getBroadcast());
+                        ps.setObject(11, payload.getSentDate());
+                        return ps;
+                    }
+                });
+
+                MetricBuilder.jdbcUpdateMeter.mark(1);
+
+                if (payload.getClients() != null){
+                    List<Object[]> args = Lists.newArrayList();
+                    final String sql0 = "insert into payload_client(id, userId, productId, statusId)values(?, ?, ?, ?)";
+                    for(String userId : payload.getClients()){
+                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), payload.getStatusId()});
+                    }
+                    mainJdbc.batchUpdate(sql0, args);
+                    MetricBuilder.jdbcUpdateMeter.mark(1);
+                }
+
+                updatePendingCount(false);
+            }
+        });
+
+        updatePendingCount(true);
+
+    }
+
     public List<Payload> findNormalList(int productId, long start, int page, int limit){
         String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
@@ -115,9 +178,12 @@ public class PayloadService extends BaseService {
                 mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, message.getId());
 
                 MetricBuilder.jdbcUpdateMeter.mark(2);
+
+                updatePendingCount(false);
             }
         });
 
+        updatePendingCount(true);
 
     }
 
@@ -141,5 +207,20 @@ public class PayloadService extends BaseService {
         jdbcExecutor.setMaxPoolSize(limit);
         jdbcExecutor.setWaitForTasksToCompleteOnShutdown(true);
         jdbcExecutor.afterPropertiesSet();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long total = jdbcPending.get();
+                logger.info("JdbcExecutor Pending. total=" + total);
+                try {
+                    Thread.sleep(10 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
     }
 }

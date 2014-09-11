@@ -60,6 +60,7 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
         ConnectionKeeper.init();
         productList = productService.findAll();
         String beanName = this.serverConfig.getProperty("payloadQueue", "default");
+        logger.info("USING PayloadQueue = " + beanName);
         this.payloadQueue = (PayloadQueue) this.applicationContext.getBean(beanName);
         this.payloadQueue.init();
         this.initDispatcher(this.productList);
@@ -83,7 +84,7 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
 
         public void run(){
 
-            int min = Integer.parseInt(serverConfig.getProperty(Dispatcher.DISPATCHER_INTERVAL, "1"));
+            int min = Integer.parseInt(serverConfig.getProperty(Dispatcher.DISPATCHER_INTERVAL, "1000"));
 
             while (running){
 
@@ -102,7 +103,7 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
                 }
 
                 try {
-                    Thread.sleep(min * 1000);
+                    Thread.sleep(min);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

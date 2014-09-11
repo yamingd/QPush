@@ -42,4 +42,11 @@ public class SentProgress {
         return this.success.get() + this.failed.get();
     }
 
+    @Override
+    public String toString() {
+        return "SentProgress{" +
+                ", success=" + success.get() +
+                ", failed=" + failed.get() +
+                '}';
+    }
 }

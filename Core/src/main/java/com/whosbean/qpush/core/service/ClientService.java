@@ -74,10 +74,10 @@ public class ClientService extends BaseService {
         return list;
     }
 
-    public long countOfflineByType(Integer productId, Integer typeId){
+    public int countOfflineByType(Integer productId, Integer typeId){
         long now = new Date().getTime()/1000 - 86400;
         String sql = "select count(1) from client where productId = ? and typeId = ? and lastOnline >= ?";
-        long count = this.mainJdbc.queryForObject(sql, Long.class, productId, typeId, now);
+        int count = this.mainJdbc.queryForObject(sql, Integer.class, productId, typeId, now);
         return count;
     }
 

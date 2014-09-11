@@ -6,15 +6,19 @@ package com.whosbean.qpush.core.entity;
  */
 public interface PayloadStatus {
     /**
+     * 等待发送并且没存入MySQL.
+     */
+    final int Pending0 = -1;
+    /**
      * 等待发送
      */
-    final int Pending = 0;
+    final int Pending = 1;
     /**
      * 已发送
      */
-    final int Sent = 1;
+    final int Sent = 2;
     /**
      * 发送失败
      */
-    final int Failed = 2;
+    final int Failed = 3;
 }

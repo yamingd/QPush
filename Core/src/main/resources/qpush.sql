@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2014-08-18 11:07:00
+Date: 2014-09-10 18:01:23
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -19,7 +19,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE `client` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `productId` int(11) DEFAULT NULL,
   `userId` varchar(32) DEFAULT NULL,
   `deviceToken` varchar(255) DEFAULT NULL,
@@ -30,11 +30,12 @@ CREATE TABLE `client` (
   `lastOnline` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_client_userId` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of client
 -- ----------------------------
+INSERT INTO `client` VALUES ('1', '1', '1', null, null, null, null, null, null);
 
 -- ----------------------------
 -- Table structure for `payload`
@@ -54,7 +55,7 @@ CREATE TABLE `payload` (
   `sentDate` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_payload_list` (`productId`,`broadcast`,`statusId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=10168 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of payload
@@ -101,7 +102,7 @@ DROP TABLE IF EXISTS `product`;
 CREATE TABLE `product` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL,
-  `key` varchar(255) DEFAULT NULL,
+  `appKey` varchar(255) DEFAULT NULL,
   `secret` varchar(255) DEFAULT NULL,
   `clientTypeid` tinyint(2) DEFAULT NULL,
   `certPass` varchar(255) DEFAULT NULL,
@@ -109,9 +110,10 @@ CREATE TABLE `product` (
   `devCertPass` varchar(255) DEFAULT NULL,
   `devCertPath` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_product_key` (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  UNIQUE KEY `ix_product_key` (`appKey`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of product
 -- ----------------------------
+INSERT INTO `product` VALUES ('1', 'app01', 'app01', 'app01', '2', null, null, null, null);

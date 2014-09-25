@@ -1,17 +1,14 @@
 package com.whosbean.qpush.publisher.queue;
 
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import com.whosbean.qpush.pipe.PayloadQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
@@ -22,7 +19,7 @@ import java.util.concurrent.Executors;
  * Created by yaming_deng on 14-2-14.
  */
 @Component
-public class DisruptorContext implements InitializingBean, ApplicationContextAware {
+public class DisruptorContext implements InitializingBean {
 
     protected static Logger logger = LoggerFactory.getLogger(DisruptorContext.class);
 
@@ -35,12 +32,6 @@ public class DisruptorContext implements InitializingBean, ApplicationContextAwa
     public static PayloadProducer producer = null;
     public static DisruptorContext instance = null;
 
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    @Qualifier("payloadMysqlQueue")
-    private PayloadQueue defaultQueue;
-
     @Autowired
     @Qualifier("appConfig")
     private Properties conf;
@@ -48,11 +39,6 @@ public class DisruptorContext implements InitializingBean, ApplicationContextAwa
     @Override
     public void afterPropertiesSet() throws Exception {
         instance = this;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
     public class MonitorThread extends Thread{
@@ -96,12 +82,10 @@ public class DisruptorContext implements InitializingBean, ApplicationContextAwa
         // Construct the Disruptor
         disruptor = new Disruptor<JsonMessage>(factory, bufferSize,
                 executor,
-                ProducerType.SINGLE,
-                new com.lmax.disruptor.BusySpinWaitStrategy()); //多核
+                ProducerType.MULTI,
+                new YieldingWaitStrategy()); //多核
 
-        String beanName = conf.getProperty("payloadQueue", "payloadMysqlQueue");
-        PayloadQueue handler = this.applicationContext.getBean(beanName, PayloadQueue.class);
-        disruptor.handleEventsWith(new PayloadConsumer(handler));
+        disruptor.handleEventsWith(new PayloadConsumer());
         disruptor.handleExceptionsWith(new DisruptorExceptionHandler());
 
         // Start the Disruptor, starts all threads running

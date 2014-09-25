@@ -2,14 +2,9 @@ package com.whosbean.qpush.publisher.queue;
 
 import com.lmax.disruptor.EventHandler;
 import com.whosbean.qpush.client.PayloadMessage;
-import com.whosbean.qpush.core.entity.Payload;
-import com.whosbean.qpush.core.entity.Product;
-import com.whosbean.qpush.core.service.ProductService;
-import com.whosbean.qpush.pipe.PayloadQueue;
+import com.whosbean.qpush.publisher.handler.PayloadHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 /**
  * 队列消息处理.
@@ -17,21 +12,14 @@ import java.util.Date;
  */
 public class PayloadConsumer implements EventHandler<JsonMessage> {
 
-    private static final String msg = "Handler[%s], totalEvent=%s, totalDuration=%s ms, avgDuration=%s ms, lastDuration=%s ms";
     protected static Logger logger = LoggerFactory.getLogger(PayloadConsumer.class);
-    private int count = 0;
-    private long totalDuration = 0;
-    private PayloadQueue payloadQueue;
 
-    public PayloadConsumer(PayloadQueue handler){
-        this.payloadQueue = handler;
+    public PayloadConsumer(){
+
     }
 
     @Override
     public void onEvent(JsonMessage event, long sequence, boolean endOfBatch) throws Exception {
-        long startTs = new Date().getTime();
-        count ++;
-
         //0. 构造消息
         /**
          * {
@@ -52,20 +40,7 @@ public class PayloadConsumer implements EventHandler<JsonMessage> {
          */
 
         PayloadMessage message = event.getBody();
-        Product product = ProductService.instance.findByKey(message.appkey);
-        if (product != null) {
-            Payload payload = new Payload(message);
-            payload.setProductId(product.getId());
-            this.payloadQueue.add(payload);
-        }else{
-            logger.error("Product not found. appkey=" + message.appkey);
-        }
-
-        long duration = new Date().getTime() - startTs;
-        totalDuration += duration;
-
-        long threadId = Thread.currentThread().getId();
-        logger.info(String.format(msg, threadId, count, totalDuration, totalDuration / count, duration));
+        PayloadHandler.instance.save(message);
     }
 
 }

@@ -3,7 +3,6 @@ package com.whosbean.qpush.publisher.handler;
 import com.whosbean.qpush.client.PayloadMessage;
 import com.whosbean.qpush.core.MessageUtils;
 import com.whosbean.qpush.core.MetricBuilder;
-import com.whosbean.qpush.publisher.queue.DisruptorContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,6 +18,10 @@ import java.io.IOException;
 public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
 
     protected static Logger logger = LoggerFactory.getLogger(PublisherConnHandler.class);
+
+    public PublisherConnHandler() {
+    }
+
     /**
      * 接收到新的连接
      */
@@ -43,7 +46,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
             if (logger.isDebugEnabled()){
                 logger.debug("Payload. message={}", message);
             }
-            DisruptorContext.producer.push(message);
+            PayloadHandler.instance.save(message);
             ack(ctx, "200");
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

@@ -1,10 +1,7 @@
 package com.whosbean.qpush.client;
 
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by yaming_deng on 14-8-11.
@@ -45,23 +42,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ChannelFuture f = ClientProxyDelegate.instance.newChannel();
-                if (ClientProxyDelegate.instance.isStopped()){
-                    return;
-                }
-                try {
-                    f.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
+        ClientProxyDelegate.instance.newChannel();
     }
 
 }

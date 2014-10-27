@@ -1,6 +1,5 @@
 package com.whosbean.qpush.client;
 
-import com.google.common.collect.Lists;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -10,16 +9,18 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by yaming_deng on 14-8-11.
@@ -32,13 +33,13 @@ public class ClientProxyDelegate {
     public static MessagePack messagePack = new MessagePack();
     public static ClientProxyDelegate instance = new ClientProxyDelegate();
 
-    private List<Channel> channelList = Lists.newArrayList();
-    private AtomicInteger seq = new AtomicInteger();
+    private ConcurrentSkipListSet<Channel> channelList = new ConcurrentSkipListSet<Channel>();
     private final Bootstrap b = new Bootstrap(); // (1)
-    private EventLoopGroup workerGroup;
+    private NioEventLoopGroup workerGroup;
     private String host;
     private Integer port;
     private volatile boolean stopping = false;
+    private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     static{
 
@@ -56,7 +57,7 @@ public class ClientProxyDelegate {
 
     }
 
-    public void start(){
+    public void start() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -67,7 +68,7 @@ public class ClientProxyDelegate {
         thread.start();
 
         try {
-            Thread.sleep(10 * 1000);
+            countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -77,12 +78,10 @@ public class ClientProxyDelegate {
 
     private void connect(){
         port = Integer.parseInt(props.getProperty("port", "8081"));
-        final int pool = Integer.parseInt(props.getProperty("thread_pool", "10"));
         host = props.getProperty("host", "127.0.0.1");
-
         logger.info("QPush server. connecting... host=" + host + "/" + port);
 
-        workerGroup = new NioEventLoopGroup(pool);
+        workerGroup = new NioEventLoopGroup();
         try {
             b.group(workerGroup); // (2)
             b.channel(NioSocketChannel.class); // (3)
@@ -103,22 +102,23 @@ public class ClientProxyDelegate {
                 }
             });
 
-            final List<ChannelFuture> fs = new ArrayList<ChannelFuture>();
             // Start the client.
-            for(int i=0; i<pool; i++){
+            for(int i=0; i<workerGroup.executorCount(); i++){
                 ChannelFuture f = newChannel();
                 if (f!=null) {
-                    fs.add(f);
+                    try {
+                        f.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
              }
 
-             for (ChannelFuture f : fs){
-                 if (!f.isDone()) {
-                     f.get();
-                 }
-             }
+            countDownLatch.countDown();
 
-             System.out.println("QPush server. connected.");
+            System.out.println("QPush server. connected.");
 
         } catch (Exception e){
             logger.error("QPush server connect error.", e);
@@ -139,11 +139,29 @@ public class ClientProxyDelegate {
         channelList.add(c);
     }
 
-    public Channel get(){
-        long id = seq.getAndIncrement();
-        id = id % channelList.size();
-        Channel c = channelList.get((int)id);
-        return c;
+    public void get(final ChannelAvaliable task){
+        Channel c = channelList.pollFirst();
+        if (c == null){
+            final ChannelFuture f = newChannel();
+            if (f == null){
+                return;
+            }
+
+            f.addListener(new GenericFutureListener<Future<? super java.lang.Void>>() {
+                @Override
+                public void operationComplete(Future<? super Void> future) throws Exception {
+                    if (future.cause() == null){
+                        final Channel c0 = f.channel();
+                        task.execute(c0);
+                    }else{
+                        future.cause().printStackTrace();
+                    }
+                }
+            });
+
+        }else{
+            task.execute(c);
+        }
     }
 
     public void remove(Channel c){

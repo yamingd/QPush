@@ -22,21 +22,28 @@ public class QPushClient {
     }
 
     public static boolean send(final AppPayload payload) throws IOException {
-        final Channel c = ClientProxyDelegate.instance.get();
-        byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
-        final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
-        data.writeBytes(bytes);
-        final ChannelFuture cf = c.writeAndFlush(data);
-        cf.addListener(new GenericFutureListener<Future<? super java.lang.Void>>() {
+        final byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
+
+         ClientProxyDelegate.instance.get(new ChannelAvaliable() {
             @Override
-            public void operationComplete(Future<? super Void> future) throws Exception {
-                if(cf.cause() != null){
-                    logger.error("Send Error: " + payload + "\n", cf.cause());
-                    c.close();
-                    ClientProxyDelegate.instance.remove(c);
-                }
+            public void execute(final Channel c) {
+                final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
+                data.writeBytes(bytes);
+                final ChannelFuture cf = c.writeAndFlush(data);
+                cf.addListener(new GenericFutureListener<Future<? super java.lang.Void>>() {
+                    @Override
+                    public void operationComplete(Future<? super Void> future) throws Exception {
+                        if(cf.cause() != null){
+                            logger.error("Send Error: " + payload + "\n", cf.cause());
+                            c.close();
+                            ClientProxyDelegate.instance.remove(c);
+                            ClientProxyDelegate.instance.newChannel();
+                        }
+                    }
+                });
             }
         });
+
         return true;
     }
 }

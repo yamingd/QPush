@@ -161,6 +161,7 @@ public class ClientProxyDelegate {
 
         }else{
             task.execute(c);
+            channelList.add(c);
         }
     }
 

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * For IOS.
  * Created by yaming_deng on 14-9-10.
  */
 @Message

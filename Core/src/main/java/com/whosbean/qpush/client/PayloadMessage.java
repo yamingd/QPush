@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * From Java App Server
  * Created by yaming_deng on 14-9-10.
  */
 @Message

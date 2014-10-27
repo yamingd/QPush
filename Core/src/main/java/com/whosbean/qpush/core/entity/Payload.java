@@ -3,7 +3,7 @@ package com.whosbean.qpush.core.entity;
 import com.whosbean.qpush.apns.APNSMessage;
 import com.whosbean.qpush.client.PayloadMessage;
 import com.whosbean.qpush.core.MessageUtils;
-import org.msgpack.annotation.Message;
+import org.msgpack.annotation.MessagePackMessage;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * 消息结构体. 参考苹果消息规范
  * Created by yaming_deng on 14-8-6.
  */
-@Message
+@MessagePackMessage
 public class Payload implements Serializable {
     /**
      * 消息id

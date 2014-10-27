@@ -1,7 +1,7 @@
 package com.whosbean.qpush.gateway;
 
-import com.whosbean.qpush.core.MessageUtils;
 import com.whosbean.qpush.core.entity.Payload;
+import com.whosbean.qpush.protobuf.convertor.PBConvertor;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,7 +26,7 @@ public class Connection {
     public void send(final SentProgress progress, Payload message) throws Exception {
         // 组装消息包
         if(channel.isOpen()){
-            byte[] msg = MessageUtils.asBytes(message.asAPNSMessage());
+            byte[] msg = PBConvertor.fromBean(message).toByteArray();
             send(progress, msg);
         }else{
             logger.error("Send Error. Channel is closed.");

@@ -28,6 +28,7 @@
         <module name="Gateway" />
         <module name="Gateway.Queue" />
         <module name="Pipe" />
+        <module name="Protobuf" />
         <module name="Publisher" />
       </profile>
     </annotationProcessing>

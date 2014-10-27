@@ -1,0 +1,19 @@
+package message;
+option java_package = "com.whosbean.qpush.protobuf";
+option java_multiple_files = true;
+
+message PBAPNSUserInfo {
+    required string key = 1;
+    required string value = 2;
+}
+
+message PBAPNSBody {
+    optional string alert = 1;
+    optional string sound = 2;
+    optional int32 badge = 3;
+}
+
+message PBAPNSMessage {
+    required PBAPNSBody aps = 1;
+    repeated PBAPNSUserInfo userInfo = 2;
+}

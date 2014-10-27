@@ -12,6 +12,7 @@
         <module>Pipe</module>
         <module>Client</module>
         <module>Demo</module>
+        <module>Protobuf</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -74,7 +75,13 @@
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack</artifactId>
-            <version>0.6.8</version>
+            <version>0.6.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>2.5.0</version>
         </dependency>
 
     </dependencies>

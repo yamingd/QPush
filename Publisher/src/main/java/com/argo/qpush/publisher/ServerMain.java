@@ -26,12 +26,10 @@ public class ServerMain {
      * 启动推送服务 8080端口
      */
     public static void start(Properties prop) {
-        String actSize = prop.getProperty("server.actors", "10");
-        String workerSize = prop.getProperty("server.workers", "10");
         port = Integer.parseInt(prop.getProperty("server.port", "8180"));
 
-        EventLoopGroup parentGroup = new NioEventLoopGroup(Integer.parseInt(actSize)); // 用于接收发来的连接请求
-        EventLoopGroup childGroup = new NioEventLoopGroup(Integer.parseInt(workerSize)); // 用于处理parentGroup接收并注册给child的连接中的信息
+        EventLoopGroup parentGroup = new NioEventLoopGroup(); // 用于接收发来的连接请求
+        EventLoopGroup childGroup = new NioEventLoopGroup(); // 用于处理parentGroup接收并注册给child的连接中的信息
 
         try {
 

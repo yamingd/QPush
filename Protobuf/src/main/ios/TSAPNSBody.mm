@@ -18,6 +18,9 @@
     return self.protocolData;
 }
 
+-(NSMutableDictionary*) asDict{
+    return nil;
+}
 
 -(instancetype) initWithData:(NSData*) data {
 
@@ -30,9 +33,9 @@
 
         // c++->objective C
         self.protocolData = data;
-        self.alert = [self cppStringToObjc:alert];
-        self.sound = [self cppStringToObjc:sound];
-        self.badge = [self cppUInt32ToNSNumber:badge];
+        self.alert = [PBObjc cppStringToObjc:alert];
+        self.sound = [PBObjc cppStringToObjc:sound];
+        self.badge = [PBObjc cppUInt32ToNSNumber:badge];
     }
     return self;
 }
@@ -42,9 +45,9 @@
 -(const std::string) serializedProtocolBufferAsString {
     message::PBAPNSBody *message = new message::PBAPNSBody;
     // objective c->c++
-    const std::string alert = [self objcStringToCpp:self.alert];
-    const std::string sound = [self objcStringToCpp:self.sound];
-    const uint32_t badge = [self objcNumberToCppUInt32:self.badge];
+    const std::string alert = [PBObjc objcStringToCpp:self.alert];
+    const std::string sound = [PBObjc objcStringToCpp:self.sound];
+    const uint32_t badge = [PBObjc objcNumberToCppUInt32:self.badge];
 
     // c++->protocol buffer
     message->set_alert(alert);

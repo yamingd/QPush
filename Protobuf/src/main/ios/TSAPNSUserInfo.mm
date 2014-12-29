@@ -18,6 +18,9 @@
     return self.protocolData;
 }
 
+-(NSMutableDictionary*) asDict{
+    return nil;
+}
 
 -(instancetype) initWithData:(NSData*) data {
 
@@ -29,8 +32,8 @@
 
         // c++->objective C
         self.protocolData = data;
-        self.key = [self cppStringToObjc:key];
-        self.value = [self cppStringToObjc:value];
+        self.key = [PBObjc cppStringToObjc:key];
+        self.value = [PBObjc cppStringToObjc:value];
     }
     return self;
 }
@@ -40,8 +43,8 @@
 -(const std::string) serializedProtocolBufferAsString {
     message::PBAPNSUserInfo *message = new message::PBAPNSUserInfo;
     // objective c->c++
-    const std::string key = [self objcStringToCpp:self.key];
-    const std::string value = [self objcStringToCpp:self.value];
+    const std::string key = [PBObjc objcStringToCpp:self.key];
+    const std::string value = [PBObjc objcStringToCpp:self.value];
 
     // c++->protocol buffer
     message->set_key(key);

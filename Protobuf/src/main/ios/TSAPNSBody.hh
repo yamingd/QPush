@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
-#import "TSProtocolBufferWrapper.hh"
+#import "PBObjcWrapper.hh"
 
-@interface TSAPNSBody : TSProtocolBufferWrapper
+@interface TSAPNSBody : NSObject<PBObjcWrapper>
 
 @property (nonatomic,strong) NSString* alert;
 @property (nonatomic,strong) NSString* sound;

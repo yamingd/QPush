@@ -20,6 +20,9 @@
     return self.protocolData;
 }
 
+-(NSMutableDictionary*) asDict{
+    return nil;
+}
 
 -(instancetype) initWithData:(NSData*) data {
 
@@ -30,9 +33,9 @@
         const message::TSAPNSBody* body = resp.aps();
 
         self.aps = [[TSAPNSBody alloc] init];
-        self.aps.alert = [self cppStringToObjc:body->alert()];
-        self.aps.sound = [self cppStringToObjc:body->sound()];
-        self.aps.badge = [self cppUInt32ToNSNumber:body->badge()];
+        self.aps.alert = [PBObjc cppStringToObjc:body->alert()];
+        self.aps.sound = [PBObjc cppStringToObjc:body->sound()];
+        self.aps.badge = [PBObjc cppUInt32ToNSNumber:body->badge()];
 
         NSMutableDictionary *uis = [[NSMutableDictionary alloc] init];
         if(resp->has_userInfo()){
@@ -41,8 +44,8 @@
                 const std::string key = ui->key();
                 const std::string value = ui->value();
 
-                NSString* key0 = [self cppStringToObjc:key];
-                NSString* value0 = [self cppStringToObjc:value];
+                NSString* key0 = [PBObjc cppStringToObjc:key];
+                NSString* value0 = [PBObjc cppStringToObjc:value];
 
                 [uis setObject:value0 forKey:key0];
             }
@@ -59,9 +62,9 @@
 -(const std::string) serializedProtocolBufferAsString {
     message::PBAPNSMessage *message = new message::PBAPNSMessage;
     // objective c->c++
-    const std::string alert = [self objcStringToCpp:self.aps.alert];
-    const std::string sound = [self objcStringToCpp:self.aps.sound];
-    const uint32_t badge = [self objcNumberToCppUInt32:self.aps.badge];
+    const std::string alert = [PBObjc objcStringToCpp:self.aps.alert];
+    const std::string sound = [PBObjc objcStringToCpp:self.aps.sound];
+    const uint32_t badge = [PBObjc objcNumberToCppUInt32:self.aps.badge];
 
     // c++->protocol buffer
     message::PBAPNSBody* body = new message::PBAPNSBody;
@@ -74,8 +77,8 @@
     for(NSString* key in self.userInfo){
         NSString* value = [self.userInfo objectForKey:key];
 
-        const std::string key0 = [self objcStringToCpp:key];
-        const std::string value0 = [self objcStringToCpp:value];
+        const std::string key0 = [PBObjc objcStringToCpp:key];
+        const std::string value0 = [PBObjc objcStringToCpp:value];
 
         message::PBAPNSUserInfo* ui = new message::PBAPNSUserInfo;
         ui->set_key(key0);

@@ -1,5 +1,5 @@
 package message;
-option java_package = "com.whosbean.qpush.protobuf";
+option java_package = "com.argo.qpush.protobuf";
 option java_multiple_files = true;
 
 message PBAPNSUserInfo {
@@ -16,4 +16,25 @@ message PBAPNSBody {
 message PBAPNSMessage {
     required PBAPNSBody aps = 1;
     repeated PBAPNSUserInfo userInfo = 2;
+}
+
+message PBAPNSEvent {
+
+    enum Ops {
+        Online = 1;
+        KeepAlive = 2;
+        PushAck = 3;
+        Offline = 4;
+    }
+
+    enum DeviceTypes{
+        iOS = 1;
+        Android = 2;
+    }
+
+    required int32 op = 1;
+    required string token = 2;
+    required string appKey = 3;
+    required string userId = 4;
+    required int32 typeId = 5;
 }

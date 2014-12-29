@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
-#import "TSProtocolBufferWrapper.hh"
+#import "PBObjcWrapper.hh"
 
-@interface TSAPNSMessage : TSProtocolBufferWrapper
+@interface TSAPNSMessage : NSObject<PBObjcWrapper>
 
 @property (nonatomic,strong) TSAPNSBody* aps;
 @property (nonatomic,strong) NSDictionary* userInfo;

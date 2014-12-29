@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>QPush</artifactId>
-        <groupId>com.whosbean.qpush</groupId>
+        <groupId>com.argo.qpush</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -26,17 +26,17 @@
         </dependency>
 
         <dependency>
-            <groupId>com.whosbean.qpush</groupId>
+            <groupId>com.argo.qpush</groupId>
             <artifactId>qpush-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.whosbean.qpush</groupId>
+            <groupId>com.argo.qpush</groupId>
             <artifactId>qpush-pipe</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.whosbean.qpush</groupId>
+            <groupId>com.argo.qpush</groupId>
             <artifactId>qpush-protobuf</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

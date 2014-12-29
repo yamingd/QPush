@@ -7,7 +7,7 @@
     	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <context:annotation-config />
-    <context:component-scan base-package="com.whosbean.qpush.core"/>
+    <context:component-scan base-package="com.argo.qpush.core"/>
 
     <bean id="jdbcConfig" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="locations">
@@ -18,7 +18,7 @@
     </bean>
 
     <!-- BoneCP configuration -->
-    <bean id="mainDataSource" class="com.whosbean.qpush.core.beans.JdbcDatasourceFactoryBean">
+    <bean id="mainDataSource" class="com.argo.qpush.core.beans.JdbcDatasourceFactoryBean">
         <property name="jdbcConfig" ref="jdbcConfig" />
     </bean>
 

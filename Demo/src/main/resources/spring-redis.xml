@@ -7,7 +7,7 @@
     	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <context:annotation-config />
-    <context:component-scan base-package="com.whosbean.qpush.pipe"/>
+    <context:component-scan base-package="com.argo.qpush.pipe"/>
 
     <bean id="jedisConfig" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="locations">
@@ -17,12 +17,12 @@
         </property>
     </bean>
 
-    <bean id="redisBucket" class="com.whosbean.qpush.pipe.redis.RedisBucket">
+    <bean id="redisBucket" class="com.argo.qpush.pipe.redis.RedisBucket">
         <constructor-arg index="0" ref="jedisConfig" />
     </bean>
 
-    <bean id="payloadRedisQueue" class="com.whosbean.qpush.pipe.redis.PayloadRedisQueue" />
+    <bean id="payloadRedisQueue" class="com.argo.qpush.pipe.redis.PayloadRedisQueue" />
 
-    <bean id="payloadRedisDQueue" class="com.whosbean.qpush.pipe.redis.PayloadRedisQueue" />
+    <bean id="payloadRedisDQueue" class="com.argo.qpush.pipe.redis.PayloadRedisQueue" />
 
 </beans>

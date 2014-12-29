@@ -37,4 +37,4 @@ DEFAULT_OPTS="$DEFAULT_OPTS -XX:+DisableExplicitGC -XX:SurvivorRatio=1 -XX:+UseC
 DEFAULT_OPTS="$DEFAULT_OPTS -DMB.home=\"$RESV_HOME\""
 
 echo java $DEBUG $DEFAULT_OPTS  -classpath $CLASSPATH  $MAIN_CLASS
-java $DEBUG $DEFAULT_OPTS  -classpath $CLASSPATH  $MAIN_CLASS &
+java $DEBUG $DEFAULT_OPTS  -classpath $CLASSPATH  $MAIN_CLASS >> stdouterr.log 2>&1 &

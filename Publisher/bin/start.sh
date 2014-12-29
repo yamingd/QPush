@@ -29,7 +29,8 @@ DEBUG_INFO=" -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n"
 DEBUG=""
 
 MAIN_CLASS="com.argo.qpush.publisher.ServerMain";
-DEFAULT_OPTS="-server -Xms8G -Xmx8G -Xmn1G -XX:PermSize=50M -XX:MaxPermSize=50M -Xss256k -Dio.netty.leakDetectionLevel=advanced" ;
+#DEFAULT_OPTS="-server -Xms8G -Xmx8G -Xmn1G -XX:PermSize=50M -XX:MaxPermSize=50M -Xss256k -Dio.netty.leakDetectionLevel=advanced" ;
+DEFAULT_OPTS="-server -Xms1G -Xmx1G -Xmn128m -XX:PermSize=50M -XX:MaxPermSize=50M -Xss256k -Dio.netty.leakDetectionLevel=advanced" ;
 
 
 DEFAULT_OPTS="$DEFAULT_OPTS -XX:+DisableExplicitGC -XX:SurvivorRatio=1 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:+CMSClassUnloadingEnabled -XX:LargePageSizeInBytes=128M -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=80 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintClassHistogram -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -Xloggc:gc.log -Dfile.encoding=UTF-8"

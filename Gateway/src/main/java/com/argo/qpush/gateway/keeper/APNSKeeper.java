@@ -50,7 +50,7 @@ public class APNSKeeper {
     }
 
     public static void push(SentProgress progress, Product product, Client cc, Payload message){
-        String json = MessageUtils.toJson(message.asAPNSMessage());
+        String json = message.asJson();
         ApnsService service = get(product);
         if (service != null){
             try{

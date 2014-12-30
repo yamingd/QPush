@@ -1,7 +1,6 @@
 package com.argo.qpush.gateway;
 
 import com.argo.qpush.core.entity.Payload;
-import com.argo.qpush.protobuf.convertor.PBConvertor;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,7 +25,7 @@ public class Connection {
     public void send(final SentProgress progress, Payload message) throws Exception {
         // 组装消息包
         if(channel.isOpen()){
-            byte[] msg = PBConvertor.fromBean(message).toByteArray();
+            byte[] msg = message.asAPNSMessage().toByteArray();
             send(progress, msg);
         }else{
             logger.error("Send Error. Channel is closed.");

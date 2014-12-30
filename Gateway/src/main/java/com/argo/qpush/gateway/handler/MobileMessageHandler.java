@@ -1,16 +1,12 @@
 package com.argo.qpush.gateway.handler;
 
-import com.argo.qpush.apns.APNSEvent;
-import com.argo.qpush.apns.APNSMessage;
-import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
-import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.core.service.ClientService;
-import com.argo.qpush.gateway.Commands;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.ServerConfig;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
+import com.argo.qpush.protobuf.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,8 +17,6 @@ import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.io.IOException;
 
 /**
  * Created by yaming_deng on 14-8-6.
@@ -59,10 +53,11 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         logger.info("channelRead: " + ctx.channel().hashCode());
         MetricBuilder.requestMeter.mark();
 
-        final APNSEvent cc;
+        final PBAPNSEvent cc;
+
         try {
-            cc = MessageUtils.asT(APNSEvent.class, (byte[])msg);
-        } catch (IOException e) {
+            cc = PBAPNSEvent.newBuilder().mergeFrom((byte[])msg).build();
+        } catch (Exception e) {
             logger.error("Invalid Data Package.", e);
             ack(ctx, null);
             return;
@@ -70,28 +65,28 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         ReferenceCountUtil.release(msg);
 
-        if (cc.typeId.intValue() == ClientType.Android){
+        if (cc.getTypeId() == PBAPNSEvent.DeviceTypes.Android_VALUE){
             MetricBuilder.clientAndroidMeter.mark();
-        }else if (cc.typeId.intValue() == ClientType.iOS){
+        }else if (cc.getTypeId() == PBAPNSEvent.DeviceTypes.iOS_VALUE){
             MetricBuilder.clientIOSMeter.mark();
         }
 
-        if(cc.op.intValue() == Commands.GO_ONLINE){
-            ConnectionKeeper.add(cc.appKey, cc.userId, new Connection(ctx.channel()));
+        if(cc.getOp() == PBAPNSEvent.Ops.Online_VALUE){
+            ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), new Connection(ctx.channel()));
             poolTaskExecutor.submit(new OnNewlyAddThread(cc));
             ack(ctx, cc);
-        }else if(cc.op.intValue() == Commands.KEEP_ALIVE){
+        }else if(cc.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
             //心跳
             ack(ctx, cc);
-        }else if(cc.op.intValue() == Commands.PUSH_ACK){
+        }else if(cc.getOp() == PBAPNSEvent.Ops.PushAck_VALUE){
             //推送反馈
             ack(ctx, cc);
-        }else if(cc.op.intValue() == Commands.GO_OFFLINE){
+        }else if(cc.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
             //离线
             poolTaskExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Client c0 = ClientService.instance.findByUserId(cc.userId);
+                    Client c0 = ClientService.instance.findByUserId(cc.getUserId());
                     if (c0 != null){
                         ClientService.instance.updateOnlineTs(c0.getId());
                     }
@@ -101,18 +96,11 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void ack(final ChannelHandlerContext ctx, APNSEvent cc){
-        APNSMessage message = new APNSMessage();
-        message.aps.alert = "ack";
-        message.userInfo.put("op", cc.op.toString());
-        //回复客户端.
-        byte[] bytes;
-        try {
-            bytes = MessageUtils.asBytes(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+    private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc){
+        PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
+        builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
+        builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue(cc.getOp() + ""));
+        byte[] bytes = builder.build().toByteArray();
 
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)
         data.writeBytes(bytes);

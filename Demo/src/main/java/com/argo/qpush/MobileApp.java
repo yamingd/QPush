@@ -1,10 +1,10 @@
 package com.argo.qpush;
 
-import com.argo.qpush.apns.APNSEvent;
-import com.argo.qpush.apns.APNSMessage;
 import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.gateway.Commands;
+import com.argo.qpush.protobuf.PBAPNSEvent;
+import com.argo.qpush.protobuf.PBAPNSMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -52,8 +52,8 @@ public class MobileApp {
             byte[] dd = (byte[])msg;
             System.out.println("message size: " + dd.length);
             try {
-                APNSMessage event = MessageUtils.asT(APNSMessage.class, dd);
-                if (event != null && event.aps != null) {
+                PBAPNSMessage event = PBAPNSMessage.newBuilder().mergeFrom(dd).build();
+                if (event != null && event.getAps() != null) {
                     System.out.println("channelRead: " + dd.length + " @ " + event);
                 }
             } catch (Exception e) {
@@ -134,17 +134,17 @@ public class MobileApp {
             return;
         }
         Channel channel = channels.pop();
-        APNSEvent event = new APNSEvent();
-        event.op = Commands.GO_ONLINE;
-        event.appKey = "app01";
-        event.userId = "1";
-        event.typeId = ClientType.Android;
+        PBAPNSEvent event = PBAPNSEvent.newBuilder()
+                .setOp(PBAPNSEvent.Ops.Online_VALUE)
+                .setAppKey("app01")
+                .setUserId("1")
+                .setTypeId(PBAPNSEvent.DeviceTypes.Android_VALUE).build();
         send(channel, event);
         channels.addLast(channel);
     }
 
-    private void send(Channel c, APNSEvent event) throws IOException {
-        byte[] bytes = MessageUtils.asBytes(event);
+    private void send(Channel c, PBAPNSEvent event) throws IOException {
+        byte[] bytes = event.toByteArray();
         final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
         data.writeBytes(bytes);
         ChannelFuture cf = c.writeAndFlush(data);

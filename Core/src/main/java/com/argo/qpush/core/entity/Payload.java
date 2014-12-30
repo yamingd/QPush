@@ -1,12 +1,17 @@
 package com.argo.qpush.core.entity;
 
-import com.argo.qpush.apns.APNSMessage;
 import com.argo.qpush.client.PayloadMessage;
 import com.argo.qpush.core.MessageUtils;
+import com.argo.qpush.protobuf.PBAPNSBody;
+import com.argo.qpush.protobuf.PBAPNSMessage;
+import com.argo.qpush.protobuf.PBAPNSUserInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.msgpack.annotation.MessagePackMessage;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消息结构体. 参考苹果消息规范
@@ -160,8 +165,32 @@ public class Payload implements Serializable {
         this.sentDate = sentDate;
     }
 
-    public APNSMessage asAPNSMessage(){
-        return new APNSMessage(this);
+    public PBAPNSMessage asAPNSMessage(){
+        PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
+        builder.setAps(PBAPNSBody.newBuilder().setBadge(this.badge).setAlert(this.title).setSound(this.sound));
+        if (StringUtils.isNotBlank(this.extras)){
+            Map<String, String> tmp = MessageUtils.asT(Map.class, this.extras);
+            for(String key : tmp.keySet()){
+                builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey(key).setValue(tmp.get(key)));
+            }
+        }
+        return builder.build();
+    }
+
+    public String asJson(){
+        Map<String, Object> builder = new HashMap<String, Object>();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("badge", this.badge);
+        map.put("alert", this.title);
+        map.put("sound", this.sound);
+        builder.put("aps", map);
+
+        if (StringUtils.isNotBlank(this.extras)){
+            Map<String, String> tmp = MessageUtils.asT(Map.class, this.extras);
+            builder.put("userInfo", tmp);
+        }
+
+        return MessageUtils.toJson(builder);
     }
 
     public Payload() {

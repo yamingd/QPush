@@ -53,27 +53,10 @@ public class ClientProxyDelegate {
             logger.error("配置文件加载失败", e);
         }
 
-        ClientProxyDelegate.instance.start();
-
     }
 
     public void start() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                connect();
-            }
-        });
-
-        thread.start();
-
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        logger.info("ClientProxyDelegate.instance DONE.");
+        connect();
     }
 
     private void connect(){
@@ -118,7 +101,7 @@ public class ClientProxyDelegate {
 
             countDownLatch.countDown();
 
-            System.out.println("QPush server. connected.");
+            logger.info("QPush server. connected. {}:{}", host, port);
 
         } catch (Exception e){
             logger.error("QPush server connect error.", e);

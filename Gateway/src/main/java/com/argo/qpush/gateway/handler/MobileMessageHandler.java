@@ -58,6 +58,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         try {
             byte[] bytes = (byte[]) msg;
             logger.info("Got Message, length:{}", bytes.length);
+            if(logger.isDebugEnabled()){
+                logger.debug("bytes: {}", bytes);
+            }
             cc = PBAPNSEvent.newBuilder().mergeFrom(bytes).build();
         } catch (Exception e) {
             logger.error("Invalid Data Package.", e);

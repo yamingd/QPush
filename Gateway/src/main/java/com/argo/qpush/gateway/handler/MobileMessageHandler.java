@@ -25,16 +25,8 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
     protected static Logger logger = LoggerFactory.getLogger(MobileMessageHandler.class);
 
-    private ThreadPoolTaskExecutor poolTaskExecutor;
-
     public MobileMessageHandler(){
-        int limit = Integer.parseInt(ServerConfig.getConf().getProperty("handler.executors", "100"));
 
-        poolTaskExecutor = new ThreadPoolTaskExecutor();
-        poolTaskExecutor.setCorePoolSize(limit/10);
-        poolTaskExecutor.setMaxPoolSize(limit);
-        poolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-        poolTaskExecutor.afterPropertiesSet();
     }
 
     /**
@@ -78,7 +70,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         if(cc.getOp() == PBAPNSEvent.Ops.Online_VALUE){
             ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), new Connection(ctx.channel()));
-            poolTaskExecutor.submit(new OnNewlyAddThread(cc));
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
             ack(ctx, cc);
         }else if(cc.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
             //心跳
@@ -88,7 +80,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             ack(ctx, cc);
         }else if(cc.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
             //离线
-            poolTaskExecutor.submit(new Runnable() {
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
                     Client c0 = ClientService.instance.findByUserId(cc.getUserId());

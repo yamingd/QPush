@@ -1,6 +1,7 @@
 package com.argo.qpush.gateway;
 
 import com.argo.qpush.gateway.handler.MobileMessageHandler;
+import com.argo.qpush.gateway.handler.PBByteArrayDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -40,7 +41,7 @@ public class ServerMain {
                                 throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
                             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-                            pipeline.addLast("bytesDecoder",new ByteArrayDecoder());
+                            pipeline.addLast("bytesDecoder",new PBByteArrayDecoder());
 
                             pipeline.addLast("frameEncoder", new LengthFieldPrepender(4, false));
                             pipeline.addLast("bytesEncoder", new ByteArrayEncoder());

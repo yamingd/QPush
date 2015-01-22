@@ -25,6 +25,7 @@ message PBAPNSEvent {
         KeepAlive = 2;
         PushAck = 3;
         Offline = 4;
+        Error = 5;
     }
 
     enum DeviceTypes{

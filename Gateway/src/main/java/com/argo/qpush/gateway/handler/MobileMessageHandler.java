@@ -56,7 +56,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         final PBAPNSEvent cc;
 
         try {
-            cc = PBAPNSEvent.newBuilder().mergeFrom((byte[])msg).build();
+            byte[] bytes = (byte[]) msg;
+            logger.info("Got Message, length:{}", bytes.length);
+            cc = PBAPNSEvent.newBuilder().mergeFrom(bytes).build();
         } catch (Exception e) {
             logger.error("Invalid Data Package.", e);
             ack(ctx, null);
@@ -99,7 +101,11 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
-        builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue(cc.getOp() + ""));
+        if (cc != null) {
+            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue(cc.getOp() + ""));
+        }else{
+            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue("5"));
+        }
         byte[] bytes = builder.build().toByteArray();
 
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)

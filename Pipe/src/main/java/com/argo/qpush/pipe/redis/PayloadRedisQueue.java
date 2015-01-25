@@ -107,10 +107,10 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
             payload.setStatusId(PayloadStatus.Pending0);
             payload.setCreateAt(new Date().getTime()/1000);
             String key = String.format("qpush:{%s:%s}.q", payload.getProductId(), payload.getBroadcast());
-            jedis.rpush(key.getBytes(), MessageUtils.asBytes(payload));
+            long ret = jedis.rpush(key.getBytes(), MessageUtils.asBytes(payload));
             long total = jedis.incr(QPUSH_PENDING);
             redisBucket.returnResource(jedis);
-            logger.info("qpush.pending total = " + total);
+            logger.info("qpush.pending total = {}, pushRet={}", total, ret);
         } catch (Exception e) {
             logger.error("添加消息进Redis错误", e);
             redisBucket.returnBrokenResource(jedis);

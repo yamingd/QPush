@@ -17,7 +17,7 @@ public class Product {
     /**
      * 产品客户端唯一码
      */
-    private String key;
+    private String appKey;
     /**
      * 产品客户端信息加密串
      */
@@ -105,14 +105,6 @@ public class Product {
         this.devCertPass = devCertPass;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     @Override
     public int hashCode() {
         return this.id;
@@ -127,5 +119,13 @@ public class Product {
             return o.getId().equals(this.getId());
         }
         return false;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
     }
 }

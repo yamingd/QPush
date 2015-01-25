@@ -202,7 +202,7 @@ public class Payload implements Serializable {
         this.sound = message.sound;
         this.clients = message.clients;
         this.extras = MessageUtils.toJson(message.ext);
-        this.broadcast = message.broadcast ? 1 : 0;
+        this.broadcast = message.broadcast == null || !message.broadcast ? 0 : 1;
     }
 
     @Override

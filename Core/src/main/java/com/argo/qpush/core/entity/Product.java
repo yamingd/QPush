@@ -17,7 +17,7 @@ public class Product {
     /**
      * 产品客户端唯一码
      */
-    private String appKey;
+    private String key;
     /**
      * 产品客户端信息加密串
      */
@@ -51,14 +51,6 @@ public class Product {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getAppKey() {
-        return appKey;
-    }
-
-    public void setAppKey(String appKey) {
-        this.appKey = appKey;
     }
 
     public String getSecret() {
@@ -111,6 +103,14 @@ public class Product {
 
     public void setDevCertPass(String devCertPass) {
         this.devCertPass = devCertPass;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Override

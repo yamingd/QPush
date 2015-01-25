@@ -155,7 +155,7 @@ public class Dispatcher extends Thread {
                 @Override
                 public void run() {
 
-                    int total0 = ClientKeeper.count(product.getAppKey());
+                    int total0 = ClientKeeper.count(product.getKey());
                     int total1 = 0;
                     if (product.getClientTypeid().intValue() == ClientType.iOS) {
                         total1 = ClientService.instance.countOfflineByType(product.getId(), ClientType.iOS);

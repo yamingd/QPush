@@ -45,7 +45,7 @@ public class OneSendThread implements Callable<Integer> {
         if(message.getClients()!=null){
             SentProgress thisProg = new SentProgress(message.getClients().size());
             for (String client : message.getClients()){
-                Connection c = ConnectionKeeper.get(product.getAppKey(), client);
+                Connection c = ConnectionKeeper.get(product.getKey(), client);
                 if(c != null) {
                     c.send(thisProg, message);
                 }else{

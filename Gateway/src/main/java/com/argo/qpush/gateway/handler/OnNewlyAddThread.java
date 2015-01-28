@@ -2,8 +2,8 @@ package com.argo.qpush.gateway.handler;
 
 import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.entity.Product;
-import com.argo.qpush.core.service.ClientService;
-import com.argo.qpush.core.service.ProductService;
+import com.argo.qpush.core.service.ClientServiceImpl;
+import com.argo.qpush.core.service.ProductServiceImpl;
 import com.argo.qpush.gateway.dispatch.Dispatcher;
 import com.argo.qpush.gateway.dispatch.DispatcherRunner;
 import com.argo.qpush.protobuf.PBAPNSEvent;
@@ -27,17 +27,17 @@ public class OnNewlyAddThread implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
-        Client client = ClientService.instance.findByUserId(cc.getUserId());
+        Client client = ClientServiceImpl.instance.findByUserId(cc.getUserId());
         boolean isnew = false;
         if (client == null){
             client = new Client();
-            Product product = ProductService.instance.findByKey(cc.getAppKey());
+            Product product = ProductServiceImpl.instance.findByKey(cc.getAppKey());
             client.setProductId(product.getId());
             client.setUserId(cc.getUserId());
             client.setTypeId(cc.getTypeId()); //
             client.setDeviceToken(cc.getToken());
             try {
-                ClientService.instance.add(client);
+                ClientServiceImpl.instance.add(client);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
@@ -50,7 +50,7 @@ public class OnNewlyAddThread implements Callable<Boolean> {
                 dispatcher.pushOfflinePayload(cc.getUserId());
             }
             try {
-                ClientService.instance.updateOnlineTs(client.getId());
+                ClientServiceImpl.instance.updateOnlineTs(client.getId());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

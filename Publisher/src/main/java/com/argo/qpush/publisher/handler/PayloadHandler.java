@@ -36,6 +36,9 @@ public class PayloadHandler implements InitializingBean, ApplicationContextAware
     @Qualifier("appConfig")
     private Properties conf;
 
+    @Autowired
+    private ProductService productService;
+
     private PayloadQueue queue;
 
     @Override
@@ -53,7 +56,7 @@ public class PayloadHandler implements InitializingBean, ApplicationContextAware
     }
 
     public void save(PayloadMessage message) {
-        Product product = ProductService.instance.findByKey(message.appkey);
+        Product product = productService.findByKey(message.appkey);
         if (product != null) {
             Payload payload = new Payload(message);
             payload.setProductId(product.getId());

@@ -1,12 +1,12 @@
 package com.argo.qpush.gateway.dispatch;
 
-import com.google.common.collect.Lists;
 import com.argo.qpush.core.entity.Product;
 import com.argo.qpush.core.service.ProductService;
 import com.argo.qpush.gateway.keeper.APNSKeeper;
 import com.argo.qpush.gateway.keeper.ClientKeeper;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import com.argo.qpush.pipe.PayloadQueue;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;

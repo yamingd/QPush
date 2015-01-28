@@ -1,10 +1,10 @@
 package com.argo.qpush.pipe.redis;
 
+import com.argo.qpush.core.service.PayloadService;
 import com.google.common.collect.Lists;
 import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadStatus;
-import com.argo.qpush.core.service.PayloadService;
 import com.argo.qpush.pipe.PayloadCursor;
 import com.argo.qpush.pipe.PayloadQueue;
 import org.slf4j.Logger;

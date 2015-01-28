@@ -38,6 +38,6 @@ public class PayloadMysqlQueue implements PayloadQueue {
 
     @Override
     public void add(Payload payload) {
-        PayloadService.instance.add(payload);
+        payloadService.add(payload);
     }
 }

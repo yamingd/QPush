@@ -2,7 +2,7 @@ package com.argo.qpush.gateway.dispatch;
 
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.Product;
-import com.argo.qpush.core.service.PayloadService;
+import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
@@ -32,7 +32,7 @@ public class OfflineSendThread implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        Payload message = PayloadService.instance.findLatest(product.getId(), userId);
+        Payload message = PayloadServiceImpl.instance.findLatest(product.getId(), userId);
         if(message == null){
             return 0;
         }
@@ -57,7 +57,7 @@ public class OfflineSendThread implements Callable<Integer> {
             int total = progress.getSuccess().get();
 
             try {
-                PayloadService.instance.updateSendStatus(message, total);
+                PayloadServiceImpl.instance.updateSendStatus(message, total);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

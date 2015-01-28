@@ -2,7 +2,7 @@ package com.argo.qpush.gateway.handler;
 
 import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
-import com.argo.qpush.core.service.ClientService;
+import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import com.argo.qpush.protobuf.PBAPNSBody;
@@ -92,9 +92,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    Client c0 = ClientService.instance.findByUserId(cc.getUserId());
+                    Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
                     if (c0 != null){
-                        ClientService.instance.updateOnlineTs(c0.getId());
+                        ClientServiceImpl.instance.updateOnlineTs(c0.getId());
                     }
                 }
             });

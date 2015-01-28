@@ -2,8 +2,8 @@ package com.argo.qpush.gateway.dispatch;
 
 import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.*;
-import com.argo.qpush.core.service.ClientService;
-import com.argo.qpush.core.service.PayloadService;
+import com.argo.qpush.core.service.ClientServiceImpl;
+import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.APNSKeeper;
@@ -52,7 +52,7 @@ public class OneSendThread implements Callable<Integer> {
                     if (product.getClientTypeid().intValue() != ClientType.iOS){
                         continue;
                     }
-                    Client cc = ClientService.instance.findByUserId(client);
+                    Client cc = ClientServiceImpl.instance.findByUserId(client);
                     if (cc == null){
                         logger.warn("Client not found. client=" + client);
                         continue;
@@ -88,9 +88,9 @@ public class OneSendThread implements Callable<Integer> {
                     message.setTotalUsers(total);
                     message.setSentDate(new Date().getTime()/1000);
                     message.setStatusId(PayloadStatus.Sent);
-                    PayloadService.instance.saveWithId(message);
+                    PayloadServiceImpl.instance.saveWithId(message);
                 }else {
-                    PayloadService.instance.updateSendStatus(message, total);
+                    PayloadServiceImpl.instance.updateSendStatus(message, total);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

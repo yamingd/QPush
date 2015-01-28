@@ -5,8 +5,8 @@ import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadStatus;
 import com.argo.qpush.core.entity.Product;
-import com.argo.qpush.core.service.ClientService;
-import com.argo.qpush.core.service.PayloadService;
+import com.argo.qpush.core.service.ClientServiceImpl;
+import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.ClientKeeper;
 import com.argo.qpush.pipe.PayloadCursor;
@@ -158,7 +158,7 @@ public class Dispatcher extends Thread {
                     int total0 = ClientKeeper.count(product.getAppKey());
                     int total1 = 0;
                     if (product.getClientTypeid().intValue() == ClientType.iOS) {
-                        total1 = ClientService.instance.countOfflineByType(product.getId(), ClientType.iOS);
+                        total1 = ClientServiceImpl.instance.countOfflineByType(product.getId(), ClientType.iOS);
                     }
                     if (total0 + total1 == 0) {
                         saveBoradcastStatus(item, 0);
@@ -248,9 +248,9 @@ public class Dispatcher extends Thread {
                 message.setTotalUsers(total);
                 message.setSentDate(new Date().getTime()/1000);
                 message.setStatusId(PayloadStatus.Sent);
-                PayloadService.instance.saveWithId(message);
+                PayloadServiceImpl.instance.saveWithId(message);
             }else {
-                PayloadService.instance.updateSendStatus(message, total);
+                PayloadServiceImpl.instance.updateSendStatus(message, total);
             }
         } catch (Exception e) {
             e.printStackTrace();

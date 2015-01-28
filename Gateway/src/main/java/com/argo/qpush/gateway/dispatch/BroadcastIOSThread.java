@@ -4,7 +4,7 @@ import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.Product;
-import com.argo.qpush.core.service.ClientService;
+import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.APNSKeeper;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class BroadcastIOSThread implements Callable<Integer> {
             return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){
-            List<Client> clients = ClientService.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
+            List<Client> clients = ClientServiceImpl.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
             for (Client c : clients){
                 APNSKeeper.push(progress, this.product, c, message);
             }

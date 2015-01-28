@@ -167,6 +167,9 @@ public class Payload implements Serializable {
 
     public PBAPNSMessage asAPNSMessage(){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
+        if (this.badge == null){
+            this.badge = 0;
+        }
         builder.setAps(PBAPNSBody.newBuilder().setBadge(this.badge).setAlert(this.title).setSound(this.sound));
         if (StringUtils.isNotBlank(this.extras)){
             Map<String, String> tmp = MessageUtils.asT(Map.class, this.extras);

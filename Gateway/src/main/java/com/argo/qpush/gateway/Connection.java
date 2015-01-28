@@ -29,7 +29,7 @@ public class Connection {
             send(progress, msg);
         }else{
             progress.incrFailed();
-            logger.error("Send Error. Channel is closed. {}", message);
+            logger.error("Send Error. Channel is closed. {}, {}", channel, message);
         }
     }
 
@@ -41,10 +41,13 @@ public class Connection {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {
                 if(cf.cause() != null){
-                    logger.error("Send Error.", cf.cause());
+                    logger.error("{}, Send Error.", channel, cf.cause());
                     progress.incrFailed();
                 }else {
                     progress.incrSuccess();
+                    if (logger.isDebugEnabled()){
+                        logger.debug("{}, Send OK.", channel);
+                    }
                 }
             }
         });

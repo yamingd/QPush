@@ -41,6 +41,7 @@ public class BroadcastIOSThread implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if(message == null){
+            progress.incrFailed();
             return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){
@@ -49,6 +50,8 @@ public class BroadcastIOSThread implements Callable<Integer> {
                 APNSKeeper.push(progress, this.product, c, message);
             }
             return 1;
+        }else{
+            progress.incrFailed();
         }
 
         return 0;

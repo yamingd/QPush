@@ -70,7 +70,7 @@ public class OneSendThread implements Callable<Integer> {
                     }
                     Client cc = ClientServiceImpl.instance.findByUserId(client);
                     if (cc == null){
-                        logger.warn("Client not found. client=" + client);
+                        logger.error("Client not found. client=" + client);
                         thisProg.incrFailed();
                         continue;
                     }

@@ -14,19 +14,25 @@ import org.slf4j.LoggerFactory;
  */
 public class Connection {
 
-    protected static Logger logger = LoggerFactory.getLogger(Connection.class);
+    protected Logger logger = null;
 
     private final Channel channel;
 
     public Connection(Channel channel) {
         this.channel = channel;
+        logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + channel.hashCode());
     }
 
-    public void send(final SentProgress progress, Payload message) throws Exception {
+    public void send(final SentProgress progress, Payload message){
         // 组装消息包
         if(channel.isOpen()){
-            byte[] msg = message.asAPNSMessage().toByteArray();
-            send(progress, msg);
+            try {
+                byte[] msg = message.asAPNSMessage().toByteArray();
+                send(progress, msg);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                progress.incrFailed();
+            }
         }else{
             progress.incrFailed();
             logger.error("Send Error. Channel is closed. {}, {}", channel, message);
@@ -46,7 +52,7 @@ public class Connection {
                 }else {
                     progress.incrSuccess();
                     if (logger.isDebugEnabled()){
-                        logger.debug("{}, Send OK.", channel);
+                        logger.debug("{}, Send OK. {}", channel, channel.hashCode());
                     }
                 }
             }

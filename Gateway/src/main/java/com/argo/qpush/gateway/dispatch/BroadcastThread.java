@@ -62,6 +62,8 @@ public class BroadcastThread implements Callable<Integer> {
             }
 
             return 1;
+        }else{
+            progress.incrFailed();
         }
 
         return 0;

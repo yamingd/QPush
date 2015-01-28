@@ -4,9 +4,11 @@ import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.service.ClientService;
 import com.argo.qpush.gateway.Connection;
-import com.argo.qpush.gateway.ServerConfig;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
-import com.argo.qpush.protobuf.*;
+import com.argo.qpush.protobuf.PBAPNSBody;
+import com.argo.qpush.protobuf.PBAPNSEvent;
+import com.argo.qpush.protobuf.PBAPNSMessage;
+import com.argo.qpush.protobuf.PBAPNSUserInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,7 +18,6 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Created by yaming_deng on 14-8-6.
@@ -42,15 +43,17 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        logger.info("channelRead: " + ctx.channel().hashCode());
+        if (logger.isDebugEnabled()) {
+            logger.info("channelRead: " + ctx.channel().hashCode());
+        }
         MetricBuilder.requestMeter.mark();
 
         final PBAPNSEvent cc;
 
         try {
             byte[] bytes = (byte[]) msg;
-            logger.info("Got Message, length:{}", bytes.length);
             if(logger.isDebugEnabled()){
+                logger.debug("Got Message, length:{}", bytes.length);
                 logger.debug("bytes: {}", bytes);
             }
             cc = PBAPNSEvent.newBuilder().mergeFrom(bytes).build();
@@ -69,9 +72,15 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
 
         if(cc.getOp() == PBAPNSEvent.Ops.Online_VALUE){
+            if (logger.isDebugEnabled()){
+                logger.debug("Got Online Message. {}", cc);
+            }
             ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), new Connection(ctx.channel()));
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
             ack(ctx, cc);
+            if (logger.isDebugEnabled()){
+                logger.debug("Got Online Message and handle DONE. {}", cc);
+            }
         }else if(cc.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
             //心跳
             ack(ctx, cc);
@@ -97,9 +106,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
         if (cc != null) {
-            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue(cc.getOp() + ""));
+            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue(cc.getOp() + "").setKey("kindId").setValue("sync"));
         }else{
-            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue("5"));
+            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue("5").setKey("kindId").setValue("sync"));
         }
         byte[] bytes = builder.build().toByteArray();
 

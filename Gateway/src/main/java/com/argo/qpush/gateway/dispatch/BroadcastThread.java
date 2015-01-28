@@ -40,6 +40,7 @@ public class BroadcastThread implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if(message == null){
+            this.progress.incrFailed();
             return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){

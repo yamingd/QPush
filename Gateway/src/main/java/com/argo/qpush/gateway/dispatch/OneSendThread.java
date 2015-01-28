@@ -38,7 +38,19 @@ public class OneSendThread implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        int ret = 0;
+        try {
+            ret = doSend();
+        } catch (Exception e) {
+            this.progress.incrFailed();
+            logger.error(e.getMessage(), e);
+        }
+        return ret;
+    }
+
+    private Integer doSend() throws Exception {
         if(message == null){
+            this.progress.incrFailed();
             return 0;
         }
 
@@ -53,17 +65,21 @@ public class OneSendThread implements Callable<Integer> {
                     c.send(thisProg, message);
                 }else{
                     if (product.getClientTypeid().intValue() != ClientType.iOS){
+                        thisProg.incrFailed();
                         continue;
                     }
                     Client cc = ClientServiceImpl.instance.findByUserId(client);
                     if (cc == null){
                         logger.warn("Client not found. client=" + client);
+                        thisProg.incrFailed();
                         continue;
                     }
                     if (!cc.isDevice(ClientType.iOS)){
+                        thisProg.incrFailed();
                         continue;
                     }
                     if (StringUtils.isBlank(cc.getDeviceToken())){
+                        thisProg.incrFailed();
                         logger.error("Client's deviceToken not found. client=" + client);
                         continue;
                     }

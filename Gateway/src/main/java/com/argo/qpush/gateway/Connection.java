@@ -28,7 +28,8 @@ public class Connection {
             byte[] msg = message.asAPNSMessage().toByteArray();
             send(progress, msg);
         }else{
-            logger.error("Send Error. Channel is closed.");
+            progress.incrFailed();
+            logger.error("Send Error. Channel is closed. {}", message);
         }
     }
 

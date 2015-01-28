@@ -7,6 +7,8 @@ import com.argo.qpush.core.service.ProductService;
 import com.argo.qpush.gateway.dispatch.Dispatcher;
 import com.argo.qpush.gateway.dispatch.DispatcherRunner;
 import com.argo.qpush.protobuf.PBAPNSEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
@@ -15,6 +17,8 @@ import java.util.concurrent.Callable;
  * Created by yaming_deng on 14-8-11.
  */
 public class OnNewlyAddThread implements Callable<Boolean> {
+
+    protected static Logger logger = LoggerFactory.getLogger(OnNewlyAddThread.class);
 
     private PBAPNSEvent cc;
     public OnNewlyAddThread(PBAPNSEvent cc){
@@ -35,7 +39,7 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             try {
                 ClientService.instance.add(client);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
             isnew = true;
         }
@@ -48,7 +52,7 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             try {
                 ClientService.instance.updateOnlineTs(client.getId());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
 

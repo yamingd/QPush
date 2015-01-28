@@ -6,6 +6,8 @@ import com.argo.qpush.core.service.PayloadService;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
@@ -16,6 +18,8 @@ import java.util.concurrent.Callable;
  * Created by yaming_deng on 14-8-8.
  */
 public class OfflineSendThread implements Callable<Integer> {
+
+    protected static Logger logger = LoggerFactory.getLogger(OfflineSendThread.class);
 
     private String userId;
     private Product product;
@@ -47,7 +51,7 @@ public class OfflineSendThread implements Callable<Integer> {
             try {
                 progress.getCountDownLatch().await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             int total = progress.getSuccess().get();
@@ -55,7 +59,7 @@ public class OfflineSendThread implements Callable<Integer> {
             try {
                 PayloadService.instance.updateSendStatus(message, total);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             return total;

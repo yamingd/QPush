@@ -71,7 +71,7 @@ public class OneSendThread implements Callable<Integer> {
             try {
                 thisProg.getCountDownLatch().await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             logger.info("SingSend Summary. id=" + message.getId() + ", " + thisProg);
@@ -93,7 +93,7 @@ public class OneSendThread implements Callable<Integer> {
                     PayloadService.instance.updateSendStatus(message, total);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             this.progress.incrSuccess();

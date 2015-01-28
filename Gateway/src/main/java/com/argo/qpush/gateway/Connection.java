@@ -17,21 +17,24 @@ public class Connection {
     protected Logger logger = null;
 
     private final Channel channel;
+    private String appKey;
+    private String userId;
 
     public Connection(Channel channel) {
         this.channel = channel;
         logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + channel.hashCode());
     }
 
-    public void send(final SentProgress progress, Payload message){
+    public void send(final SentProgress progress, final Payload message){
         // 组装消息包
         if(channel.isOpen()){
             try {
                 byte[] msg = message.asAPNSMessage().toByteArray();
-                send(progress, msg);
+                send(progress, message, msg);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 progress.incrFailed();
+                message.addFailedClient(this.userId);
             }
         }else{
             progress.incrFailed();
@@ -39,7 +42,7 @@ public class Connection {
         }
     }
 
-    public void send(final SentProgress progress, final byte[] msg) {
+    public void send(final SentProgress progress, final Payload message, final byte[] msg) {
         try {
             final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
             data.writeBytes(msg);
@@ -50,6 +53,7 @@ public class Connection {
                     if(cf.cause() != null){
                         logger.error("{}, Send Error.", channel, cf.cause());
                         progress.incrFailed();
+                        message.addFailedClient(userId);
                     }else {
                         progress.incrSuccess();
                         if (logger.isDebugEnabled()){
@@ -60,8 +64,25 @@ public class Connection {
             });
         } catch (Exception e) {
             progress.incrFailed();
+            message.addFailedClient(userId);
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public void close(){

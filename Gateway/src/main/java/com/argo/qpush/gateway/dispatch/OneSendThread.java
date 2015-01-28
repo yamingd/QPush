@@ -64,10 +64,6 @@ public class OneSendThread implements Callable<Integer> {
                 if(c != null) {
                     c.send(thisProg, message);
                 }else{
-                    if (product.getClientTypeid().intValue() != ClientType.iOS){
-                        thisProg.incrFailed();
-                        continue;
-                    }
                     Client cc = ClientServiceImpl.instance.findByUserId(client);
                     if (cc == null){
                         logger.error("Client not found. client=" + client);
@@ -76,10 +72,12 @@ public class OneSendThread implements Callable<Integer> {
                     }
                     if (!cc.isDevice(ClientType.iOS)){
                         thisProg.incrFailed();
+                        message.addFailedClient(cc.getUserId());
                         continue;
                     }
                     if (StringUtils.isBlank(cc.getDeviceToken())){
                         thisProg.incrFailed();
+                        message.addFailedClient(cc.getUserId());
                         logger.error("Client's deviceToken not found. client=" + client);
                         continue;
                     }
@@ -107,7 +105,7 @@ public class OneSendThread implements Callable<Integer> {
                     message.setTotalUsers(total);
                     message.setSentDate(new Date().getTime()/1000);
                     message.setStatusId(PayloadStatus.Sent);
-                    PayloadServiceImpl.instance.saveWithId(message);
+                    PayloadServiceImpl.instance.saveAfterSent(message);
                 }else {
                     PayloadServiceImpl.instance.updateSendStatus(message, total);
                 }

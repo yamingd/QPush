@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -104,13 +105,13 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
     @Override
     @TxMain
-    public void saveWithId(final Payload payload) throws Exception {
+    public void saveAfterSent(final Payload payload) throws Exception {
         if (payload == null){
             return;
         }
 
         if (payload.getId() == null || payload.getId().intValue() == 0){
-            throw new Exception("saveWithId needs payload to be having id value.");
+            throw new Exception("saveAfterSent needs payload to be having id value.");
         }
 
         jdbcExecutor.submit(new Runnable() {
@@ -144,9 +145,11 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                 if (payload.getClients() != null){
                     List<Object[]> args = Lists.newArrayList();
-                    final String sql0 = "insert into payload_client(id, userId, productId, statusId)values(?, ?, ?, ?)";
+                    Set<String> cc = payload.getFailedClients();
+                    final String sql0 = "insert into payload_client(id, userId, productId, statusId, createTime)values(?, ?, ?, ?, ?)";
                     for(String userId : payload.getClients()){
-                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), payload.getStatusId()});
+                        int statusId = cc.contains(userId) ? 0 : 1;
+                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), statusId, new Date().getTime()/1000});
                     }
                     mainJdbc.batchUpdate(sql0, args);
                     MetricBuilder.jdbcUpdateMeter.mark(1);
@@ -185,8 +188,15 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                 String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
                 mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime()/1000, message.getId());
 
-                sql = "update payload_client set statusId=? where id = ?";
-                mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, message.getId());
+                sql = "update payload_client set statusId=?, createTime=? where id = ? and userId = ?";
+
+                List<Object[]> args = Lists.newArrayList();
+                Set<String> cc = message.getFailedClients();
+                for(String userId : message.getClients()){
+                    int statusId = cc.contains(userId) ? 0 : 1;
+                    args.add(new Object[]{statusId, new Date().getTime()/1000, message.getId(), userId});
+                }
+                mainJdbc.batchUpdate(sql, args);
 
                 MetricBuilder.jdbcUpdateMeter.mark(2);
 

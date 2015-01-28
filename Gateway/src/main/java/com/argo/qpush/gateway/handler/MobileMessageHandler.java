@@ -2,6 +2,7 @@ package com.argo.qpush.gateway.handler;
 
 import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
+import com.argo.qpush.core.entity.ClientStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
@@ -75,7 +76,10 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (logger.isDebugEnabled()){
                 logger.debug("Got Online Message. {}", cc);
             }
-            ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), new Connection(ctx.channel()));
+            Connection conn = new Connection(ctx.channel());
+            conn.setUserId(cc.getUserId());
+            conn.setAppKey(cc.getAppKey());
+            ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), conn);
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
             ack(ctx, cc);
             if (logger.isDebugEnabled()){
@@ -94,7 +98,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 public void run() {
                     Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
                     if (c0 != null){
-                        ClientServiceImpl.instance.updateOnlineTs(c0.getId());
+                        ClientServiceImpl.instance.updateStatus(c0.getId(), ClientStatus.Offline);
                     }
                 }
             });
@@ -148,6 +152,13 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx)
             throws Exception {
         logger.info("channelInactive: " + ctx.channel().hashCode());
+        Connection connection = ConnectionKeeper.get(ctx.channel().hashCode());
+        if (null != connection){
+            Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
+            if (null != client){
+                ClientServiceImpl.instance.updateStatus(client.getId(), ClientStatus.Offline);
+            }
+        }
         ConnectionKeeper.remove(ctx.channel().hashCode());
     }
 

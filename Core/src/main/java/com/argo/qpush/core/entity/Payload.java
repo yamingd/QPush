@@ -5,6 +5,7 @@ import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.protobuf.PBAPNSBody;
 import com.argo.qpush.protobuf.PBAPNSMessage;
 import com.argo.qpush.protobuf.PBAPNSUserInfo;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.msgpack.annotation.MessagePackMessage;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 消息结构体. 参考苹果消息规范
@@ -165,6 +167,7 @@ public class Payload implements Serializable {
         this.sentDate = sentDate;
     }
 
+
     public PBAPNSMessage asAPNSMessage(){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         if (this.badge == null){
@@ -206,6 +209,16 @@ public class Payload implements Serializable {
         this.clients = message.clients;
         this.extras = MessageUtils.toJson(message.ext);
         this.broadcast = message.broadcast == null || !message.broadcast ? 0 : 1;
+    }
+
+    private Map<String, Integer> failedClients = Maps.newConcurrentMap();
+
+    public Set<String> getFailedClients() {
+        return failedClients.keySet();
+    }
+
+    public void addFailedClient(String userId){
+        failedClients.put(userId, 1);
     }
 
     @Override

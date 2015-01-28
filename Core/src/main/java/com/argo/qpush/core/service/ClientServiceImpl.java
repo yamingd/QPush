@@ -53,7 +53,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
                 ps.setObject(2, client.getUserId());
                 ps.setObject(3, client.getDeviceToken());
                 ps.setObject(4, new Date());
-                ps.setObject(5, ClientStatus.NewlyAdd);
+                ps.setObject(5, ClientStatus.Online);
                 ps.setObject(6, client.getTypeId());
                 return ps;
             }
@@ -92,7 +92,13 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     @Override
     @TxMain
     public void updateOnlineTs(long id){
-        String sql = "update client set lastOnline=? where id = ?";
-        this.mainJdbc.update(sql, new Date().getTime()/1000, id);
+        String sql = "update client set lastOnline=?, statusId=? where id = ?";
+        this.mainJdbc.update(sql, new Date().getTime()/1000, ClientStatus.Online, id);
+    }
+
+    @Override
+    public void updateStatus(long id, int statusId) {
+        String sql = "update client set lastOnline=?, statusId=? where id = ?";
+        this.mainJdbc.update(sql, new Date().getTime()/1000, statusId, id);
     }
 }

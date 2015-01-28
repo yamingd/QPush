@@ -255,7 +255,7 @@ public class Dispatcher extends Thread {
                 message.setTotalUsers(total);
                 message.setSentDate(new Date().getTime()/1000);
                 message.setStatusId(PayloadStatus.Sent);
-                PayloadServiceImpl.instance.saveWithId(message);
+                PayloadServiceImpl.instance.saveAfterSent(message);
             }else {
                 PayloadServiceImpl.instance.updateSendStatus(message, total);
             }

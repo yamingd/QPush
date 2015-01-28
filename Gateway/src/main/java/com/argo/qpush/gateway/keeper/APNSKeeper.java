@@ -1,16 +1,15 @@
 package com.argo.qpush.gateway.keeper;
 
-import com.google.common.collect.Maps;
-import com.notnoop.apns.APNS;
-import com.notnoop.apns.ApnsService;
-import com.notnoop.apns.ApnsServiceBuilder;
-import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.Product;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.ServerConfig;
+import com.google.common.collect.Maps;
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
+import com.notnoop.apns.ApnsServiceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +59,7 @@ public class APNSKeeper {
             catch(Exception e){
                 logger.error("Push Failed", e);
                 progress.incrFailed();
+                message.addFailedClient(cc.getUserId());
             }
         }
     }

@@ -40,23 +40,28 @@ public class Connection {
     }
 
     public void send(final SentProgress progress, final byte[] msg) {
-        final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
-        data.writeBytes(msg);
-        final ChannelFuture cf = channel.writeAndFlush(data);
-        cf.addListener(new GenericFutureListener<Future<? super java.lang.Void>>() {
-            @Override
-            public void operationComplete(Future<? super Void> future) throws Exception {
-                if(cf.cause() != null){
-                    logger.error("{}, Send Error.", channel, cf.cause());
-                    progress.incrFailed();
-                }else {
-                    progress.incrSuccess();
-                    if (logger.isDebugEnabled()){
-                        logger.debug("{}, Send OK. {}", channel, channel.hashCode());
+        try {
+            final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
+            data.writeBytes(msg);
+            final ChannelFuture cf = channel.writeAndFlush(data);
+            cf.addListener(new GenericFutureListener<Future<? super Void>>() {
+                @Override
+                public void operationComplete(Future<? super Void> future) throws Exception {
+                    if(cf.cause() != null){
+                        logger.error("{}, Send Error.", channel, cf.cause());
+                        progress.incrFailed();
+                    }else {
+                        progress.incrSuccess();
+                        if (logger.isDebugEnabled()){
+                            logger.debug("{}, Send OK. {}", channel, channel.hashCode());
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            progress.incrFailed();
+            logger.error(e.getMessage(), e);
+        }
     }
 
     public void close(){

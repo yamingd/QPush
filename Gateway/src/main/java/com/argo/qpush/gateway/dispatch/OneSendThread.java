@@ -45,6 +45,9 @@ public class OneSendThread implements Callable<Integer> {
         if(message.getClients()!=null){
             SentProgress thisProg = new SentProgress(message.getClients().size());
             for (String client : message.getClients()){
+                if (logger.isDebugEnabled()){
+                    logger.debug("Send Message to {}, {}", client, message);
+                }
                 Connection c = ConnectionKeeper.get(product.getAppKey(), client);
                 if(c != null) {
                     c.send(thisProg, message);
@@ -99,6 +102,8 @@ public class OneSendThread implements Callable<Integer> {
             this.progress.incrSuccess();
 
             return total;
+        }else{
+            logger.error("Message Clients is Empty. {}", message);
         }
 
         return 0;

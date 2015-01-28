@@ -12,6 +12,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by yaming_deng on 14-8-8.
  */
 @Service
+@Transactional
 public class PayloadService extends BaseService {
 
     public static PayloadService instance;

@@ -1,5 +1,6 @@
 package com.argo.qpush.core.service;
 
+import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Product;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -7,7 +8,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +20,6 @@ import java.util.UUID;
  * Created by yaming_deng on 14-8-8.
  */
 @Service
-@Transactional
 public class ProductService extends BaseService {
 
     public static ProductService instance;
@@ -37,6 +36,7 @@ public class ProductService extends BaseService {
         return null;
     }
 
+    @TxMain
     public void add(final Product product){
         if (product == null){
             return;

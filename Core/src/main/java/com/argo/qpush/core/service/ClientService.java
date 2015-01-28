@@ -1,5 +1,6 @@
 package com.argo.qpush.core.service;
 
+import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.entity.ClientStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -8,7 +9,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +22,6 @@ import java.util.List;
  * Created by yaming_deng on 14-8-11.
  */
 @Service
-@Transactional
 public class ClientService extends BaseService {
 
     public static ClientService instance;
@@ -35,6 +34,7 @@ public class ClientService extends BaseService {
         instance = this;
     }
 
+    @TxMain
     public void add(final Client client){
         if (client == null){
             return;
@@ -85,6 +85,7 @@ public class ClientService extends BaseService {
         return count;
     }
 
+    @TxMain
     public void updateOnlineTs(long id){
         String sql = "update client set lastOnline=? where id = ?";
         this.mainJdbc.update(sql, new Date().getTime()/1000, id);

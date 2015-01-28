@@ -1,10 +1,11 @@
 package com.argo.qpush.core.service;
 
-import com.google.common.collect.Lists;
 import com.argo.qpush.core.MetricBuilder;
+import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadHistory;
 import com.argo.qpush.core.entity.PayloadStatus;
+import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,7 +13,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by yaming_deng on 14-8-8.
  */
 @Service
-@Transactional
 public class PayloadService extends BaseService {
 
     public static PayloadService instance;
@@ -55,6 +54,7 @@ public class PayloadService extends BaseService {
         return null;
     }
 
+    @TxMain
     public void add(final Payload payload){
         if (payload == null){
             return;
@@ -94,11 +94,13 @@ public class PayloadService extends BaseService {
         }
     }
 
+    @TxMain
     private void updatePendingCount(boolean incr){
         long count = incr ? jdbcPending.incrementAndGet() : jdbcPending.decrementAndGet();
         logger.info("JdbcExecutor Pending. total=" + count);
     }
 
+    @TxMain
     public void saveWithId(final Payload payload) throws Exception {
         if (payload == null){
             return;
@@ -167,6 +169,7 @@ public class PayloadService extends BaseService {
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 1, PayloadStatus.Pending, start, offset, limit);
     }
 
+    @TxMain
     public void updateSendStatus(final Payload message, final int counting) {
 
         jdbcExecutor.submit(new Runnable() {

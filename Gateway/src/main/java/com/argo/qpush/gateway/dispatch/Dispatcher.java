@@ -73,6 +73,13 @@ public class Dispatcher extends Thread {
     @Override
     public void run(){
 
+        //延迟1分钟启动
+        try {
+            Thread.sleep(60 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         logger.info("Dispatcher start to run. " + this.product);
 
         final int min = Integer.parseInt(this.conf.getProperty(DISPATCHER_INTERVAL, "1000"));

@@ -67,4 +67,15 @@ public class Connection {
         return channel;
     }
 
+    @Override
+    public int hashCode() {
+        return channel.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Connection{" +
+                "channel=" + channel +
+                '}';
+    }
 }

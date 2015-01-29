@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -88,7 +89,7 @@ public class OneSendThread implements Callable<Integer> {
             }
 
             try {
-                thisProg.getCountDownLatch().await();
+                thisProg.getCountDownLatch().await(message.getClients().size() * 5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }

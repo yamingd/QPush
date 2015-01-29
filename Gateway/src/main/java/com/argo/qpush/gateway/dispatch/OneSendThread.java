@@ -118,6 +118,7 @@ public class OneSendThread implements Callable<Integer> {
 
             return total;
         }else{
+            this.progress.incrFailed();
             logger.error("Message Clients is Empty. {}", message);
         }
 

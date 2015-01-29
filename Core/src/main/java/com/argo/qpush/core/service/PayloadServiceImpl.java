@@ -206,6 +206,10 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                 MetricBuilder.jdbcUpdateMeter.mark(2);
 
                 updatePendingCount(false);
+
+                if (logger.isDebugEnabled()){
+                    logger.debug("updateSendStatus OK!");
+                }
             }
         });
 
@@ -223,6 +227,14 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
         return this.get(list.get(0));
     }
 
+    private volatile boolean stopping = false;
+
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        stopping = true;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         instance = this;
@@ -238,12 +250,14 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                long total = jdbcPending.get();
-                logger.info("JdbcExecutor Pending. total=" + total);
-                try {
-                    Thread.sleep(10 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while (!stopping) {
+                    long total = jdbcPending.get();
+                    logger.info("JdbcExecutor Pending. total=" + total);
+                    try {
+                        Thread.sleep(10 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

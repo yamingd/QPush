@@ -2,6 +2,7 @@ package com.argo.qpush.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +14,7 @@ import java.util.Properties;
 /**
  * Created by yaming_deng on 14-8-8.
  */
-public abstract class BaseService implements InitializingBean {
+public abstract class BaseService implements InitializingBean, DisposableBean {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -32,4 +33,14 @@ public abstract class BaseService implements InitializingBean {
     @Autowired
     @Qualifier("jdbcConfig")
     protected Properties jdbcConfig;
+
+    @Override
+    public void destroy() throws Exception {
+
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+    }
 }

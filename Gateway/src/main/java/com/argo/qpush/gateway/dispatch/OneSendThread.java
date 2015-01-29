@@ -68,6 +68,7 @@ public class OneSendThread implements Callable<Integer> {
                     if (cc == null){
                         logger.error("Client not found. client=" + client);
                         thisProg.incrFailed();
+                        message.addFailedClient(client, new PushError(PushError.NoClient, null));
                         continue;
                     }
                     if (!cc.isDevice(ClientType.iOS)){

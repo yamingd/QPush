@@ -112,7 +112,7 @@ public class ClientProxyDelegate {
     public ChannelFuture newChannel(){
         ChannelFuture f = b.connect(host, port); // (5)
         if(f.cause() != null){
-            f.cause().printStackTrace();
+            logger.error("QPush newChannel.", f.cause());
             return null;
         }
         return f;
@@ -137,7 +137,7 @@ public class ClientProxyDelegate {
                         final Channel c0 = f.channel();
                         task.execute(c0);
                     }else{
-                        future.cause().printStackTrace();
+                        logger.error("QPush newChannel.", f.cause());
                     }
                 }
             });

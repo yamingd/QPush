@@ -25,6 +25,9 @@ public class PushError {
     private int code;
     private String msg;
 
+    public PushError() {
+    }
+
     public PushError(int code, String msg){
         this.code = code;
         this.msg = msg;
@@ -38,4 +41,11 @@ public class PushError {
         return msg;
     }
 
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 }

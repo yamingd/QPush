@@ -5,6 +5,7 @@ import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadHistory;
 import com.argo.qpush.core.entity.PayloadStatus;
+import com.argo.qpush.core.entity.PushError;
 import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -20,7 +21,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -145,11 +145,13 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                 if (payload.getClients() != null){
                     List<Object[]> args = Lists.newArrayList();
-                    Set<String> cc = payload.getFailedClients();
-                    final String sql0 = "insert into payload_client(id, userId, productId, statusId, createTime)values(?, ?, ?, ?, ?)";
+                    final String sql0 = "insert into payload_client(payloadId, userId, productId, statusId, createTime, errorId, errorMsg)values(?, ?, ?, ?, ?, ?, ?)";
                     for(String userId : payload.getClients()){
-                        int statusId = cc.contains(userId) ? 0 : 1;
-                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), statusId, new Date().getTime()/1000});
+                        PushError error = payload.getFailedClients().get(userId);
+                        int statusId = error != null ? 0 : 1;
+                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), statusId, new Date().getTime()/1000,
+                                error != null ? error.getCode() : null,
+                                error != null ? error.getMsg() : null});
                     }
                     mainJdbc.batchUpdate(sql0, args);
                     MetricBuilder.jdbcUpdateMeter.mark(1);
@@ -188,13 +190,16 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                 String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
                 mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime()/1000, message.getId());
 
-                sql = "update payload_client set statusId=?, createTime=? where id = ? and userId = ?";
+                sql = "update payload_client set statusId=?, createTime=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
 
                 List<Object[]> args = Lists.newArrayList();
-                Set<String> cc = message.getFailedClients();
                 for(String userId : message.getClients()){
-                    int statusId = cc.contains(userId) ? 0 : 1;
-                    args.add(new Object[]{statusId, new Date().getTime()/1000, message.getId(), userId});
+                    PushError error = message.getFailedClients().get(userId);
+                    int statusId = error != null ? 0 : 1;
+                    args.add(new Object[]{statusId, new Date().getTime()/1000,
+                            error != null ? error.getCode() : null,
+                            error != null ? error.getMsg() : null,
+                            message.getId(), userId});
                 }
                 mainJdbc.batchUpdate(sql, args);
 

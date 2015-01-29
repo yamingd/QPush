@@ -1,5 +1,6 @@
 package com.argo.qpush.gateway;
 
+import com.argo.qpush.core.entity.PushError;
 import com.argo.qpush.core.entity.Payload;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -34,10 +35,11 @@ public class Connection {
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 progress.incrFailed();
-                message.addFailedClient(this.userId);
+                message.addFailedClient(this.userId, new PushError(PushError.UnKnown, e.getMessage()));
             }
         }else{
             progress.incrFailed();
+            message.addFailedClient(this.userId, new PushError(PushError.ChannelClosed, null));
             logger.error("Send Error. Channel is closed. {}, {}", channel, message);
         }
     }
@@ -53,7 +55,7 @@ public class Connection {
                     if(cf.cause() != null){
                         logger.error("{}, Send Error.", channel, cf.cause());
                         progress.incrFailed();
-                        message.addFailedClient(userId);
+                        message.addFailedClient(userId, new PushError(PushError.UnKnown, cf.cause().getMessage()));
                     }else {
                         progress.incrSuccess();
                         if (logger.isDebugEnabled()){
@@ -64,7 +66,7 @@ public class Connection {
             });
         } catch (Exception e) {
             progress.incrFailed();
-            message.addFailedClient(userId);
+            message.addFailedClient(userId, new PushError(PushError.UnKnown, e.getMessage()));
             logger.error(e.getMessage(), e);
         }
     }

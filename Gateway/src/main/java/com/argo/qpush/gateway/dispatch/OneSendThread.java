@@ -72,12 +72,12 @@ public class OneSendThread implements Callable<Integer> {
                     }
                     if (!cc.isDevice(ClientType.iOS)){
                         thisProg.incrFailed();
-                        message.addFailedClient(cc.getUserId());
+                        message.addFailedClient(cc.getUserId(), new PushError(PushError.NoConnections, null));
                         continue;
                     }
                     if (StringUtils.isBlank(cc.getDeviceToken())){
                         thisProg.incrFailed();
-                        message.addFailedClient(cc.getUserId());
+                        message.addFailedClient(cc.getUserId(), new PushError(PushError.NoDevivceToken, null));
                         logger.error("Client's deviceToken not found. client=" + client);
                         continue;
                     }

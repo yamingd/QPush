@@ -1,9 +1,6 @@
 package com.argo.qpush.gateway.keeper;
 
-import com.argo.qpush.core.entity.Client;
-import com.argo.qpush.core.entity.ClientType;
-import com.argo.qpush.core.entity.Payload;
-import com.argo.qpush.core.entity.Product;
+import com.argo.qpush.core.entity.*;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.ServerConfig;
 import com.google.common.collect.Maps;
@@ -59,7 +56,7 @@ public class APNSKeeper {
             catch(Exception e){
                 logger.error("Push Failed", e);
                 progress.incrFailed();
-                message.addFailedClient(cc.getUserId());
+                message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushError, e.getMessage()));
             }
         }
     }

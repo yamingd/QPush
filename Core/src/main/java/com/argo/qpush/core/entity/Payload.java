@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 消息结构体. 参考苹果消息规范
@@ -211,14 +210,14 @@ public class Payload implements Serializable {
         this.broadcast = message.broadcast == null || !message.broadcast ? 0 : 1;
     }
 
-    private Map<String, Integer> failedClients = Maps.newConcurrentMap();
+    private Map<String, PushError> failedClients = Maps.newConcurrentMap();
 
-    public Set<String> getFailedClients() {
-        return failedClients.keySet();
+    public Map<String, PushError> getFailedClients() {
+        return failedClients;
     }
 
-    public void addFailedClient(String userId){
-        failedClients.put(userId, 1);
+    public void addFailedClient(String userId, PushError error){
+        failedClients.put(userId, error);
     }
 
     @Override

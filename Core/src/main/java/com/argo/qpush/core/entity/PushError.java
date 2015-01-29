@@ -1,8 +1,11 @@
 package com.argo.qpush.core.entity;
 
+import org.msgpack.annotation.MessagePackMessage;
+
 /**
  * Created by user on 1/29/15.
  */
+@MessagePackMessage
 public class PushError {
 
     public static final int Offline  = 1;

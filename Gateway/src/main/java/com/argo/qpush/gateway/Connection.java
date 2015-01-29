@@ -55,7 +55,7 @@ public class Connection {
                     if(cf.cause() != null){
                         logger.error("{}, Send Error.", channel, cf.cause());
                         progress.incrFailed();
-                        message.addFailedClient(userId, new PushError(PushError.UnKnown, cf.cause().getMessage()));
+                        message.addFailedClient(userId, new PushError(PushError.WriterError, cf.cause().getMessage()));
                     }else {
                         progress.incrSuccess();
                         if (logger.isDebugEnabled()){

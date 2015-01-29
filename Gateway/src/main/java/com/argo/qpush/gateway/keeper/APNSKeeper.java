@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 import com.notnoop.apns.ApnsServiceBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,14 @@ public class APNSKeeper {
     public static ApnsService get(Product product){
 
         if (product.getClientTypeid().intValue() != ClientType.iOS){
+            return null;
+        }
+
+        if (StringUtils.isBlank(product.getDevCertPath())
+                || StringUtils.isBlank(product.getDevCertPass())
+                || StringUtils.isBlank(product.getCertPath())
+                || StringUtils.isBlank(product.getCertPass())){
+            logger.error("Product iOS Push Service Miss Cert Path and Password. {}", product);
             return null;
         }
 
@@ -58,6 +67,10 @@ public class APNSKeeper {
                 progress.incrFailed();
                 message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushError, e.getMessage()));
             }
+        }else{
+            logger.error("iOS Push Service Not Found.");
+            progress.incrFailed();
+            message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushConfigError, null));
         }
     }
 }

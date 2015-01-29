@@ -72,6 +72,7 @@ public class OneSendThread implements Callable<Integer> {
                         continue;
                     }
                     if (!cc.isDevice(ClientType.iOS)){
+                        logger.error("Client is not iOS. client=" + client);
                         thisProg.incrFailed();
                         message.addFailedClient(cc.getUserId(), new PushError(PushError.NoConnections, null));
                         continue;

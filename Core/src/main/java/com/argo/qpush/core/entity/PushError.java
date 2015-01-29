@@ -24,6 +24,8 @@ public class PushError {
 
     public static final int NoClient = 8;
 
+    public static final int iOSPushConfigError = 9;
+
     private int code;
     private String msg;
 

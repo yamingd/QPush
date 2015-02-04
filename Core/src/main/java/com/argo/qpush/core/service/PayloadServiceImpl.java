@@ -89,7 +89,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
         if (payload.getClients() != null){
             List<Object[]> args = Lists.newArrayList();
-            final String sql0 = "insert into payload_client(id, userId, productId)values(?, ?, ?)";
+            final String sql0 = "insert into payload_client(payloadId, userId, productId)values(?, ?, ?)";
             for(String userId : payload.getClients()){
                 args.add(new Object[]{payload.getId(), userId, payload.getProductId()});
             }

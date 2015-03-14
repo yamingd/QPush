@@ -148,7 +148,6 @@ public class Dispatcher extends Thread {
     protected int doBroadcastPush() {
         List<Payload> items = queue.getBroadcastItems(this.broadcastCursor);
         if (items.size() == 0){
-            logger.debug("size=0, broadcastCursor={}", this.broadcastCursor);
             return 0;
         }
 
@@ -214,7 +213,6 @@ public class Dispatcher extends Thread {
     protected int doSinglePush() {
         List<Payload> items = queue.getNormalItems(this.singleCursor);
         if (items.size() == 0){
-            logger.debug("size=0, singleCursor={}", this.singleCursor);
             return 0;
         }
 

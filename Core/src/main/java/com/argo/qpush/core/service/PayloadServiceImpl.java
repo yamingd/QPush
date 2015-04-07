@@ -41,6 +41,27 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     private AtomicLong jdbcPending = new AtomicLong();
 
     @Override
+    public Payload getSimple(long id) {
+        String sql = "select * from payload where id = ?";
+        List<Payload> list = mainJdbc.query(sql, Payload_ROWMAPPER, id);
+        if(list.size() > 0){
+            return list.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Payload> getSimpleList(List<Long> ids) {
+        StringBuilder sql = new StringBuilder("select * from payload where ");
+        for (Long id : ids){
+            sql.append(" id=? or ");
+        }
+        sql.setLength(sql.length() - 3);
+        List<Payload> list = mainJdbc.query(sql.toString().intern(), ids.toArray(new Object[0]), Payload_ROWMAPPER);
+        return list;
+    }
+
+    @Override
     public Payload get(long id){
         String sql = "select * from payload where id = ?";
         List<Payload> list = mainJdbc.query(sql, Payload_ROWMAPPER, id);
@@ -218,13 +239,10 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @Override
-    public Payload findLatest(int productId, String userId){
-        String sql = "select id from payload_client where productId=? and userId = ? and statusId=? order by id desc limit 1, 0";
-        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, PayloadStatus.Pending);
-        if (list.size() == 0){
-            return null;
-        }
-        return this.get(list.get(0));
+    public List<Long> findLatest(int productId, String userId, long start){
+        String sql = "select id from payload_client where productId=? and userId = ? and statusId=? and id > ? order by id desc limit 0, 10";
+        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, PayloadStatus.Pending, start);
+        return list;
     }
 
     private volatile boolean stopping = false;

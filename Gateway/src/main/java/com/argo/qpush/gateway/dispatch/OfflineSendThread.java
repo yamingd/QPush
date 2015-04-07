@@ -9,6 +9,7 @@ import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -32,20 +33,28 @@ public class OfflineSendThread implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        Payload message = PayloadServiceImpl.instance.findLatest(product.getId(), userId);
-        if(message == null){
+        List<Long> ids = PayloadServiceImpl.instance.findLatest(product.getId(), userId, 0);
+        logger.info("Found Offline Message. userId={}, productId={}, total={}", userId, product, ids.size());
+        if(ids == null || ids.size() == 0){
             return 0;
         }
 
-        if(message.getClients()!=null){
-            SentProgress progress = new SentProgress(message.getClients().size());
-            for (String client : message.getClients()){
-                Connection c = ConnectionKeeper.get(product.getAppKey(), client);
-                if(c != null) {
-                    c.send(progress, message);
-                }else{
-                    progress.incrFailed();
-                }
+        List<Payload> list = PayloadServiceImpl.instance.getSimpleList(ids);
+        for (Payload message : list){
+            this.doSendMessage(message);
+        }
+
+        return 0;
+    }
+
+    private Integer doSendMessage(Payload message){
+        if(message != null){
+            SentProgress progress = new SentProgress(1);
+            Connection c = ConnectionKeeper.get(product.getAppKey(), this.userId);
+            if(c != null) {
+                c.send(progress, message);
+            }else{
+                progress.incrFailed();
             }
 
             try {

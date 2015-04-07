@@ -10,6 +10,18 @@ import java.util.List;
  */
 public interface PayloadService {
 
+    /**
+     * 读取详细. 仅是payload
+     * @param id
+     * @return
+     */
+    Payload getSimple(long id);
+    List<Payload> getSimpleList(List<Long> ids);
+    /**
+     * 读取详细，包括clients
+     * @param id
+     * @return
+     */
     Payload get(long id);
 
     @TxMain
@@ -25,5 +37,11 @@ public interface PayloadService {
     @TxMain
     void updateSendStatus(Payload message, int counting);
 
-    Payload findLatest(int productId, String userId);
+    /**
+     * 读取离线消息
+     * @param productId
+     * @param userId
+     * @return
+     */
+    List<Long> findLatest(int productId, String userId, long start);
 }

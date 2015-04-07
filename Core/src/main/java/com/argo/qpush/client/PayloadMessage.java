@@ -40,4 +40,17 @@ public class PayloadMessage {
      * 是否广播
      */
     public Boolean broadcast;
+
+    @Override
+    public String toString() {
+        return "PayloadMessage{" +
+                "title='" + title + '\'' +
+                ", badge=" + badge +
+                ", sound='" + sound + '\'' +
+                ", clients=" + clients +
+                ", ext=" + ext +
+                ", appkey='" + appkey + '\'' +
+                ", broadcast=" + broadcast +
+                '}';
+    }
 }

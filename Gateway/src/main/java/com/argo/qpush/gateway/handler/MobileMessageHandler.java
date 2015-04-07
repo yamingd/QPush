@@ -156,6 +156,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         if (null != connection){
             Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
             if (null != client){
+                logger.info("Client offline: {}", client);
                 ClientServiceImpl.instance.updateStatus(client.getId(), ClientStatus.Offline);
             }
         }

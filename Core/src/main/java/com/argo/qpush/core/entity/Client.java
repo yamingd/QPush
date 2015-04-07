@@ -132,4 +132,19 @@ public class Client {
     public boolean isDevice(int typeId){
         return typeId == this.typeId.intValue();
     }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", productId=" + productId +
+                ", userId='" + userId + '\'' +
+                ", deviceToken='" + deviceToken + '\'' +
+                ", createAt=" + createAt +
+                ", statusId=" + statusId +
+                ", typeId=" + typeId +
+                ", lastSendAt=" + lastSendAt +
+                ", lastOnline=" + lastOnline +
+                '}';
+    }
 }

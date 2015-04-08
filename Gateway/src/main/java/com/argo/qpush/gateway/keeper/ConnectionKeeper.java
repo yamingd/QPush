@@ -55,7 +55,7 @@ public class ConnectionKeeper {
      * @param token
      * @param conn
      */
-    public static void add(String productId, String token, Connection conn) {
+    public static boolean add(String productId, String token, Connection conn) {
         Integer cid = ClientKeeper.get(productId, token);
         if ( cid != null){
             //关闭旧连接.
@@ -72,6 +72,7 @@ public class ConnectionKeeper {
 
         ServerMetrics.incrConnection();
 
+        return true;
     }
 
     /**

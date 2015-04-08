@@ -26,6 +26,8 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     public static ClientService instance;
 
+    public static long epoch = 1420041600L;
+
     protected static final RowMapper<Client> Client_ROWMAPPER = new BeanPropertyRowMapper<Client>(
             Client.class);
 
@@ -74,7 +76,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     public List<Client> findOfflineByType(Integer productId, Integer typeId, Integer page, Integer limit){
-        long now = new Date().getTime()/1000 - 86400;
+        long now = new Date().getTime()/1000 - epoch - 86400;
         int offset = (page - 1) * limit;
         String sql = "select * from client where productId = ? and typeId = ? and lastOnline >= ? and deviceToken is not null order by id limit ?, ?";
         List<Client> list = this.mainJdbc.query(sql, Client_ROWMAPPER, productId, typeId, now, offset, limit);
@@ -83,7 +85,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     public int countOfflineByType(Integer productId, Integer typeId){
-        long now = new Date().getTime()/1000 - 86400;
+        long now = new Date().getTime()/1000 - epoch - 86400;
         String sql = "select count(1) from client where productId = ? and typeId = ? and lastOnline >= ?";
         int count = this.mainJdbc.queryForObject(sql, Integer.class, productId, typeId, now);
         return count;
@@ -93,12 +95,19 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     @TxMain
     public void updateOnlineTs(long id){
         String sql = "update client set lastOnline=?, statusId=? where id = ?";
-        this.mainJdbc.update(sql, new Date().getTime()/1000, ClientStatus.Online, id);
+        long ts = new Date().getTime() / 1000 - epoch;
+        this.mainJdbc.update(sql, ts, ClientStatus.Online, id);
     }
 
     @Override
     public void updateStatus(long id, int statusId) {
-        String sql = "update client set lastOnline=?, statusId=? where id = ?";
-        this.mainJdbc.update(sql, new Date().getTime()/1000, statusId, id);
+        String sql = "update client set statusId=? where id = ?";
+        this.mainJdbc.update(sql, statusId, id);
+    }
+
+    @Override
+    public void updateOfflineTs(long id, int lastSendTs) {
+        String sql = "update client set lastSendAt=?, statusId=? where id = ?";
+        this.mainJdbc.update(sql, lastSendTs, ClientStatus.Offline, id);
     }
 }

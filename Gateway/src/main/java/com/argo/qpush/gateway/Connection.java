@@ -1,7 +1,7 @@
 package com.argo.qpush.gateway;
 
-import com.argo.qpush.core.entity.PushError;
 import com.argo.qpush.core.entity.Payload;
+import com.argo.qpush.core.entity.PushError;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -10,22 +10,44 @@ import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 /**
  * Created by yaming_deng on 14-8-6.
  */
 public class Connection {
+
+    public static long epoch = 1420041600L;
 
     protected Logger logger = null;
 
     private final Channel channel;
     private String appKey;
     private String userId;
+    private int lastOpTime;
 
     public Connection(Channel channel) {
         this.channel = channel;
         logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + channel.hashCode());
+        lastOpTime = (int) (new Date().getTime() - epoch);
     }
 
+    public int getLastOpTime() {
+        return lastOpTime;
+    }
+
+    /**
+     * 更新最后发送时间
+     */
+    public void updateOpTime(){
+        lastOpTime = (int) (new Date().getTime() - epoch);
+    }
+
+    /**
+     * 发送消息
+     * @param progress
+     * @param message
+     */
     public void send(final SentProgress progress, final Payload message){
         // 组装消息包
         if(channel.isOpen()){
@@ -44,6 +66,12 @@ public class Connection {
         }
     }
 
+    /**
+     * 发送消息
+     * @param progress
+     * @param message
+     * @param msg
+     */
     public void send(final SentProgress progress, final Payload message, final byte[] msg) {
         try {
             final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
@@ -57,6 +85,7 @@ public class Connection {
                         progress.incrFailed();
                         message.addFailedClient(userId, new PushError(PushError.WriterError, cf.cause().getMessage()));
                     }else {
+                        updateOpTime();
                         progress.incrSuccess();
                         if (logger.isDebugEnabled()){
                             logger.debug("{}, Send OK. {}", channel, channel.hashCode());
@@ -104,6 +133,9 @@ public class Connection {
     public String toString() {
         return "Connection{" +
                 "channel=" + channel +
+                ", appKey='" + appKey + '\'' +
+                ", userId='" + userId + '\'' +
+                ", lastOpTime=" + lastOpTime +
                 '}';
     }
 }

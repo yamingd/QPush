@@ -1,11 +1,14 @@
 package com.argo.qpush.core.entity;
 
+import org.msgpack.annotation.MessagePackMessage;
+
 import java.util.Date;
 
 /**
  * 移动客户端设备
  * Created by yaming_deng on 14-8-6.
  */
+@MessagePackMessage
 public class Client {
 
     /**

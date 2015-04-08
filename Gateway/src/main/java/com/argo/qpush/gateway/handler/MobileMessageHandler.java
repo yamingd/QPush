@@ -2,7 +2,6 @@ package com.argo.qpush.gateway.handler;
 
 import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
-import com.argo.qpush.core.entity.ClientStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
@@ -25,6 +24,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
+    public static final String MULTI_CLIENTS = "multi_clients";
+    public static final String SYNC = "sync";
     protected static Logger logger = LoggerFactory.getLogger(MobileMessageHandler.class);
 
     public MobileMessageHandler(){
@@ -60,7 +61,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             cc = PBAPNSEvent.newBuilder().mergeFrom(bytes).build();
         } catch (Exception e) {
             logger.error("Invalid Data Package.", e);
-            ack(ctx, null);
+            ack(ctx, null, "invalid_msg");
             return;
         }
 
@@ -76,29 +77,38 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (logger.isDebugEnabled()){
                 logger.debug("Got Online Message. {}", cc);
             }
-            Connection conn = new Connection(ctx.channel());
+            Connection conn = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
+            if (null != conn){
+                logger.error("你已经在线了!. cc={}, conn={}", cc, conn);
+                ack(ctx, cc, MULTI_CLIENTS);
+                return;
+            }
+            conn = new Connection(ctx.channel());
             conn.setUserId(cc.getUserId());
             conn.setAppKey(cc.getAppKey());
             ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), conn);
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
-            ack(ctx, cc);
+            ack(ctx, cc, SYNC);
             if (logger.isDebugEnabled()){
                 logger.debug("Got Online Message and handle DONE. {}", cc);
             }
         }else if(cc.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
             //心跳
-            ack(ctx, cc);
+            ack(ctx, cc, "ok");
         }else if(cc.getOp() == PBAPNSEvent.Ops.PushAck_VALUE){
             //推送反馈
-            ack(ctx, cc);
+            ack(ctx, cc, "ok");
         }else if(cc.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
             //离线
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
-                    if (c0 != null){
-                        ClientServiceImpl.instance.updateStatus(c0.getId(), ClientStatus.Offline);
+                    Connection connection = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
+                    if (null != connection) {
+                        Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
+                        if (c0 != null) {
+                            ClientServiceImpl.instance.updateOfflineTs(c0.getId(), connection.getLastOpTime());
+                        }
                     }
                 }
             });
@@ -106,14 +116,12 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc){
+    private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc, String result){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
-        if (cc != null) {
-            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue(cc.getOp() + "").setKey("kindId").setValue("sync"));
-        }else{
-            builder.addUserInfo(PBAPNSUserInfo.newBuilder().setKey("op").setValue("5").setKey("kindId").setValue("sync"));
-        }
+        PBAPNSUserInfo.Builder infoBuilder = PBAPNSUserInfo.newBuilder();
+        infoBuilder.setKey("msg").setValue(result).setKey("kindId").setValue(SYNC);
+        builder.addUserInfo(infoBuilder);
         byte[] bytes = builder.build().toByteArray();
 
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)
@@ -157,7 +165,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
             if (null != client){
                 logger.info("Client offline: {}", client);
-                ClientServiceImpl.instance.updateStatus(client.getId(), ClientStatus.Offline);
+                ClientServiceImpl.instance.updateOfflineTs(client.getId(), connection.getLastOpTime());
             }
         }
         ConnectionKeeper.remove(ctx.channel().hashCode());

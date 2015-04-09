@@ -4,6 +4,7 @@ import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.Connection;
+import com.argo.qpush.gateway.keeper.ClientKeeper;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import com.argo.qpush.protobuf.PBAPNSBody;
 import com.argo.qpush.protobuf.PBAPNSEvent;
@@ -149,7 +150,8 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        lostConnection(ctx);
+        logger.error("exceptionCaught: " + ctx.channel().hashCode(), cause);
         ctx.close();
     }
 
@@ -160,8 +162,14 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx)
             throws Exception {
         logger.info("channelInactive: " + ctx.channel().hashCode());
+        lostConnection(ctx);
+    }
+
+    private void lostConnection(ChannelHandlerContext ctx) {
+        logger.info("lost Connection: {}", ctx.channel());
         Connection connection = ConnectionKeeper.get(ctx.channel().hashCode());
         if (null != connection){
+            ClientKeeper.remove(connection.getAppKey(), connection.getUserId());
             Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
             if (null != client){
                 logger.info("Client offline: {}", client);

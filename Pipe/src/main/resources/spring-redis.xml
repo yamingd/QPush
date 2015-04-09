@@ -17,7 +17,7 @@
         </property>
     </bean>
 
-    <bean id="redisBucket" class="com.argo.qpush.pipe.redis.RedisBucket">
+    <bean id="redisBucket" class="com.argo.qpush.core.RedisBucket">
         <constructor-arg index="0" ref="jedisConfig" />
     </bean>
 

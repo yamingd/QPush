@@ -1,17 +1,18 @@
 package com.argo.qpush.pipe.redis;
 
-import com.argo.qpush.core.service.PayloadService;
-import com.google.common.collect.Lists;
 import com.argo.qpush.core.MessageUtils;
+import com.argo.qpush.core.RedisBucket;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadStatus;
+import com.argo.qpush.core.service.PayloadService;
 import com.argo.qpush.pipe.PayloadCursor;
 import com.argo.qpush.pipe.PayloadQueue;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import redis.clients.jedis.BinaryShardedJedis;
+import redis.clients.jedis.BinaryJedis;
 
 import java.io.IOException;
 import java.util.Date;
@@ -42,7 +43,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
     @Override
     public List<Payload> getNormalItems(PayloadCursor cursor) {
-        BinaryShardedJedis jedis =  redisBucket.getResource();
+        BinaryJedis jedis =  redisBucket.getResource();
         try {
             byte[] key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 0).getBytes();
             List<Payload> ids = Lists.newArrayList();
@@ -73,7 +74,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
     @Override
     public List<Payload> getBroadcastItems(PayloadCursor cursor) {
-        BinaryShardedJedis jedis =  redisBucket.getResource();
+        BinaryJedis jedis =  redisBucket.getResource();
         try {
             byte[] key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 1).getBytes();
             List<Payload> ids = Lists.newArrayList();
@@ -100,7 +101,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
     @Override
     public void add(Payload payload) {
-        BinaryShardedJedis jedis =  redisBucket.getResource();
+        BinaryJedis jedis =  redisBucket.getResource();
         try {
             long id = jedis.incr(QPUSH_PK);
             payload.setId(id);

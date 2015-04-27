@@ -38,6 +38,8 @@ public class QPushClient {
                             c.close();
                             ClientProxyDelegate.instance.remove(c);
                             ClientProxyDelegate.instance.newChannel();
+                        }else{
+                            logger.info("Send OK: " + payload + "\n");
                         }
                     }
                 });

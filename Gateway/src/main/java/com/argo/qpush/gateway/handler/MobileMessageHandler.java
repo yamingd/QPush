@@ -94,26 +94,43 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 logger.debug("Got Online Message and handle DONE. {}", cc);
             }
         }else if(cc.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
+            Connection conn = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
+            if (null != conn){
+                //链接还保持，直接返回
+                ack(ctx, cc, SYNC);
+                return;
+            }
+
+            conn = new Connection(ctx.channel());
+            conn.setUserId(cc.getUserId());
+            conn.setAppKey(cc.getAppKey());
+            ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), conn);
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
             //心跳
-            ack(ctx, cc, "ok");
+            ack(ctx, cc, SYNC);
+
         }else if(cc.getOp() == PBAPNSEvent.Ops.PushAck_VALUE){
             //推送反馈
-            ack(ctx, cc, "ok");
+            ack(ctx, cc, SYNC);
         }else if(cc.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
             //离线
-            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
-                @Override
-                public void run() {
-                    Connection connection = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
-                    if (null != connection) {
+            final Connection connection = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
+            if (connection != null) {
+                ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
+                MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
+                    @Override
+                    public void run() {
                         Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
                         if (c0 != null) {
                             ClientServiceImpl.instance.updateOfflineTs(c0.getId(), connection.getLastOpTime());
                         }
                     }
-                }
-            });
+                });
+            }
+
+            ack(ctx, cc, SYNC);
             ctx.close();
+
         }
     }
 
@@ -167,15 +184,22 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
     private void lostConnection(ChannelHandlerContext ctx) {
         logger.info("lost Connection: {}", ctx.channel());
-        Connection connection = ConnectionKeeper.get(ctx.channel().hashCode());
+        final Connection connection = ConnectionKeeper.get(ctx.channel().hashCode());
         if (null != connection){
             ClientKeeper.remove(connection.getAppKey(), connection.getUserId());
-            Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
-            if (null != client){
-                logger.info("Client offline: {}", client);
-                ClientServiceImpl.instance.updateOfflineTs(client.getId(), connection.getLastOpTime());
-            }
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
+                @Override
+                public void run() {
+                    Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
+                    if (null != client){
+                        logger.info("Client offline: {}", client);
+                        ClientServiceImpl.instance.updateOfflineTs(client.getId(), connection.getLastOpTime());
+                    }
+                }
+            });
+
         }
+
         ConnectionKeeper.remove(ctx.channel().hashCode());
     }
 

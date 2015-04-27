@@ -269,8 +269,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
                 while (!stopping) {
-                    long total = jdbcPending.get();
-                    logger.info("JdbcExecutor Pending. total=" + total);
+                    logger.info("JdbcExecutor. {}", jdbcExecutor.getThreadPoolExecutor());
                     try {
                         Thread.sleep(10 * 1000);
                     } catch (InterruptedException e) {

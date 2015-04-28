@@ -54,15 +54,29 @@ public class APNSKeeper {
         return service;
     }
 
+    /**
+     *
+     * 使用APNS服务推送到苹果
+     *
+     * @param progress
+     * @param product
+     * @param cc
+     * @param message
+     *
+     */
     public static void push(SentProgress progress, Product product, Client cc, Payload message){
         String json = message.asJson();
         ApnsService service = get(product);
         if (service != null){
             try{
-                service.push(cc.getDeviceToken(), json);
-                progress.incrSuccess();
-            }
-            catch(Exception e){
+                if (StringUtils.isBlank(cc.getDeviceToken())){
+                    progress.incrFailed();
+                    message.addFailedClient(cc.getUserId(), new PushError(PushError.NoDevivceToken));
+                }else {
+                    service.push(cc.getDeviceToken(), json);
+                    progress.incrSuccess();
+                }
+            }catch(Exception e){
                 logger.error("Push Failed", e);
                 progress.incrFailed();
                 message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushError, e.getMessage()));
@@ -70,7 +84,7 @@ public class APNSKeeper {
         }else{
             logger.error("iOS Push Service Not Found.");
             progress.incrFailed();
-            message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushConfigError, null));
+            message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushConfigError));
         }
     }
 }

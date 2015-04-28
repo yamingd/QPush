@@ -29,12 +29,16 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     public Product findByKey(String key){
+        String cachekey = String.format("prod:%s", key);
+        Product product = this.getItemFromRedis(cachekey, Product.class);
         String sql = "select * from product where appKey = ?";
         List<Product> list = this.mainJdbc.query(sql, Product_ROWMAPPER, key);
         if (list.size() > 0){
-            return list.get(0);
+            product = list.get(0);
+            this.putItemToRedis(cachekey, product);
         }
-        return null;
+
+        return product;
     }
 
     @Override

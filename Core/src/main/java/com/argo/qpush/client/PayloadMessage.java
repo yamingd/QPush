@@ -40,6 +40,12 @@ public class PayloadMessage {
      * 是否广播
      */
     public Boolean broadcast;
+    /**
+     * 当Client是离线状态时. 怎么处理消息
+     * @OfflineMode
+     */
+    public Integer offlineMode;
+
 
     @Override
     public String toString() {

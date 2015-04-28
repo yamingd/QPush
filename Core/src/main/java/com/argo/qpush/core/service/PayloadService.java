@@ -24,16 +24,46 @@ public interface PayloadService {
      */
     Payload get(long id);
 
+    /**
+     * 保存一个payload记录
+     * @param payload
+     */
     @TxMain
     void add(Payload payload);
 
+    /**
+     * 发送后保存记录及状态
+     * @param payload
+     * @throws Exception
+     */
     @TxMain
     void saveAfterSent(Payload payload) throws Exception;
 
+    /**
+     * 读取p2p项
+     * @param productId
+     * @param start
+     * @param page
+     * @param limit
+     * @return
+     */
     List<Payload> findNormalList(int productId, long start, int page, int limit);
 
+    /**
+     * 读取广播项
+     * @param productId
+     * @param start
+     * @param page
+     * @param limit
+     * @return
+     */
     List<Payload> findBrodcastList(int productId, long start, int page, int limit);
 
+    /**
+     * 更新发送状态
+     * @param message
+     * @param counting
+     */
     @TxMain
     void updateSendStatus(Payload message, int counting);
 

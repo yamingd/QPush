@@ -3,43 +3,54 @@
 
 package com.argo.qpush.protobuf;
 
-public interface PBAPNSMessageOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:message.PBAPNSMessage)
-    com.google.protobuf.MessageOrBuilder {
+public interface PBAPNSMessageOrBuilder
+    extends com.google.protobuf.MessageOrBuilder {
 
+  // required int32 offlineMode = 1;
   /**
-   * <code>required .message.PBAPNSBody aps = 1;</code>
+   * <code>required int32 offlineMode = 1;</code>
+   */
+  boolean hasOfflineMode();
+  /**
+   * <code>required int32 offlineMode = 1;</code>
+   */
+  int getOfflineMode();
+
+  // required .message.PBAPNSBody aps = 2;
+  /**
+   * <code>required .message.PBAPNSBody aps = 2;</code>
    */
   boolean hasAps();
   /**
-   * <code>required .message.PBAPNSBody aps = 1;</code>
+   * <code>required .message.PBAPNSBody aps = 2;</code>
    */
   com.argo.qpush.protobuf.PBAPNSBody getAps();
   /**
-   * <code>required .message.PBAPNSBody aps = 1;</code>
+   * <code>required .message.PBAPNSBody aps = 2;</code>
    */
   com.argo.qpush.protobuf.PBAPNSBodyOrBuilder getApsOrBuilder();
 
+  // repeated .message.PBAPNSUserInfo userInfo = 3;
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> 
       getUserInfoList();
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   com.argo.qpush.protobuf.PBAPNSUserInfo getUserInfo(int index);
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   int getUserInfoCount();
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   java.util.List<? extends com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder> 
       getUserInfoOrBuilderList();
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder getUserInfoOrBuilder(
       int index);

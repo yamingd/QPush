@@ -14,8 +14,16 @@ message PBAPNSBody {
 }
 
 message PBAPNSMessage {
-    required PBAPNSBody aps = 1;
-    repeated PBAPNSUserInfo userInfo = 2;
+
+    enum OfflineModes {
+        Ignore = 0;
+        APNS = 1;
+        SendAfterOnline = 2;
+    }
+
+    required int32 offlineMode = 1;
+    required PBAPNSBody aps = 2;
+    repeated PBAPNSUserInfo userInfo = 3;
 }
 
 message PBAPNSEvent {
@@ -25,7 +33,9 @@ message PBAPNSEvent {
         KeepAlive = 2;
         PushAck = 3;
         Offline = 4;
-        Error = 5;
+        Error = 0;
+        Sleep = 5;
+        Awake = 6;
     }
 
     enum DeviceTypes{

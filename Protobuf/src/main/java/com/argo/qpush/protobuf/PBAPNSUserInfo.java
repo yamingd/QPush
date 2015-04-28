@@ -6,10 +6,9 @@ package com.argo.qpush.protobuf;
 /**
  * Protobuf type {@code message.PBAPNSUserInfo}
  */
-public final class PBAPNSUserInfo extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:message.PBAPNSUserInfo)
-    PBAPNSUserInfoOrBuilder {
+public  final class PBAPNSUserInfo extends
+    com.google.protobuf.GeneratedMessage
+    implements PBAPNSUserInfoOrBuilder {
   // Use PBAPNSUserInfo.newBuilder() to construct.
   private PBAPNSUserInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -56,15 +55,13 @@ public final class PBAPNSUserInfo extends
             break;
           }
           case 10: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000001;
-            key_ = bs;
+            key_ = input.readBytes();
             break;
           }
           case 18: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            value_ = bs;
+            value_ = input.readBytes();
             break;
           }
         }
@@ -107,6 +104,7 @@ public final class PBAPNSUserInfo extends
   }
 
   private int bitField0_;
+  // required string key = 1;
   public static final int KEY_FIELD_NUMBER = 1;
   private java.lang.Object key_;
   /**
@@ -149,6 +147,7 @@ public final class PBAPNSUserInfo extends
     }
   }
 
+  // required string value = 2;
   public static final int VALUE_FIELD_NUMBER = 2;
   private java.lang.Object value_;
   /**
@@ -198,8 +197,7 @@ public final class PBAPNSUserInfo extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     if (!hasKey()) {
       memoizedIsInitialized = 0;
@@ -321,9 +319,8 @@ public final class PBAPNSUserInfo extends
    * Protobuf type {@code message.PBAPNSUserInfo}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:message.PBAPNSUserInfo)
-      com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.argo.qpush.protobuf.PbMessage.internal_static_message_PBAPNSUserInfo_descriptor;
@@ -457,6 +454,7 @@ public final class PBAPNSUserInfo extends
     }
     private int bitField0_;
 
+    // required string key = 1;
     private java.lang.Object key_ = "";
     /**
      * <code>required string key = 1;</code>
@@ -470,12 +468,9 @@ public final class PBAPNSUserInfo extends
     public java.lang.String getKey() {
       java.lang.Object ref = key_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          key_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        key_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -533,6 +528,7 @@ public final class PBAPNSUserInfo extends
       return this;
     }
 
+    // required string value = 2;
     private java.lang.Object value_ = "";
     /**
      * <code>required string value = 2;</code>
@@ -546,12 +542,9 @@ public final class PBAPNSUserInfo extends
     public java.lang.String getValue() {
       java.lang.Object ref = value_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          value_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        value_ = s;
         return s;
       } else {
         return (java.lang.String) ref;

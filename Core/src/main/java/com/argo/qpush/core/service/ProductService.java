@@ -9,6 +9,7 @@ import java.util.List;
  * Created by user on 1/28/15.
  */
 public interface ProductService {
+
     Product findByKey(String key);
 
     @TxMain

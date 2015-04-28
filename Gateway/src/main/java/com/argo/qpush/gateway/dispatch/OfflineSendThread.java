@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 
 /**
  *
- * 1对1或1对多的推送
+ * 1对1或1对多的离线推送
  *
  * Created by yaming_deng on 14-8-8.
  */

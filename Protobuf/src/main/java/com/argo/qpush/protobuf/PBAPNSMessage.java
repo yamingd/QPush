@@ -6,10 +6,9 @@ package com.argo.qpush.protobuf;
 /**
  * Protobuf type {@code message.PBAPNSMessage}
  */
-public final class PBAPNSMessage extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:message.PBAPNSMessage)
-    PBAPNSMessageOrBuilder {
+public  final class PBAPNSMessage extends
+    com.google.protobuf.GeneratedMessage
+    implements PBAPNSMessageOrBuilder {
   // Use PBAPNSMessage.newBuilder() to construct.
   private PBAPNSMessage(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -55,9 +54,14 @@ public final class PBAPNSMessage extends
             }
             break;
           }
-          case 10: {
+          case 8: {
+            bitField0_ |= 0x00000001;
+            offlineMode_ = input.readInt32();
+            break;
+          }
+          case 18: {
             com.argo.qpush.protobuf.PBAPNSBody.Builder subBuilder = null;
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
               subBuilder = aps_.toBuilder();
             }
             aps_ = input.readMessage(com.argo.qpush.protobuf.PBAPNSBody.PARSER, extensionRegistry);
@@ -65,13 +69,13 @@ public final class PBAPNSMessage extends
               subBuilder.mergeFrom(aps_);
               aps_ = subBuilder.buildPartial();
             }
-            bitField0_ |= 0x00000001;
+            bitField0_ |= 0x00000002;
             break;
           }
-          case 18: {
-            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+          case 26: {
+            if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
               userInfo_ = new java.util.ArrayList<com.argo.qpush.protobuf.PBAPNSUserInfo>();
-              mutable_bitField0_ |= 0x00000002;
+              mutable_bitField0_ |= 0x00000004;
             }
             userInfo_.add(input.readMessage(com.argo.qpush.protobuf.PBAPNSUserInfo.PARSER, extensionRegistry));
             break;
@@ -84,7 +88,7 @@ public final class PBAPNSMessage extends
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e.getMessage()).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+      if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
         userInfo_ = java.util.Collections.unmodifiableList(userInfo_);
       }
       this.unknownFields = unknownFields.build();
@@ -118,57 +122,166 @@ public final class PBAPNSMessage extends
     return PARSER;
   }
 
-  private int bitField0_;
-  public static final int APS_FIELD_NUMBER = 1;
-  private com.argo.qpush.protobuf.PBAPNSBody aps_;
   /**
-   * <code>required .message.PBAPNSBody aps = 1;</code>
+   * Protobuf enum {@code message.PBAPNSMessage.OfflineModes}
    */
-  public boolean hasAps() {
+  public enum OfflineModes
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>Ignore = 0;</code>
+     */
+    Ignore(0, 0),
+    /**
+     * <code>APNS = 1;</code>
+     */
+    APNS(1, 1),
+    /**
+     * <code>SendAfterOnline = 2;</code>
+     */
+    SendAfterOnline(2, 2),
+    ;
+
+    /**
+     * <code>Ignore = 0;</code>
+     */
+    public static final int Ignore_VALUE = 0;
+    /**
+     * <code>APNS = 1;</code>
+     */
+    public static final int APNS_VALUE = 1;
+    /**
+     * <code>SendAfterOnline = 2;</code>
+     */
+    public static final int SendAfterOnline_VALUE = 2;
+
+
+    public final int getNumber() { return value; }
+
+    public static OfflineModes valueOf(int value) {
+      switch (value) {
+        case 0: return Ignore;
+        case 1: return APNS;
+        case 2: return SendAfterOnline;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<OfflineModes>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<OfflineModes>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<OfflineModes>() {
+            public OfflineModes findValueByNumber(int number) {
+              return OfflineModes.valueOf(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return com.argo.qpush.protobuf.PBAPNSMessage.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final OfflineModes[] VALUES = values();
+
+    public static OfflineModes valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int index;
+    private final int value;
+
+    private OfflineModes(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:message.PBAPNSMessage.OfflineModes)
+  }
+
+  private int bitField0_;
+  // required int32 offlineMode = 1;
+  public static final int OFFLINEMODE_FIELD_NUMBER = 1;
+  private int offlineMode_;
+  /**
+   * <code>required int32 offlineMode = 1;</code>
+   */
+  public boolean hasOfflineMode() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required .message.PBAPNSBody aps = 1;</code>
+   * <code>required int32 offlineMode = 1;</code>
+   */
+  public int getOfflineMode() {
+    return offlineMode_;
+  }
+
+  // required .message.PBAPNSBody aps = 2;
+  public static final int APS_FIELD_NUMBER = 2;
+  private com.argo.qpush.protobuf.PBAPNSBody aps_;
+  /**
+   * <code>required .message.PBAPNSBody aps = 2;</code>
+   */
+  public boolean hasAps() {
+    return ((bitField0_ & 0x00000002) == 0x00000002);
+  }
+  /**
+   * <code>required .message.PBAPNSBody aps = 2;</code>
    */
   public com.argo.qpush.protobuf.PBAPNSBody getAps() {
     return aps_;
   }
   /**
-   * <code>required .message.PBAPNSBody aps = 1;</code>
+   * <code>required .message.PBAPNSBody aps = 2;</code>
    */
   public com.argo.qpush.protobuf.PBAPNSBodyOrBuilder getApsOrBuilder() {
     return aps_;
   }
 
-  public static final int USERINFO_FIELD_NUMBER = 2;
+  // repeated .message.PBAPNSUserInfo userInfo = 3;
+  public static final int USERINFO_FIELD_NUMBER = 3;
   private java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> userInfo_;
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   public java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> getUserInfoList() {
     return userInfo_;
   }
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   public java.util.List<? extends com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder> 
       getUserInfoOrBuilderList() {
     return userInfo_;
   }
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   public int getUserInfoCount() {
     return userInfo_.size();
   }
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   public com.argo.qpush.protobuf.PBAPNSUserInfo getUserInfo(int index) {
     return userInfo_.get(index);
   }
   /**
-   * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+   * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
   public com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder getUserInfoOrBuilder(
       int index) {
@@ -176,15 +289,19 @@ public final class PBAPNSMessage extends
   }
 
   private void initFields() {
+    offlineMode_ = 0;
     aps_ = com.argo.qpush.protobuf.PBAPNSBody.getDefaultInstance();
     userInfo_ = java.util.Collections.emptyList();
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
+    if (!hasOfflineMode()) {
+      memoizedIsInitialized = 0;
+      return false;
+    }
     if (!hasAps()) {
       memoizedIsInitialized = 0;
       return false;
@@ -203,10 +320,13 @@ public final class PBAPNSMessage extends
                       throws java.io.IOException {
     getSerializedSize();
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
-      output.writeMessage(1, aps_);
+      output.writeInt32(1, offlineMode_);
+    }
+    if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      output.writeMessage(2, aps_);
     }
     for (int i = 0; i < userInfo_.size(); i++) {
-      output.writeMessage(2, userInfo_.get(i));
+      output.writeMessage(3, userInfo_.get(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -219,11 +339,15 @@ public final class PBAPNSMessage extends
     size = 0;
     if (((bitField0_ & 0x00000001) == 0x00000001)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, aps_);
+        .computeInt32Size(1, offlineMode_);
+    }
+    if (((bitField0_ & 0x00000002) == 0x00000002)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(2, aps_);
     }
     for (int i = 0; i < userInfo_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, userInfo_.get(i));
+        .computeMessageSize(3, userInfo_.get(i));
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -307,9 +431,8 @@ public final class PBAPNSMessage extends
    * Protobuf type {@code message.PBAPNSMessage}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:message.PBAPNSMessage)
-      com.argo.qpush.protobuf.PBAPNSMessageOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements com.argo.qpush.protobuf.PBAPNSMessageOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.argo.qpush.protobuf.PbMessage.internal_static_message_PBAPNSMessage_descriptor;
@@ -344,15 +467,17 @@ public final class PBAPNSMessage extends
 
     public Builder clear() {
       super.clear();
+      offlineMode_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000001);
       if (apsBuilder_ == null) {
         aps_ = com.argo.qpush.protobuf.PBAPNSBody.getDefaultInstance();
       } else {
         apsBuilder_.clear();
       }
-      bitField0_ = (bitField0_ & ~0x00000001);
+      bitField0_ = (bitField0_ & ~0x00000002);
       if (userInfoBuilder_ == null) {
         userInfo_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
       } else {
         userInfoBuilder_.clear();
       }
@@ -387,15 +512,19 @@ public final class PBAPNSMessage extends
       if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
         to_bitField0_ |= 0x00000001;
       }
+      result.offlineMode_ = offlineMode_;
+      if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+        to_bitField0_ |= 0x00000002;
+      }
       if (apsBuilder_ == null) {
         result.aps_ = aps_;
       } else {
         result.aps_ = apsBuilder_.build();
       }
       if (userInfoBuilder_ == null) {
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
           userInfo_ = java.util.Collections.unmodifiableList(userInfo_);
-          bitField0_ = (bitField0_ & ~0x00000002);
+          bitField0_ = (bitField0_ & ~0x00000004);
         }
         result.userInfo_ = userInfo_;
       } else {
@@ -417,6 +546,9 @@ public final class PBAPNSMessage extends
 
     public Builder mergeFrom(com.argo.qpush.protobuf.PBAPNSMessage other) {
       if (other == com.argo.qpush.protobuf.PBAPNSMessage.getDefaultInstance()) return this;
+      if (other.hasOfflineMode()) {
+        setOfflineMode(other.getOfflineMode());
+      }
       if (other.hasAps()) {
         mergeAps(other.getAps());
       }
@@ -424,7 +556,7 @@ public final class PBAPNSMessage extends
         if (!other.userInfo_.isEmpty()) {
           if (userInfo_.isEmpty()) {
             userInfo_ = other.userInfo_;
-            bitField0_ = (bitField0_ & ~0x00000002);
+            bitField0_ = (bitField0_ & ~0x00000004);
           } else {
             ensureUserInfoIsMutable();
             userInfo_.addAll(other.userInfo_);
@@ -437,7 +569,7 @@ public final class PBAPNSMessage extends
             userInfoBuilder_.dispose();
             userInfoBuilder_ = null;
             userInfo_ = other.userInfo_;
-            bitField0_ = (bitField0_ & ~0x00000002);
+            bitField0_ = (bitField0_ & ~0x00000004);
             userInfoBuilder_ = 
               com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                  getUserInfoFieldBuilder() : null;
@@ -451,6 +583,10 @@ public final class PBAPNSMessage extends
     }
 
     public final boolean isInitialized() {
+      if (!hasOfflineMode()) {
+        
+        return false;
+      }
       if (!hasAps()) {
         
         return false;
@@ -483,17 +619,51 @@ public final class PBAPNSMessage extends
     }
     private int bitField0_;
 
+    // required int32 offlineMode = 1;
+    private int offlineMode_ ;
+    /**
+     * <code>required int32 offlineMode = 1;</code>
+     */
+    public boolean hasOfflineMode() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required int32 offlineMode = 1;</code>
+     */
+    public int getOfflineMode() {
+      return offlineMode_;
+    }
+    /**
+     * <code>required int32 offlineMode = 1;</code>
+     */
+    public Builder setOfflineMode(int value) {
+      bitField0_ |= 0x00000001;
+      offlineMode_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>required int32 offlineMode = 1;</code>
+     */
+    public Builder clearOfflineMode() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      offlineMode_ = 0;
+      onChanged();
+      return this;
+    }
+
+    // required .message.PBAPNSBody aps = 2;
     private com.argo.qpush.protobuf.PBAPNSBody aps_ = com.argo.qpush.protobuf.PBAPNSBody.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         com.argo.qpush.protobuf.PBAPNSBody, com.argo.qpush.protobuf.PBAPNSBody.Builder, com.argo.qpush.protobuf.PBAPNSBodyOrBuilder> apsBuilder_;
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public boolean hasAps() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
+      return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSBody getAps() {
       if (apsBuilder_ == null) {
@@ -503,7 +673,7 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public Builder setAps(com.argo.qpush.protobuf.PBAPNSBody value) {
       if (apsBuilder_ == null) {
@@ -515,11 +685,11 @@ public final class PBAPNSMessage extends
       } else {
         apsBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       return this;
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public Builder setAps(
         com.argo.qpush.protobuf.PBAPNSBody.Builder builderForValue) {
@@ -529,15 +699,15 @@ public final class PBAPNSMessage extends
       } else {
         apsBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       return this;
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public Builder mergeAps(com.argo.qpush.protobuf.PBAPNSBody value) {
       if (apsBuilder_ == null) {
-        if (((bitField0_ & 0x00000001) == 0x00000001) &&
+        if (((bitField0_ & 0x00000002) == 0x00000002) &&
             aps_ != com.argo.qpush.protobuf.PBAPNSBody.getDefaultInstance()) {
           aps_ =
             com.argo.qpush.protobuf.PBAPNSBody.newBuilder(aps_).mergeFrom(value).buildPartial();
@@ -548,11 +718,11 @@ public final class PBAPNSMessage extends
       } else {
         apsBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       return this;
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public Builder clearAps() {
       if (apsBuilder_ == null) {
@@ -561,19 +731,19 @@ public final class PBAPNSMessage extends
       } else {
         apsBuilder_.clear();
       }
-      bitField0_ = (bitField0_ & ~0x00000001);
+      bitField0_ = (bitField0_ & ~0x00000002);
       return this;
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSBody.Builder getApsBuilder() {
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return getApsFieldBuilder().getBuilder();
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSBodyOrBuilder getApsOrBuilder() {
       if (apsBuilder_ != null) {
@@ -583,7 +753,7 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>required .message.PBAPNSBody aps = 1;</code>
+     * <code>required .message.PBAPNSBody aps = 2;</code>
      */
     private com.google.protobuf.SingleFieldBuilder<
         com.argo.qpush.protobuf.PBAPNSBody, com.argo.qpush.protobuf.PBAPNSBody.Builder, com.argo.qpush.protobuf.PBAPNSBodyOrBuilder> 
@@ -591,7 +761,7 @@ public final class PBAPNSMessage extends
       if (apsBuilder_ == null) {
         apsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             com.argo.qpush.protobuf.PBAPNSBody, com.argo.qpush.protobuf.PBAPNSBody.Builder, com.argo.qpush.protobuf.PBAPNSBodyOrBuilder>(
-                getAps(),
+                aps_,
                 getParentForChildren(),
                 isClean());
         aps_ = null;
@@ -599,12 +769,13 @@ public final class PBAPNSMessage extends
       return apsBuilder_;
     }
 
+    // repeated .message.PBAPNSUserInfo userInfo = 3;
     private java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> userInfo_ =
       java.util.Collections.emptyList();
     private void ensureUserInfoIsMutable() {
-      if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (!((bitField0_ & 0x00000004) == 0x00000004)) {
         userInfo_ = new java.util.ArrayList<com.argo.qpush.protobuf.PBAPNSUserInfo>(userInfo_);
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
        }
     }
 
@@ -612,7 +783,7 @@ public final class PBAPNSMessage extends
         com.argo.qpush.protobuf.PBAPNSUserInfo, com.argo.qpush.protobuf.PBAPNSUserInfo.Builder, com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder> userInfoBuilder_;
 
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> getUserInfoList() {
       if (userInfoBuilder_ == null) {
@@ -622,7 +793,7 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public int getUserInfoCount() {
       if (userInfoBuilder_ == null) {
@@ -632,7 +803,7 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSUserInfo getUserInfo(int index) {
       if (userInfoBuilder_ == null) {
@@ -642,7 +813,7 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder setUserInfo(
         int index, com.argo.qpush.protobuf.PBAPNSUserInfo value) {
@@ -659,7 +830,7 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder setUserInfo(
         int index, com.argo.qpush.protobuf.PBAPNSUserInfo.Builder builderForValue) {
@@ -673,7 +844,7 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder addUserInfo(com.argo.qpush.protobuf.PBAPNSUserInfo value) {
       if (userInfoBuilder_ == null) {
@@ -689,7 +860,7 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder addUserInfo(
         int index, com.argo.qpush.protobuf.PBAPNSUserInfo value) {
@@ -706,7 +877,7 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder addUserInfo(
         com.argo.qpush.protobuf.PBAPNSUserInfo.Builder builderForValue) {
@@ -720,7 +891,7 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder addUserInfo(
         int index, com.argo.qpush.protobuf.PBAPNSUserInfo.Builder builderForValue) {
@@ -734,14 +905,13 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder addAllUserInfo(
         java.lang.Iterable<? extends com.argo.qpush.protobuf.PBAPNSUserInfo> values) {
       if (userInfoBuilder_ == null) {
         ensureUserInfoIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, userInfo_);
+        super.addAll(values, userInfo_);
         onChanged();
       } else {
         userInfoBuilder_.addAllMessages(values);
@@ -749,12 +919,12 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder clearUserInfo() {
       if (userInfoBuilder_ == null) {
         userInfo_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
       } else {
         userInfoBuilder_.clear();
@@ -762,7 +932,7 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public Builder removeUserInfo(int index) {
       if (userInfoBuilder_ == null) {
@@ -775,14 +945,14 @@ public final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSUserInfo.Builder getUserInfoBuilder(
         int index) {
       return getUserInfoFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder getUserInfoOrBuilder(
         int index) {
@@ -792,7 +962,7 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public java.util.List<? extends com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder> 
          getUserInfoOrBuilderList() {
@@ -803,14 +973,14 @@ public final class PBAPNSMessage extends
       }
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSUserInfo.Builder addUserInfoBuilder() {
       return getUserInfoFieldBuilder().addBuilder(
           com.argo.qpush.protobuf.PBAPNSUserInfo.getDefaultInstance());
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public com.argo.qpush.protobuf.PBAPNSUserInfo.Builder addUserInfoBuilder(
         int index) {
@@ -818,7 +988,7 @@ public final class PBAPNSMessage extends
           index, com.argo.qpush.protobuf.PBAPNSUserInfo.getDefaultInstance());
     }
     /**
-     * <code>repeated .message.PBAPNSUserInfo userInfo = 2;</code>
+     * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
      */
     public java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo.Builder> 
          getUserInfoBuilderList() {
@@ -831,7 +1001,7 @@ public final class PBAPNSMessage extends
         userInfoBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
             com.argo.qpush.protobuf.PBAPNSUserInfo, com.argo.qpush.protobuf.PBAPNSUserInfo.Builder, com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder>(
                 userInfo_,
-                ((bitField0_ & 0x00000002) == 0x00000002),
+                ((bitField0_ & 0x00000004) == 0x00000004),
                 getParentForChildren(),
                 isClean());
         userInfo_ = null;

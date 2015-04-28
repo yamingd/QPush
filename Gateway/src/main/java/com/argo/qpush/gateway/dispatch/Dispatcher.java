@@ -130,7 +130,28 @@ public class Dispatcher extends Thread {
 
         //TODO: 离线
 
-        logger.info("Dispatcher stop running. " + this.product);
+        // pool status
+        Thread thread3 = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (!stopping) {
+
+                    logger.info("\nSingle Pool Status:{}\n Broadcast Pool Status:{}\n",
+                            singlePool.getThreadPoolExecutor(),
+                            broadcastPool.getThreadPoolExecutor());
+
+                    try {
+                        Thread.sleep(10 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread3.start();
+
+        logger.info("Dispatcher running. " + this.product);
     }
 
     public void stopDispatch(){
@@ -141,6 +162,11 @@ public class Dispatcher extends Thread {
         this.stopping = false;
     }
 
+    /**
+     * 在客户端上线时，把之前下线后的最新的消息推送到客户端
+     *
+     * @param userId
+     */
     public void pushOfflinePayload(String userId){
         this.singlePool.submit(new OfflineSendThread(this.product, userId));
     }

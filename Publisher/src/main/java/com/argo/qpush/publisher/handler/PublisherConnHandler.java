@@ -17,6 +17,9 @@ import java.io.IOException;
  */
 public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
 
+    public static final String STATUS_200 = "200";
+    public static final String STATUS_500 = "500";
+
     protected static Logger logger = LoggerFactory.getLogger(PublisherConnHandler.class);
 
     public PublisherConnHandler() {
@@ -27,7 +30,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws Exception {
-        logger.info("channelActive: " + ctx.channel().hashCode());
+        logger.info("channelActive: {}", ctx.channel().hashCode());
     }
 
     /**
@@ -35,7 +38,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        logger.info("channelRead: " + ctx.channel().hashCode());
+        logger.info("channelRead: {}", ctx.channel().hashCode());
 
         MetricBuilder.recvMeter.mark();
 
@@ -47,10 +50,10 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
                 logger.debug("Payload. message={}", message);
             }
             PayloadHandler.instance.save(message);
-            ack(ctx, "200");
+            ack(ctx, STATUS_200);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            ack(ctx, "500");
+            ack(ctx, STATUS_500);
         }finally {
             ctx.fireChannelRead(msg);
         }
@@ -70,7 +73,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        logger.info("channelReadComplete: " + ctx.channel().hashCode());
+        logger.info("channelReadComplete: {}", ctx.channel().hashCode());
     }
 
     /**
@@ -78,7 +81,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        logger.error("channel Error: {}, {}", ctx.channel().hashCode(), cause);
         ctx.close();
     }
 
@@ -89,6 +92,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx)
             throws Exception {
         logger.info("channelInactive: " + ctx.channel().hashCode());
+        ctx.close();
     }
 
 }

@@ -55,6 +55,12 @@ public class PayloadHandler implements InitializingBean, ApplicationContextAware
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * 保存Payload到 Queue.
+     * Queue 根据配置项payloadQueue决定
+     *
+     * @param message
+     */
     public void save(PayloadMessage message) {
         Product product = productService.findByKey(message.appkey);
         if (product != null) {

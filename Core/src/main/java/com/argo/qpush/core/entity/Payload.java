@@ -66,6 +66,8 @@ public class Payload implements Serializable {
     private Integer broadcast;
     private Long sentDate;
 
+    private Integer offlineMode;
+
     public Long getId() {
         return id;
     }
@@ -166,6 +168,13 @@ public class Payload implements Serializable {
         this.sentDate = sentDate;
     }
 
+    public Integer getOfflineMode() {
+        return offlineMode;
+    }
+
+    public void setOfflineMode(Integer offlineMode) {
+        this.offlineMode = offlineMode;
+    }
 
     public PBAPNSMessage asAPNSMessage(){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
@@ -208,6 +217,7 @@ public class Payload implements Serializable {
         this.clients = message.clients;
         this.extras = MessageUtils.toJson(message.ext);
         this.broadcast = message.broadcast == null || !message.broadcast ? 0 : 1;
+        this.offlineMode = message.offlineMode;
     }
 
     private Map<String, PushError> failedClients = Maps.newConcurrentMap();

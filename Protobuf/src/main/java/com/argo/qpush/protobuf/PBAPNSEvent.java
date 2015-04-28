@@ -6,10 +6,9 @@ package com.argo.qpush.protobuf;
 /**
  * Protobuf type {@code message.PBAPNSEvent}
  */
-public final class PBAPNSEvent extends
-    com.google.protobuf.GeneratedMessage implements
-    // @@protoc_insertion_point(message_implements:message.PBAPNSEvent)
-    PBAPNSEventOrBuilder {
+public  final class PBAPNSEvent extends
+    com.google.protobuf.GeneratedMessage
+    implements PBAPNSEventOrBuilder {
   // Use PBAPNSEvent.newBuilder() to construct.
   private PBAPNSEvent(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -61,21 +60,18 @@ public final class PBAPNSEvent extends
             break;
           }
           case 18: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            token_ = bs;
+            token_ = input.readBytes();
             break;
           }
           case 26: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000004;
-            appKey_ = bs;
+            appKey_ = input.readBytes();
             break;
           }
           case 34: {
-            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000008;
-            userId_ = bs;
+            userId_ = input.readBytes();
             break;
           }
           case 40: {
@@ -143,6 +139,18 @@ public final class PBAPNSEvent extends
      * <code>Offline = 4;</code>
      */
     Offline(3, 4),
+    /**
+     * <code>Error = 0;</code>
+     */
+    Error(4, 0),
+    /**
+     * <code>Sleep = 5;</code>
+     */
+    Sleep(5, 5),
+    /**
+     * <code>Awake = 6;</code>
+     */
+    Awake(6, 6),
     ;
 
     /**
@@ -161,6 +169,18 @@ public final class PBAPNSEvent extends
      * <code>Offline = 4;</code>
      */
     public static final int Offline_VALUE = 4;
+    /**
+     * <code>Error = 0;</code>
+     */
+    public static final int Error_VALUE = 0;
+    /**
+     * <code>Sleep = 5;</code>
+     */
+    public static final int Sleep_VALUE = 5;
+    /**
+     * <code>Awake = 6;</code>
+     */
+    public static final int Awake_VALUE = 6;
 
 
     public final int getNumber() { return value; }
@@ -171,6 +191,9 @@ public final class PBAPNSEvent extends
         case 2: return KeepAlive;
         case 3: return PushAck;
         case 4: return Offline;
+        case 0: return Error;
+        case 5: return Sleep;
+        case 6: return Awake;
         default: return null;
       }
     }
@@ -305,6 +328,7 @@ public final class PBAPNSEvent extends
   }
 
   private int bitField0_;
+  // required int32 op = 1;
   public static final int OP_FIELD_NUMBER = 1;
   private int op_;
   /**
@@ -320,6 +344,7 @@ public final class PBAPNSEvent extends
     return op_;
   }
 
+  // required string token = 2;
   public static final int TOKEN_FIELD_NUMBER = 2;
   private java.lang.Object token_;
   /**
@@ -362,6 +387,7 @@ public final class PBAPNSEvent extends
     }
   }
 
+  // required string appKey = 3;
   public static final int APPKEY_FIELD_NUMBER = 3;
   private java.lang.Object appKey_;
   /**
@@ -404,6 +430,7 @@ public final class PBAPNSEvent extends
     }
   }
 
+  // required string userId = 4;
   public static final int USERID_FIELD_NUMBER = 4;
   private java.lang.Object userId_;
   /**
@@ -446,6 +473,7 @@ public final class PBAPNSEvent extends
     }
   }
 
+  // required int32 typeId = 5;
   public static final int TYPEID_FIELD_NUMBER = 5;
   private int typeId_;
   /**
@@ -471,8 +499,7 @@ public final class PBAPNSEvent extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized != -1) return isInitialized == 1;
 
     if (!hasOp()) {
       memoizedIsInitialized = 0;
@@ -627,9 +654,8 @@ public final class PBAPNSEvent extends
    * Protobuf type {@code message.PBAPNSEvent}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:message.PBAPNSEvent)
-      com.argo.qpush.protobuf.PBAPNSEventOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder>
+     implements com.argo.qpush.protobuf.PBAPNSEventOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.argo.qpush.protobuf.PbMessage.internal_static_message_PBAPNSEvent_descriptor;
@@ -804,6 +830,7 @@ public final class PBAPNSEvent extends
     }
     private int bitField0_;
 
+    // required int32 op = 1;
     private int op_ ;
     /**
      * <code>required int32 op = 1;</code>
@@ -836,6 +863,7 @@ public final class PBAPNSEvent extends
       return this;
     }
 
+    // required string token = 2;
     private java.lang.Object token_ = "";
     /**
      * <code>required string token = 2;</code>
@@ -849,12 +877,9 @@ public final class PBAPNSEvent extends
     public java.lang.String getToken() {
       java.lang.Object ref = token_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          token_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        token_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -912,6 +937,7 @@ public final class PBAPNSEvent extends
       return this;
     }
 
+    // required string appKey = 3;
     private java.lang.Object appKey_ = "";
     /**
      * <code>required string appKey = 3;</code>
@@ -925,12 +951,9 @@ public final class PBAPNSEvent extends
     public java.lang.String getAppKey() {
       java.lang.Object ref = appKey_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          appKey_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        appKey_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -988,6 +1011,7 @@ public final class PBAPNSEvent extends
       return this;
     }
 
+    // required string userId = 4;
     private java.lang.Object userId_ = "";
     /**
      * <code>required string userId = 4;</code>
@@ -1001,12 +1025,9 @@ public final class PBAPNSEvent extends
     public java.lang.String getUserId() {
       java.lang.Object ref = userId_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          userId_ = s;
-        }
+        java.lang.String s = ((com.google.protobuf.ByteString) ref)
+            .toStringUtf8();
+        userId_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
@@ -1064,6 +1085,7 @@ public final class PBAPNSEvent extends
       return this;
     }
 
+    // required int32 typeId = 5;
     private int typeId_ ;
     /**
      * <code>required int32 typeId = 5;</code>

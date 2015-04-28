@@ -6,6 +6,7 @@ import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadHistory;
 import com.argo.qpush.core.entity.PayloadStatus;
 import com.argo.qpush.core.entity.PushError;
+import com.argo.qpush.protobuf.PBAPNSMessage;
 import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -21,7 +22,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by yaming_deng on 14-8-8.
@@ -38,7 +38,6 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             PayloadHistory.class);
 
     private ThreadPoolTaskExecutor jdbcExecutor = null;
-    private AtomicLong jdbcPending = new AtomicLong();
 
     @Override
     public Payload getSimple(long id) {
@@ -118,15 +117,10 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
         }
     }
 
-    @TxMain
-    private void updatePendingCount(boolean incr){
-        long count = incr ? jdbcPending.incrementAndGet() : jdbcPending.decrementAndGet();
-        logger.info("JdbcExecutor Pending. total=" + count);
-    }
-
     @Override
     @TxMain
     public void saveAfterSent(final Payload payload) throws Exception {
+
         if (payload == null){
             return;
         }
@@ -139,7 +133,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                final String sql = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                final String sql = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate, offlineMode)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 mainJdbc.update(new PreparedStatementCreator() {
                     @Override
@@ -158,6 +152,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                         ps.setObject(9, payload.getStatusId());
                         ps.setObject(10, payload.getBroadcast());
                         ps.setObject(11, payload.getSentDate());
+                        ps.setObject(12, payload.getOfflineMode());
                         return ps;
                     }
                 });
@@ -166,36 +161,52 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                 if (payload.getClients() != null){
                     List<Object[]> args = Lists.newArrayList();
-                    final String sql0 = "insert into payload_client(payloadId, userId, productId, statusId, createTime, errorId, errorMsg)values(?, ?, ?, ?, ?, ?, ?)";
+                    final String sql0 = "insert into payload_client(payloadId, userId, productId, statusId, createTime, onlineMode, errorId, errorMsg)values(?, ?, ?, ?, ?, ?, ?, ?)";
                     for(String userId : payload.getClients()){
                         PushError error = payload.getFailedClients().get(userId);
-                        int statusId = error != null ? 0 : 1;
-                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), statusId, new Date().getTime()/1000,
+                        int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
+                        int onlineMode = 0;
+
+                        if (error != null && (error.getCode() == PushError.NoClient
+                                            || error.getCode() == PushError.NoDevivceToken
+                                            || error.getCode() == PushError.WaitOnline)){
+
+                            //离线消息在用户上线时的处理方式
+                            if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                                onlineMode = 0; //忽略
+                            }else{
+                                onlineMode = 1; //发送
+                            }
+
+                        }
+
+                        args.add(new Object[]{payload.getId(), userId, payload.getProductId(), statusId,
+                                new Date().getTime()/1000,
+                                onlineMode,
                                 error != null ? error.getCode() : null,
-                                error != null ? error.getMsg() : null});
+                                error != null ? error.getMsg() : null}
+                        );
+
                     }
                     mainJdbc.batchUpdate(sql0, args);
                     MetricBuilder.jdbcUpdateMeter.mark(1);
                 }
 
-                updatePendingCount(false);
             }
         });
-
-        updatePendingCount(true);
 
     }
 
     @Override
     public List<Payload> findNormalList(int productId, long start, int page, int limit){
-        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
+        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and tryLimit > 0 and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 0, PayloadStatus.Pending, start, offset, limit);
     }
 
     @Override
     public List<Payload> findBrodcastList(int productId, long start, int page, int limit){
-        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
+        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and tryLimit > 0 and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 1, PayloadStatus.Pending, start, offset, limit);
     }
@@ -209,15 +220,15 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             public void run() {
 
                 String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
-                mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime()/1000, message.getId());
+                mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime() / 1000, message.getId());
 
-                sql = "update payload_client set statusId=?, createTime=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
+                sql = "update payload_client set tryLimit=tryLimit-1, statusId=?, createTime=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
 
                 List<Object[]> args = Lists.newArrayList();
-                for(String userId : message.getClients()){
+                for (String userId : message.getClients()) {
                     PushError error = message.getFailedClients().get(userId);
-                    int statusId = error != null ? 0 : 1;
-                    args.add(new Object[]{statusId, new Date().getTime()/1000,
+                    int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
+                    args.add(new Object[]{statusId, new Date().getTime() / 1000,
                             error != null ? error.getCode() : null,
                             error != null ? error.getMsg() : null,
                             message.getId(), userId});
@@ -226,22 +237,18 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                 MetricBuilder.jdbcUpdateMeter.mark(2);
 
-                updatePendingCount(false);
-
-                if (logger.isDebugEnabled()){
+                if (logger.isDebugEnabled()) {
                     logger.debug("updateSendStatus OK!");
                 }
             }
         });
 
-        updatePendingCount(true);
-
     }
 
     @Override
     public List<Long> findLatest(int productId, String userId, long start){
-        String sql = "select id from payload_client where productId=? and userId = ? and statusId=? and id > ? order by id desc limit 0, 10";
-        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, PayloadStatus.Pending, start);
+        String sql = "select payloadId from payload_client where productId=? and userId = ? and onlineMode=? and id > ? order by id desc limit 0, 10";
+        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, 1, start);
         return list;
     }
 
@@ -269,7 +276,9 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
                 while (!stopping) {
-                    logger.info("JdbcExecutor. {}", jdbcExecutor.getThreadPoolExecutor());
+
+                    logger.info("JdbcExecutor Status\n. {}", jdbcExecutor.getThreadPoolExecutor());
+
                     try {
                         Thread.sleep(10 * 1000);
                     } catch (InterruptedException e) {

@@ -28,7 +28,7 @@ public class OnNewlyAddThread implements Callable<Boolean> {
     @Override
     public Boolean call() throws Exception {
         Client client = ClientServiceImpl.instance.findByUserId(cc.getUserId());
-        boolean isnew = false;
+        boolean isNew = false;
         if (client == null){
             client = new Client();
             Product product = ProductServiceImpl.instance.findByKey(cc.getAppKey());
@@ -41,10 +41,11 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
-            isnew = true;
+            isNew = true;
         }
-        //推送旧消息
-        if (!isnew) {
+
+        //如不是旧客户端. 则推送旧消息
+        if (!isNew) {
             Dispatcher dispatcher = DispatcherRunner.instance.get(cc.getAppKey());
             if (dispatcher != null) {
                 dispatcher.pushOfflinePayload(cc.getUserId());

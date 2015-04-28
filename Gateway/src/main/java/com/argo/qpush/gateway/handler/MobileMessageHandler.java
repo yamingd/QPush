@@ -38,7 +38,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelActive(final ChannelHandlerContext ctx) throws Exception {
-        logger.info("channelActive: " + ctx.channel().hashCode());
+        logger.info("channelActive: {}", ctx.channel().hashCode());
     }
 
     /**
@@ -47,7 +47,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (logger.isDebugEnabled()) {
-            logger.info("channelRead: " + ctx.channel().hashCode());
+            logger.info("channelRead: {}", ctx.channel().hashCode());
         }
         MetricBuilder.requestMeter.mark();
 
@@ -88,27 +88,44 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             conn.setUserId(cc.getUserId());
             conn.setAppKey(cc.getAppKey());
             ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), conn);
+            //记录客户端
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
             ack(ctx, cc, SYNC);
             if (logger.isDebugEnabled()){
                 logger.debug("Got Online Message and handle DONE. {}", cc);
             }
         }else if(cc.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
-            Connection conn = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
-            if (null != conn){
-                //链接还保持，直接返回
-                ack(ctx, cc, SYNC);
-                return;
-            }
-
-            conn = new Connection(ctx.channel());
-            conn.setUserId(cc.getUserId());
-            conn.setAppKey(cc.getAppKey());
-            ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), conn);
-            MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
             //心跳
             ack(ctx, cc, SYNC);
 
+        }else if(cc.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
+
+                @Override
+                public void run() {
+                    Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
+                    if (c0 != null) {
+                        ClientServiceImpl.instance.updateStatus(c0.getId(), 2);
+                    }
+                }
+
+            });
+            //心跳
+            ack(ctx, cc, SYNC);
+
+        }else if(cc.getOp() == PBAPNSEvent.Ops.Awake_VALUE){
+            Connection conn = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
+            if (null == conn){
+                conn = new Connection(ctx.channel());
+                conn.setUserId(cc.getUserId());
+                conn.setAppKey(cc.getAppKey());
+                ConnectionKeeper.add(cc.getAppKey(), cc.getUserId(), conn);
+            }
+
+            //记录客户端
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(cc));
+            //心跳
+            ack(ctx, cc, SYNC);
         }else if(cc.getOp() == PBAPNSEvent.Ops.PushAck_VALUE){
             //推送反馈
             ack(ctx, cc, SYNC);
@@ -118,6 +135,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (connection != null) {
                 ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
                 MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
+
                     @Override
                     public void run() {
                         Client c0 = ClientServiceImpl.instance.findByUserId(cc.getUserId());
@@ -125,6 +143,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                             ClientServiceImpl.instance.updateOfflineTs(c0.getId(), connection.getLastOpTime());
                         }
                     }
+
                 });
             }
 
@@ -158,7 +177,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        logger.info("channelReadComplete: " + ctx.channel().hashCode());
+        logger.info("channelReadComplete: {}", ctx.channel().hashCode());
         ctx.flush();
     }
 
@@ -168,7 +187,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         lostConnection(ctx);
-        logger.error("exceptionCaught: " + ctx.channel().hashCode(), cause);
+        logger.error("exceptionCaught: {}", ctx.channel().hashCode(), cause);
         ctx.close();
     }
 
@@ -178,7 +197,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx)
             throws Exception {
-        logger.info("channelInactive: " + ctx.channel().hashCode());
+        logger.info("channelInactive: {}", ctx.channel().hashCode());
         lostConnection(ctx);
     }
 

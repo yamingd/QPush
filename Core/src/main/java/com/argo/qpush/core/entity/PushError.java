@@ -26,10 +26,16 @@ public class PushError {
 
     public static final int iOSPushConfigError = 9;
 
+    public static final int WaitOnline = 10;
+
     private int code;
     private String msg;
 
     public PushError() {
+    }
+
+    public PushError(int code) {
+        this.code = code;
     }
 
     public PushError(int code, String msg){

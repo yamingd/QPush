@@ -397,7 +397,7 @@ class PBAPNSMessage : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // required int32 offlineMode = 1;
+  // optional int32 offlineMode = 1;
   inline bool has_offlinemode() const;
   inline void clear_offlinemode();
   static const int kOfflineModeFieldNumber = 1;
@@ -955,7 +955,7 @@ inline void PBAPNSBody::set_badge(::google::protobuf::int32 value) {
 
 // PBAPNSMessage
 
-// required int32 offlineMode = 1;
+// optional int32 offlineMode = 1;
 inline bool PBAPNSMessage::has_offlinemode() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }

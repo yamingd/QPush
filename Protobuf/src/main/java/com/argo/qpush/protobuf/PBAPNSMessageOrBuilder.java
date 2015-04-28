@@ -6,13 +6,13 @@ package com.argo.qpush.protobuf;
 public interface PBAPNSMessageOrBuilder
     extends com.google.protobuf.MessageOrBuilder {
 
-  // required int32 offlineMode = 1;
+  // optional int32 offlineMode = 1;
   /**
-   * <code>required int32 offlineMode = 1;</code>
+   * <code>optional int32 offlineMode = 1;</code>
    */
   boolean hasOfflineMode();
   /**
-   * <code>required int32 offlineMode = 1;</code>
+   * <code>optional int32 offlineMode = 1;</code>
    */
   int getOfflineMode();
 

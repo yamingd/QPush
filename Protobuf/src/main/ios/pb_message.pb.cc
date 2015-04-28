@@ -163,7 +163,7 @@ void protobuf_AddDesc_pb_5fmessage_2eproto() {
     "rInfo\022\013\n\003key\030\001 \002(\t\022\r\n\005value\030\002 \002(\t\"9\n\nPBA"
     "PNSBody\022\r\n\005alert\030\001 \001(\t\022\r\n\005sound\030\002 \001(\t\022\r\n"
     "\005badge\030\003 \001(\005\"\254\001\n\rPBAPNSMessage\022\023\n\013offlin"
-    "eMode\030\001 \002(\005\022 \n\003aps\030\002 \002(\0132\023.message.PBAPN"
+    "eMode\030\001 \001(\005\022 \n\003aps\030\002 \002(\0132\023.message.PBAPN"
     "SBody\022)\n\010userInfo\030\003 \003(\0132\027.message.PBAPNS"
     "UserInfo\"9\n\014OfflineModes\022\n\n\006Ignore\020\000\022\010\n\004"
     "APNS\020\001\022\023\n\017SendAfterOnline\020\002\"\332\001\n\013PBAPNSEv"
@@ -900,7 +900,7 @@ bool PBAPNSMessage::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // required int32 offlineMode = 1;
+      // optional int32 offlineMode = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
@@ -962,7 +962,7 @@ bool PBAPNSMessage::MergePartialFromCodedStream(
 
 void PBAPNSMessage::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // required int32 offlineMode = 1;
+  // optional int32 offlineMode = 1;
   if (has_offlinemode()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->offlinemode(), output);
   }
@@ -987,7 +987,7 @@ void PBAPNSMessage::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* PBAPNSMessage::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // required int32 offlineMode = 1;
+  // optional int32 offlineMode = 1;
   if (has_offlinemode()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->offlinemode(), target);
   }
@@ -1017,7 +1017,7 @@ int PBAPNSMessage::ByteSize() const {
   int total_size = 0;
 
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // required int32 offlineMode = 1;
+    // optional int32 offlineMode = 1;
     if (has_offlinemode()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
@@ -1090,7 +1090,7 @@ void PBAPNSMessage::CopyFrom(const PBAPNSMessage& from) {
 }
 
 bool PBAPNSMessage::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x00000002) != 0x00000002) return false;
 
   for (int i = 0; i < userinfo_size(); i++) {
     if (!this->userinfo(i).IsInitialized()) return false;

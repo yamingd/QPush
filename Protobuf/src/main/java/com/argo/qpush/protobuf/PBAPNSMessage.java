@@ -214,17 +214,17 @@ public  final class PBAPNSMessage extends
   }
 
   private int bitField0_;
-  // required int32 offlineMode = 1;
+  // optional int32 offlineMode = 1;
   public static final int OFFLINEMODE_FIELD_NUMBER = 1;
   private int offlineMode_;
   /**
-   * <code>required int32 offlineMode = 1;</code>
+   * <code>optional int32 offlineMode = 1;</code>
    */
   public boolean hasOfflineMode() {
     return ((bitField0_ & 0x00000001) == 0x00000001);
   }
   /**
-   * <code>required int32 offlineMode = 1;</code>
+   * <code>optional int32 offlineMode = 1;</code>
    */
   public int getOfflineMode() {
     return offlineMode_;
@@ -298,10 +298,6 @@ public  final class PBAPNSMessage extends
     byte isInitialized = memoizedIsInitialized;
     if (isInitialized != -1) return isInitialized == 1;
 
-    if (!hasOfflineMode()) {
-      memoizedIsInitialized = 0;
-      return false;
-    }
     if (!hasAps()) {
       memoizedIsInitialized = 0;
       return false;
@@ -583,10 +579,6 @@ public  final class PBAPNSMessage extends
     }
 
     public final boolean isInitialized() {
-      if (!hasOfflineMode()) {
-        
-        return false;
-      }
       if (!hasAps()) {
         
         return false;
@@ -619,22 +611,22 @@ public  final class PBAPNSMessage extends
     }
     private int bitField0_;
 
-    // required int32 offlineMode = 1;
+    // optional int32 offlineMode = 1;
     private int offlineMode_ ;
     /**
-     * <code>required int32 offlineMode = 1;</code>
+     * <code>optional int32 offlineMode = 1;</code>
      */
     public boolean hasOfflineMode() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 offlineMode = 1;</code>
+     * <code>optional int32 offlineMode = 1;</code>
      */
     public int getOfflineMode() {
       return offlineMode_;
     }
     /**
-     * <code>required int32 offlineMode = 1;</code>
+     * <code>optional int32 offlineMode = 1;</code>
      */
     public Builder setOfflineMode(int value) {
       bitField0_ |= 0x00000001;
@@ -643,7 +635,7 @@ public  final class PBAPNSMessage extends
       return this;
     }
     /**
-     * <code>required int32 offlineMode = 1;</code>
+     * <code>optional int32 offlineMode = 1;</code>
      */
     public Builder clearOfflineMode() {
       bitField0_ = (bitField0_ & ~0x00000001);

@@ -41,7 +41,7 @@ public final class PbMessage {
       "rInfo\022\013\n\003key\030\001 \002(\t\022\r\n\005value\030\002 \002(\t\"9\n\nPBA" +
       "PNSBody\022\r\n\005alert\030\001 \001(\t\022\r\n\005sound\030\002 \001(\t\022\r\n" +
       "\005badge\030\003 \001(\005\"\254\001\n\rPBAPNSMessage\022\023\n\013offlin" +
-      "eMode\030\001 \002(\005\022 \n\003aps\030\002 \002(\0132\023.message.PBAPN" +
+      "eMode\030\001 \001(\005\022 \n\003aps\030\002 \002(\0132\023.message.PBAPN" +
       "SBody\022)\n\010userInfo\030\003 \003(\0132\027.message.PBAPNS" +
       "UserInfo\"9\n\014OfflineModes\022\n\n\006Ignore\020\000\022\010\n\004" +
       "APNS\020\001\022\023\n\017SendAfterOnline\020\002\"\332\001\n\013PBAPNSEv" +

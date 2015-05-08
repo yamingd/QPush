@@ -82,8 +82,8 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (null != conn){
                 logger.error("你已经在线了!. cc={}, conn={}", cc, conn);
                 ack(ctx, cc, MULTI_CLIENTS);
-                return;
             }
+
             conn = new Connection(ctx.channel());
             conn.setUserId(cc.getUserId());
             conn.setAppKey(cc.getAppKey());
@@ -153,7 +153,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc, String result){
+    private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc, final String result){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
         PBAPNSUserInfo.Builder infoBuilder = PBAPNSUserInfo.newBuilder();

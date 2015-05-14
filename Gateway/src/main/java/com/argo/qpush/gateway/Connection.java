@@ -40,7 +40,7 @@ public class Connection {
      * 更新最后发送时间
      */
     public void updateOpTime(){
-        lastOpTime = (int) (new Date().getTime() - epoch);
+        lastOpTime = (int) (new Date().getTime() / 1000 - epoch);
     }
 
     /**

@@ -81,7 +81,7 @@ public class OneSendThread implements Callable<Integer> {
 
                     if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                         thisProg.incrFailed();
-                        message.addFailedClient(cc.getUserId(), new PushError(PushError.NoClient));
+                        message.addFailedClient(client, new PushError(PushError.NoClient));
                     }else{
                         thisProg.incrSuccess();
                     }

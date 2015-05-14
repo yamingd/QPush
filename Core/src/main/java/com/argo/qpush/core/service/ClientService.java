@@ -20,7 +20,7 @@ public interface ClientService {
     int countOfflineByType(Integer productId, Integer typeId);
 
     @TxMain
-    void updateOnlineTs(long id);
+    void updateOnlineTs(Client client);
 
     @TxMain
     void updateOfflineTs(long id, int lastSendTs);

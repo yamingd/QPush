@@ -93,10 +93,10 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     @TxMain
-    public void updateOnlineTs(long id){
-        String sql = "update client set lastOnline=?, statusId=? where id = ?";
+    public void updateOnlineTs(Client client){
+        String sql = "update client set lastOnline=?, statusId=?, deviceToken=? where id = ?";
         long ts = new Date().getTime() / 1000 - epoch;
-        this.mainJdbc.update(sql, ts, ClientStatus.Online, id);
+        this.mainJdbc.update(sql, ts, ClientStatus.Online, client.getDeviceToken(), client.getId());
     }
 
     @Override

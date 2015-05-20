@@ -55,10 +55,6 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         try {
             byte[] bytes = (byte[]) msg;
-            if(logger.isDebugEnabled()){
-                logger.debug("Got Message, length:{}", bytes.length);
-                logger.debug("bytes: {}", bytes);
-            }
             cc = PBAPNSEvent.newBuilder().mergeFrom(bytes).build();
         } catch (Exception e) {
             logger.error("Invalid Data Package.", e);
@@ -74,10 +70,12 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             MetricBuilder.clientIOSMeter.mark();
         }
 
+        if (logger.isDebugEnabled()){
+            logger.debug("Got Message. {}", cc);
+        }
+
         if(cc.getOp() == PBAPNSEvent.Ops.Online_VALUE){
-            if (logger.isDebugEnabled()){
-                logger.debug("Got Online Message. {}", cc);
-            }
+
             Connection conn = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
             if (null != conn){
                 logger.error("你已经在线了!. cc={}, conn={}", cc, conn);
@@ -137,6 +135,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
 
                 connection.close();
+                logger.info("Client disconnect: {}", cc);
 
                 MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
 

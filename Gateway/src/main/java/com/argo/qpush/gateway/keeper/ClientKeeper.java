@@ -60,8 +60,7 @@ public class ClientKeeper {
     public static Integer remove(String key, String token){
         ConcurrentHashMap<String, Integer> m = mapping.get(key);
         if(m != null){
-            Integer val = m.get(token);
-            m.remove(token);
+            Integer val = m.remove(token);
             return val;
         }
         return null;

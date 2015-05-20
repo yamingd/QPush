@@ -211,6 +211,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         logger.info("lost Connection: {}", ctx.channel());
         final Connection connection = ConnectionKeeper.get(ctx.channel().hashCode());
         if (null != connection){
+            connection.close();
             ClientKeeper.remove(connection.getAppKey(), connection.getUserId());
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override

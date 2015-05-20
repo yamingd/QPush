@@ -82,6 +82,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (null != conn){
                 logger.error("你已经在线了!. cc={}, conn={}", cc, conn);
                 ack(ctx, cc, MULTI_CLIENTS);
+                conn.close();
             }
 
             conn = new Connection(ctx.channel());
@@ -134,6 +135,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             final Connection connection = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
             if (connection != null) {
                 ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
+
+                connection.close();
+
                 MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
 
                     @Override
@@ -147,7 +151,6 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 });
             }
 
-            ack(ctx, cc, SYNC);
             ctx.close();
 
         }

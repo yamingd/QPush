@@ -15,7 +15,7 @@
         <Encoding>UTF-8</Encoding>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>
-                logs/publisher.%d{yyyy-MM-dd}.log
+                ../logs/publisher.%d{yyyy-MM-dd}.log
             </FileNamePattern>
         </rollingPolicy>
         <MaxHistory>30</MaxHistory>

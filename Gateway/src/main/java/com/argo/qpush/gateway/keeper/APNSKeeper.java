@@ -40,7 +40,7 @@ public class APNSKeeper {
 
         ApnsService service = mapping.get(product.getId());
         if (service == null){
-            boolean sandbox = (Boolean) ServerConfig.getConf().get("apns.sandbox");
+            boolean sandbox = (Boolean) ServerConfig.current.get().get("apns.sandbox");
              ApnsServiceBuilder builder =  APNS.newService();
             if (sandbox){
                 builder.withCert(product.getDevCertPath(), product.getDevCertPass());

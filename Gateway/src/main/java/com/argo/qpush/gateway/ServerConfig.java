@@ -1,19 +1,31 @@
 package com.argo.qpush.gateway;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import java.util.Properties;
 
 /**
  * Created by yaming_deng on 14-8-13.
  */
-public class ServerConfig {
+@Component
+public class ServerConfig implements InitializingBean {
 
-    private static Properties conf;
+    @Autowired
+    @Qualifier("appConfig")
+    private Properties serverConfig;
 
-    public static Properties getConf() {
-        return conf;
+    public static ServerConfig current;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        current = this;
     }
 
-    public static void setConf(Properties conf) {
-        ServerConfig.conf = conf;
+    public Properties get() {
+        return serverConfig;
     }
+
 }

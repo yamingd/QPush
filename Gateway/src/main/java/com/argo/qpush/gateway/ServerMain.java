@@ -9,7 +9,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -72,7 +71,6 @@ public class ServerMain {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring-gateway.xml");
         Properties prop = context.getBean("appConfig", Properties.class);
-        ServerConfig.setConf(prop);
         start(prop);
     }
 }

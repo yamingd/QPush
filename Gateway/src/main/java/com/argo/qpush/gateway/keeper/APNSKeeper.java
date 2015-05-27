@@ -65,7 +65,6 @@ public class APNSKeeper {
      *
      */
     public static void push(SentProgress progress, Product product, Client cc, Payload message){
-        String json = message.asJson();
         ApnsService service = get(product);
         if (service != null){
             try{
@@ -73,6 +72,7 @@ public class APNSKeeper {
                     progress.incrFailed();
                     message.addFailedClient(cc.getUserId(), new PushError(PushError.NoDevivceToken));
                 }else {
+                    String json = message.asJson();
                     service.push(cc.getDeviceToken(), json);
                     progress.incrSuccess();
                 }

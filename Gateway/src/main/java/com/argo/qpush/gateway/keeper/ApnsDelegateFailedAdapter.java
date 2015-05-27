@@ -14,6 +14,6 @@ public class ApnsDelegateFailedAdapter extends ApnsDelegateAdapter {
 
     @Override
     public void messageSendFailed(ApnsNotification message, Throwable e) {
-        logger.error("Push Failed.", e);
+        logger.error("Push Failed. {}" + message, e);
     }
 }

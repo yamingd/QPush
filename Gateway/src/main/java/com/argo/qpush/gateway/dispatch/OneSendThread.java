@@ -109,7 +109,7 @@ public class OneSendThread implements Callable<Integer> {
                 }
 
                 if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
-                    APNSKeeper.push(thisProg, this.product, cc, message);
+                    APNSKeeper.instance.push(thisProg, this.product, cc, message);
                 }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                     thisProg.incrFailed();
                     message.addFailedClient(cc.getUserId(), new PushError(PushError.WaitOnline));

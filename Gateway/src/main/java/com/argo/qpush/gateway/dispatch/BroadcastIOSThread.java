@@ -47,7 +47,7 @@ public class BroadcastIOSThread implements Callable<Integer> {
         if(message.getClients() == null || message.getClients().size() == 0){
             List<Client> clients = ClientServiceImpl.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
             for (Client c : clients){
-                APNSKeeper.push(progress, this.product, c, message);
+                APNSKeeper.instance.push(progress, this.product, c, message);
             }
             return 1;
         }else{

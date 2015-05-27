@@ -116,7 +116,7 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
         for (Product prod : prods){
             //注册产品
             ClientKeeper.registry(prod.getAppKey());
-            APNSKeeper.get(prod);
+            APNSKeeper.instance.get(prod);
             //启动推送器
             Dispatcher dispatcher = new Dispatcher(serverConfig, prod, payloadQueue);
             dispatcherList.add(dispatcher);

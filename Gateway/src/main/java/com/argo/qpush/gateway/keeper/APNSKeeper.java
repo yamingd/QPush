@@ -1,8 +1,8 @@
 package com.argo.qpush.gateway.keeper;
 
 import com.argo.qpush.core.entity.*;
+import com.argo.qpush.core.service.ProductService;
 import com.argo.qpush.gateway.SentProgress;
-import com.argo.qpush.gateway.ServerConfig;
 import com.google.common.collect.Maps;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
@@ -10,13 +10,20 @@ import com.notnoop.apns.ApnsServiceBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by yaming_deng on 14-8-13.
  */
-public class APNSKeeper {
+@Component
+public class APNSKeeper implements InitializingBean {
 
     protected static Logger logger = LoggerFactory.getLogger(APNSKeeper.class);
 
@@ -24,7 +31,18 @@ public class APNSKeeper {
 
     private static ApnsDelegateFailedAdapter delegateAdapter = new ApnsDelegateFailedAdapter();
 
-    public static ApnsService get(Product product){
+    @Autowired
+    @Qualifier("appConfig")
+    private Properties serverConfig;
+
+    @Autowired
+    private ProductService productService;
+
+    private List<Product> productList;
+    private boolean sandBox = true;
+
+
+    public ApnsService get(Product product){
 
         if (product.getClientTypeid().intValue() != ClientType.iOS){
             return null;
@@ -40,9 +58,8 @@ public class APNSKeeper {
 
         ApnsService service = mapping.get(product.getId());
         if (service == null){
-            boolean sandbox = (Boolean) ServerConfig.current.get().get("apns.sandbox");
              ApnsServiceBuilder builder =  APNS.newService();
-            if (sandbox){
+            if (sandBox){
                 builder.withCert(product.getDevCertPath(), product.getDevCertPass());
                 builder.withSandboxDestination();
             }else{
@@ -51,6 +68,7 @@ public class APNSKeeper {
             service = builder.asPool(10).withDelegate(delegateAdapter).build();
             mapping.put(product.getId(), service);
         }
+
         return service;
     }
 
@@ -64,7 +82,7 @@ public class APNSKeeper {
      * @param message
      *
      */
-    public static void push(SentProgress progress, Product product, Client cc, Payload message){
+    public void push(SentProgress progress, Product product, Client cc, Payload message){
         ApnsService service = get(product);
         if (service != null){
             try{
@@ -87,4 +105,26 @@ public class APNSKeeper {
             message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushConfigError));
         }
     }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        String flag = "" + this.serverConfig.get("apns.sandbox");
+        if (flag.equals("false")) {
+            this.sandBox = false;
+        }else{
+            this.sandBox = true;
+        }
+
+        productList = productService.findAll();
+        for (Product product : productList){
+            ApnsService service = get(product);
+            if (service != null) {
+                logger.info("Init Product APNS service. {}", product);
+            }
+        }
+
+        instance = this;
+    }
+
+    public static APNSKeeper instance = null;
 }

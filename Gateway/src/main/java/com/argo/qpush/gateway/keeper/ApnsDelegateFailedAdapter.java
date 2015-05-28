@@ -2,6 +2,7 @@ package com.argo.qpush.gateway.keeper;
 
 import com.notnoop.apns.ApnsDelegateAdapter;
 import com.notnoop.apns.ApnsNotification;
+import com.notnoop.apns.DeliveryError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,15 @@ public class ApnsDelegateFailedAdapter extends ApnsDelegateAdapter {
 
     @Override
     public void messageSendFailed(ApnsNotification message, Throwable e) {
-        logger.error("Push Failed. {}" + message, e);
+
+        logger.error("Push Failed. {}\n {}", message, e);
+
+    }
+
+    @Override
+    public void connectionClosed(DeliveryError e, int messageIdentifier) {
+
+        logger.error("connectionClosed. {} {}", messageIdentifier, e);
+
     }
 }

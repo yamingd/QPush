@@ -87,7 +87,7 @@ public class APNSKeeper implements InitializingBean {
         ApnsService service = get(product);
         if (service != null){
             try{
-                if (StringUtils.isBlank(cc.getDeviceToken())){
+                if (StringUtils.isBlank(cc.getDeviceToken()) || "NULL".equalsIgnoreCase(cc.getDeviceToken())){
                     progress.incrFailed();
                     message.addFailedClient(cc.getUserId(), new PushError(PushError.NoDevivceToken));
                 }else {

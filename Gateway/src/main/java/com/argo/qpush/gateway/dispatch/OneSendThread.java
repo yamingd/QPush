@@ -95,7 +95,7 @@ public class OneSendThread implements Callable<Integer> {
                     message.addFailedClient(cc.getUserId(), new PushError(PushError.NoConnections));
                     continue;
                 }
-                if (StringUtils.isBlank(cc.getDeviceToken())){
+                if (StringUtils.isBlank(cc.getDeviceToken()) || "NULL".equalsIgnoreCase(cc.getDeviceToken())){
                     logger.error("Client's deviceToken not found. client=" + client);
 
                     if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
@@ -108,11 +108,13 @@ public class OneSendThread implements Callable<Integer> {
                     continue;
                 }
 
-                if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
-                    APNSKeeper.instance.push(thisProg, this.product, cc, message);
-                }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                    thisProg.incrFailed();
-                    message.addFailedClient(cc.getUserId(), new PushError(PushError.WaitOnline));
+                if (0 == message.getToMode()){
+                    if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
+                        APNSKeeper.instance.push(thisProg, this.product, cc, message);
+                    }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                        thisProg.incrFailed();
+                        message.addFailedClient(cc.getUserId(), new PushError(PushError.WaitOnline));
+                    }
                 }else{
                     thisProg.incrSuccess();
                 }

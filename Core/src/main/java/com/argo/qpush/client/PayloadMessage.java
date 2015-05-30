@@ -46,6 +46,10 @@ public class PayloadMessage {
      */
     public Integer offlineMode;
 
+    /**
+     * 发送到人得状态.(0:所有,1:在线)
+     */
+    public Integer toMode;
 
     @Override
     public String toString() {

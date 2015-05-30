@@ -68,6 +68,8 @@ public class Payload implements Serializable {
 
     private Integer offlineMode;
 
+    private Integer toMode;
+
     public Long getId() {
         return id;
     }
@@ -176,6 +178,14 @@ public class Payload implements Serializable {
         this.offlineMode = offlineMode;
     }
 
+    public Integer getToMode() {
+        return toMode;
+    }
+
+    public void setToMode(Integer toMode) {
+        this.toMode = toMode;
+    }
+
     public PBAPNSMessage asAPNSMessage(){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         if (this.badge == null){
@@ -218,6 +228,7 @@ public class Payload implements Serializable {
         this.extras = MessageUtils.toJson(message.ext);
         this.broadcast = message.broadcast == null || !message.broadcast ? 0 : 1;
         this.offlineMode = message.offlineMode;
+        this.toMode = message.toMode;
     }
 
     private Map<String, PushError> failedClients = Maps.newConcurrentMap();

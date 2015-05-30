@@ -133,7 +133,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                final String sql = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate, offlineMode)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                final String sql = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate, offlineMode, toMode)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 mainJdbc.update(new PreparedStatementCreator() {
                     @Override
@@ -141,6 +141,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                             Connection connection) throws SQLException {
                         PreparedStatement ps = connection.prepareStatement(sql,
                                 Statement.RETURN_GENERATED_KEYS);
+
                         ps.setObject(1, payload.getId());
                         ps.setObject(2, payload.getTitle());
                         ps.setObject(3, payload.getBadge());
@@ -153,6 +154,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                         ps.setObject(10, payload.getBroadcast());
                         ps.setObject(11, payload.getSentDate());
                         ps.setObject(12, payload.getOfflineMode());
+                        ps.setObject(13, payload.getToMode());
+
                         return ps;
                     }
                 });

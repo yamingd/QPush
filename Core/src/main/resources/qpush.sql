@@ -1,119 +1,135 @@
-/*
-Navicat MySQL Data Transfer
+# ************************************************************
+# Sequel Pro SQL dump
+# Version 4004
+#
+# http://www.sequelpro.com/
+# http://code.google.com/p/sequel-pro/
+#
+# Host: 120.24.65.250 (MySQL 10.0.16-MariaDB-log)
+# Database: k12_push
+# Generation Time: 2015-05-30 00:52:02 +0000
+# ************************************************************
 
-Source Server         : 127.0.0.1
-Source Server Version : 50505
-Source Host           : 127.0.0.1:3306
-Source Database       : qpush
 
-Target Server Type    : MYSQL
-Target Server Version : 50505
-File Encoding         : 65001
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-Date: 2014-09-10 18:01:23
-*/
 
-SET FOREIGN_KEY_CHECKS=0;
--- ----------------------------
--- Table structure for `client`
--- ----------------------------
+# Dump of table client
+# ------------------------------------------------------------
+
 DROP TABLE IF EXISTS `client`;
+
 CREATE TABLE `client` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `productId` int(11) DEFAULT NULL,
-  `userId` varchar(32) DEFAULT NULL,
-  `deviceToken` varchar(255) DEFAULT NULL,
-  `createAt` datetime DEFAULT NULL,
-  `statusId` tinyint(4) DEFAULT NULL,
-  `typeId` int(11) DEFAULT NULL,
-  `lastSendAt` int(11) DEFAULT NULL,
-  `lastOnline` int(11) DEFAULT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录id',
+  `productId` int(11) DEFAULT NULL COMMENT '产品id. 关联到product表',
+  `userId` varchar(32) DEFAULT NULL COMMENT '用户id',
+  `deviceToken` varchar(255) DEFAULT NULL COMMENT '设备推送Token',
+  `createAt` datetime DEFAULT NULL COMMENT '创建日期',
+  `statusId` tinyint(2) NOT NULL DEFAULT '1' COMMENT '客户端状态(1:在线,0:下线,2:Sleep)',
+  `typeId` int(11) DEFAULT NULL COMMENT '类别id',
+  `lastSendAt` int(11) DEFAULT NULL COMMENT '最后发送日期',
+  `lastOnline` int(11) DEFAULT NULL COMMENT '最后在线日期',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_client_userId` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='客户端信息表';
 
--- ----------------------------
--- Records of client
--- ----------------------------
-INSERT INTO `client` VALUES ('1', '1', '1', null, null, null, null, null, null);
 
--- ----------------------------
--- Table structure for `payload`
--- ----------------------------
+
+# Dump of table payload
+# ------------------------------------------------------------
+
 DROP TABLE IF EXISTS `payload`;
+
 CREATE TABLE `payload` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) DEFAULT NULL,
-  `badge` int(11) DEFAULT NULL,
-  `extras` varchar(255) DEFAULT NULL,
-  `sound` varchar(255) DEFAULT NULL,
-  `productId` int(11) DEFAULT NULL,
-  `totalUsers` int(11) DEFAULT '0',
-  `createAt` int(11) DEFAULT NULL,
-  `statusId` tinyint(2) DEFAULT NULL,
-  `broadcast` tinyint(1) DEFAULT NULL,
-  `sentDate` int(11) DEFAULT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录id',
+  `title` varchar(255) DEFAULT NULL COMMENT '标题',
+  `badge` int(11) DEFAULT NULL COMMENT '提示总数',
+  `extras` varchar(255) DEFAULT NULL COMMENT '补充信息',
+  `sound` varchar(255) DEFAULT NULL COMMENT '提示声音',
+  `productId` int(11) DEFAULT NULL COMMENT '产品id',
+  `totalUsers` int(11) DEFAULT '0' COMMENT '推送到总用户数',
+  `createAt` int(11) DEFAULT NULL COMMENT '创建日期',
+  `statusId` tinyint(2) DEFAULT NULL COMMENT '推送状态',
+  `broadcast` tinyint(1) DEFAULT NULL COMMENT '是否是广播',
+  `sentDate` int(11) DEFAULT NULL COMMENT '推送日期',
+  `offlineMode` tinyint(1) NOT NULL DEFAULT '0' COMMENT '离线时的推送模式',
+  `toMode` tinyint(1) NOT NULL DEFAULT '0' COMMENT '接受人模式(0:所有,1:在线)',
   PRIMARY KEY (`id`),
   KEY `ix_payload_list` (`productId`,`broadcast`,`statusId`)
-) ENGINE=InnoDB AUTO_INCREMENT=10168 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='推送消息表';
 
--- ----------------------------
--- Records of payload
--- ----------------------------
 
--- ----------------------------
--- Table structure for `payload_client`
--- ----------------------------
+
+# Dump of table payload_client
+# ------------------------------------------------------------
+
 DROP TABLE IF EXISTS `payload_client`;
+
 CREATE TABLE `payload_client` (
-  `id` bigint(20) NOT NULL,
-  `userId` varchar(255) NOT NULL,
-  `productId` int(11) DEFAULT NULL,
-  `statusId` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`,`userId`),
-  KEY `ix_payload_client_pu` (`productId`,`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `payloadId` bigint(20) NOT NULL COMMENT '推送消息id',
+  `userId` varchar(50) NOT NULL DEFAULT '' COMMENT '需要推送到用户id',
+  `productId` int(11) DEFAULT NULL COMMENT '关联的产品id',
+  `statusId` tinyint(1) NOT NULL DEFAULT '0' COMMENT '推送状态(2: 成功, 3: 失败)',
+  `onlineMode` tinyint(1) NOT NULL DEFAULT '0' COMMENT '上线后失败消息处理(0:忽略,1:发送)',
+  `createTime` int(11) DEFAULT NULL COMMENT '记录时间',
+  `tryLimit` smallint(1) NOT NULL DEFAULT '3' COMMENT '最多尝试次数',
+  `errorId` smallint(2) DEFAULT NULL COMMENT '错误标示',
+  `errorMsg` varchar(1000) DEFAULT NULL COMMENT '错误信息',
+  PRIMARY KEY (`id`),
+  KEY `ix_payload_client_pu_resend` (`productId`,`userId`,`onlineMode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='需要推送到用户表';
 
--- ----------------------------
--- Records of payload_client
--- ----------------------------
 
--- ----------------------------
--- Table structure for `payload_history`
--- ----------------------------
+
+# Dump of table payload_history
+# ------------------------------------------------------------
+
 DROP TABLE IF EXISTS `payload_history`;
+
 CREATE TABLE `payload_history` (
-  `id` bigint(20) DEFAULT NULL,
-  `userId` int(11) DEFAULT NULL,
-  `productId` int(11) DEFAULT NULL,
-  `status` tinyint(2) DEFAULT NULL,
-  `createAt` int(11) DEFAULT NULL,
+  `id` bigint(20) NOT NULL COMMENT '推送消息id',
+  `userId` int(11) NOT NULL COMMENT '用户id',
+  `productId` int(11) DEFAULT NULL COMMENT '产品id',
+  `status` tinyint(2) DEFAULT NULL COMMENT '推送状态',
+  `createAt` int(11) DEFAULT NULL COMMENT '创建日期',
+  PRIMARY KEY (`id`,`userId`),
   KEY `ix_payload_history_id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='推送历史表. 在确认时写入';
 
--- ----------------------------
--- Records of payload_history
--- ----------------------------
 
--- ----------------------------
--- Table structure for `product`
--- ----------------------------
+
+# Dump of table product
+# ------------------------------------------------------------
+
 DROP TABLE IF EXISTS `product`;
+
 CREATE TABLE `product` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) DEFAULT NULL,
-  `appKey` varchar(255) DEFAULT NULL,
-  `secret` varchar(255) DEFAULT NULL,
-  `clientTypeid` tinyint(2) DEFAULT NULL,
-  `certPass` varchar(255) DEFAULT NULL,
-  `certPath` varchar(255) DEFAULT NULL,
-  `devCertPass` varchar(255) DEFAULT NULL,
-  `devCertPath` varchar(255) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '产品id',
+  `title` varchar(255) DEFAULT NULL COMMENT '产品名称',
+  `appKey` varchar(255) DEFAULT NULL COMMENT '产品key',
+  `secret` varchar(255) DEFAULT NULL COMMENT '产品secret',
+  `clientTypeid` tinyint(2) DEFAULT NULL COMMENT '客户端类别id, 判断消息的投递方式，在离线状态下',
+  `certPass` varchar(255) DEFAULT NULL COMMENT 'iOS推送证书密码(正式)',
+  `certPath` varchar(255) DEFAULT NULL COMMENT 'iOS推送证书路径(正式)',
+  `devCertPass` varchar(255) DEFAULT NULL COMMENT 'iOS推送证书密码(开发)',
+  `devCertPath` varchar(255) DEFAULT NULL COMMENT 'iOS推送证书路径(开发)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_product_key` (`appKey`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产品表';
 
--- ----------------------------
--- Records of product
--- ----------------------------
-INSERT INTO `product` VALUES ('1', 'app01', 'app01', 'app01', '2', null, null, null, null);
+
+
+
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

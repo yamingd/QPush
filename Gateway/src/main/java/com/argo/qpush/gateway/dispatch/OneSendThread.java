@@ -68,26 +68,28 @@ public class OneSendThread implements Callable<Integer> {
             if (logger.isDebugEnabled()){
                 logger.debug("Send Message to {}, {}", client, message);
             }
+
+            Client cc = ClientServiceImpl.instance.findByUserId(client);
+            if (cc == null){
+                //离线
+                logger.error("Client not found. client=" + client);
+                thisProg.incrFailed();
+
+                if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                    thisProg.incrFailed();
+                    message.addFailedClient(client, new PushError(PushError.NoClient));
+                }else{
+                    thisProg.incrSuccess();
+                }
+
+                continue;
+            }
+
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
                 c.send(thisProg, message);
             }else{
 
-                Client cc = ClientServiceImpl.instance.findByUserId(client);
-                if (cc == null){
-                    //离线
-                    logger.error("Client not found. client=" + client);
-                    thisProg.incrFailed();
-
-                    if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                        thisProg.incrFailed();
-                        message.addFailedClient(client, new PushError(PushError.NoClient));
-                    }else{
-                        thisProg.incrSuccess();
-                    }
-
-                    continue;
-                }
                 if (!cc.isDevice(ClientType.iOS)){
                     //不是iOS, 可以不继续跑
                     logger.error("Client is not iOS. client=" + client);
@@ -95,6 +97,7 @@ public class OneSendThread implements Callable<Integer> {
                     message.addFailedClient(cc.getUserId(), new PushError(PushError.NoConnections));
                     continue;
                 }
+
                 if (StringUtils.isBlank(cc.getDeviceToken()) || "NULL".equalsIgnoreCase(cc.getDeviceToken())){
                     logger.error("Client's deviceToken not found. client=" + client);
 
@@ -118,6 +121,7 @@ public class OneSendThread implements Callable<Integer> {
                 }else{
                     thisProg.incrSuccess();
                 }
+
             }
         }
 

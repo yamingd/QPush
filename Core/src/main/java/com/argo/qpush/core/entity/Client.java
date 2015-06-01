@@ -48,6 +48,8 @@ public class Client {
      */
     private Long lastOnline;
 
+    private Integer badge;
+
     public Long getId() {
         return id;
     }
@@ -134,6 +136,14 @@ public class Client {
 
     public boolean isDevice(int typeId){
         return typeId == this.typeId.intValue();
+    }
+
+    public Integer getBadge() {
+        return badge;
+    }
+
+    public void setBadge(Integer badge) {
+        this.badge = badge;
     }
 
     @Override

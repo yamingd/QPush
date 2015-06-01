@@ -194,17 +194,17 @@ public class Dispatcher extends Thread {
                         total1 = ClientServiceImpl.instance.countOfflineByType(product.getId(), ClientType.iOS);
                     }
                     if (total0 + total1 == 0) {
-                        saveBoradcastStatus(item, 0);
+                        saveBroadcastStatus(item, 0);
                     } else {
                         //sending progress
                         SentProgress progress1 = new SentProgress(total0 + total1);
                         //step1
                         if (total0 > 0) {
-                            doBoradcastToClients(item, total0, progress1);
+                            doBroadcastToClients(item, total0, progress1);
                         }
                         //step2
                         if (total1 >0) {
-                            doBoradcastToIOSClients(item, total1, progress1);
+                            doBroadcastToIOSClients(item, total1, progress1);
                         }
                         //wait to be finished.
                         try {
@@ -213,7 +213,7 @@ public class Dispatcher extends Thread {
                             e.printStackTrace();
                         }
                         //step4
-                        saveBoradcastStatus(item, progress1.getSuccess().get());
+                        saveBroadcastStatus(item, progress1.getSuccess().get());
                         logger.info("Broadcast Summary. id=" + item.getId() + ", " + progress1);
                     }
 
@@ -263,7 +263,7 @@ public class Dispatcher extends Thread {
         return size;
     }
 
-    protected void doBoradcastToClients(Payload message, int total, SentProgress progress){
+    protected void doBroadcastToClients(Payload message, int total, SentProgress progress){
         //每个线程发送100个客户端.
         int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
         int pages = total / limit;
@@ -275,7 +275,7 @@ public class Dispatcher extends Thread {
         }
     }
 
-    private void saveBoradcastStatus(Payload message, int total) {
+    private void saveBroadcastStatus(Payload message, int total) {
         try {
             if (message.getStatusId().intValue() == PayloadStatus.Pending0){
                 message.setTotalUsers(total);
@@ -295,7 +295,7 @@ public class Dispatcher extends Thread {
         }
     }
 
-    protected void doBoradcastToIOSClients(Payload message, int total, SentProgress progress){
+    protected void doBroadcastToIOSClients(Payload message, int total, SentProgress progress){
         //每个线程发送100个客户端.
         int limit = Integer.parseInt(this.conf.getProperty(DISPATCHER_BROADCAST_LIMIT, "100"));
         long pages = total / limit;

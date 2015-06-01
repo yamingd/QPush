@@ -70,4 +70,14 @@ public interface PBAPNSEventOrBuilder
    * <code>required int32 typeId = 5;</code>
    */
   int getTypeId();
+
+  // optional int32 read = 6;
+  /**
+   * <code>optional int32 read = 6;</code>
+   */
+  boolean hasRead();
+  /**
+   * <code>optional int32 read = 6;</code>
+   */
+  int getRead();
 }

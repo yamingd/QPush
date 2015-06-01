@@ -44,13 +44,14 @@ public final class PbMessage {
       "eMode\030\001 \001(\005\022 \n\003aps\030\002 \002(\0132\023.message.PBAPN" +
       "SBody\022)\n\010userInfo\030\003 \003(\0132\027.message.PBAPNS" +
       "UserInfo\"9\n\014OfflineModes\022\n\n\006Ignore\020\000\022\010\n\004" +
-      "APNS\020\001\022\023\n\017SendAfterOnline\020\002\"\332\001\n\013PBAPNSEv" +
+      "APNS\020\001\022\023\n\017SendAfterOnline\020\002\"\350\001\n\013PBAPNSEv" +
       "ent\022\n\n\002op\030\001 \002(\005\022\r\n\005token\030\002 \002(\t\022\016\n\006appKey" +
-      "\030\003 \002(\t\022\016\n\006userId\030\004 \002(\t\022\016\n\006typeId\030\005 \002(\005\"[",
-      "\n\003Ops\022\n\n\006Online\020\001\022\r\n\tKeepAlive\020\002\022\013\n\007Push" +
-      "Ack\020\003\022\013\n\007Offline\020\004\022\t\n\005Error\020\000\022\t\n\005Sleep\020\005" +
-      "\022\t\n\005Awake\020\006\"#\n\013DeviceTypes\022\007\n\003iOS\020\001\022\013\n\007A" +
-      "ndroid\020\002B\033\n\027com.argo.qpush.protobufP\001"
+      "\030\003 \002(\t\022\016\n\006userId\030\004 \002(\t\022\016\n\006typeId\030\005 \002(\005\022\014",
+      "\n\004read\030\006 \001(\005\"[\n\003Ops\022\n\n\006Online\020\001\022\r\n\tKeepA" +
+      "live\020\002\022\013\n\007PushAck\020\003\022\013\n\007Offline\020\004\022\t\n\005Erro" +
+      "r\020\000\022\t\n\005Sleep\020\005\022\t\n\005Awake\020\006\"#\n\013DeviceTypes" +
+      "\022\007\n\003iOS\020\001\022\013\n\007Android\020\002B\033\n\027com.argo.qpush" +
+      ".protobufP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -80,7 +81,7 @@ public final class PbMessage {
           internal_static_message_PBAPNSEvent_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_message_PBAPNSEvent_descriptor,
-              new java.lang.String[] { "Op", "Token", "AppKey", "UserId", "TypeId", });
+              new java.lang.String[] { "Op", "Token", "AppKey", "UserId", "TypeId", "Read", });
           return null;
         }
       };

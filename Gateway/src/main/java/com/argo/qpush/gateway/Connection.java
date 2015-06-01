@@ -2,6 +2,7 @@ package com.argo.qpush.gateway;
 
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PushError;
+import com.argo.qpush.core.service.ClientServiceImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -87,6 +88,7 @@ public class Connection {
                     }else {
                         updateOpTime();
                         progress.incrSuccess();
+                        ClientServiceImpl.instance.updateBadge(userId, 1);
                         if (logger.isDebugEnabled()){
                             logger.debug("{}, Send OK. {}", channel, channel.hashCode());
                         }

@@ -127,7 +127,19 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             ack(ctx, cc, SYNC);
         }else if(cc.getOp() == PBAPNSEvent.Ops.PushAck_VALUE){
             //推送反馈
+            if (cc.getRead() > 0){
+
+                MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        ClientServiceImpl.instance.updateBadge(cc.getUserId(), cc.getRead() * -1);
+                    }
+                });
+
+            }
+
             ack(ctx, cc, SYNC);
+
         }else if(cc.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
             //离线
             final Connection connection = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());

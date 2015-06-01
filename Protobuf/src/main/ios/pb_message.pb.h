@@ -607,6 +607,13 @@ class PBAPNSEvent : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 typeid_() const;
   inline void set_typeid_(::google::protobuf::int32 value);
 
+  // optional int32 read = 6;
+  inline bool has_read() const;
+  inline void clear_read();
+  static const int kReadFieldNumber = 6;
+  inline ::google::protobuf::int32 read() const;
+  inline void set_read(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:message.PBAPNSEvent)
  private:
   inline void set_has_op();
@@ -619,6 +626,8 @@ class PBAPNSEvent : public ::google::protobuf::Message {
   inline void clear_has_userid();
   inline void set_has_typeid_();
   inline void clear_has_typeid_();
+  inline void set_has_read();
+  inline void clear_has_read();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -627,9 +636,10 @@ class PBAPNSEvent : public ::google::protobuf::Message {
   ::google::protobuf::int32 op_;
   ::google::protobuf::int32 typeid__;
   ::std::string* userid_;
+  ::google::protobuf::int32 read_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
 
   friend void  protobuf_AddDesc_pb_5fmessage_2eproto();
   friend void protobuf_AssignDesc_pb_5fmessage_2eproto();
@@ -1296,6 +1306,28 @@ inline ::google::protobuf::int32 PBAPNSEvent::typeid_() const {
 inline void PBAPNSEvent::set_typeid_(::google::protobuf::int32 value) {
   set_has_typeid_();
   typeid__ = value;
+}
+
+// optional int32 read = 6;
+inline bool PBAPNSEvent::has_read() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void PBAPNSEvent::set_has_read() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void PBAPNSEvent::clear_has_read() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void PBAPNSEvent::clear_read() {
+  read_ = 0;
+  clear_has_read();
+}
+inline ::google::protobuf::int32 PBAPNSEvent::read() const {
+  return read_;
+}
+inline void PBAPNSEvent::set_read(::google::protobuf::int32 value) {
+  set_has_read();
+  read_ = value;
 }
 
 

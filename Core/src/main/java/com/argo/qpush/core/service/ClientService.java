@@ -27,4 +27,7 @@ public interface ClientService {
 
     @TxMain
     void updateStatus(long id, int statusId);
+
+    @TxMain
+    void updateBadge(String userId, int count);
 }

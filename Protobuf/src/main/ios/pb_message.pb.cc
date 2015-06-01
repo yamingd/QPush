@@ -97,12 +97,13 @@ void protobuf_AssignDesc_pb_5fmessage_2eproto() {
       sizeof(PBAPNSMessage));
   PBAPNSMessage_OfflineModes_descriptor_ = PBAPNSMessage_descriptor_->enum_type(0);
   PBAPNSEvent_descriptor_ = file->message_type(3);
-  static const int PBAPNSEvent_offsets_[5] = {
+  static const int PBAPNSEvent_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PBAPNSEvent, op_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PBAPNSEvent, token_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PBAPNSEvent, appkey_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PBAPNSEvent, userid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PBAPNSEvent, typeid__),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PBAPNSEvent, read_),
   };
   PBAPNSEvent_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -166,13 +167,14 @@ void protobuf_AddDesc_pb_5fmessage_2eproto() {
     "eMode\030\001 \001(\005\022 \n\003aps\030\002 \002(\0132\023.message.PBAPN"
     "SBody\022)\n\010userInfo\030\003 \003(\0132\027.message.PBAPNS"
     "UserInfo\"9\n\014OfflineModes\022\n\n\006Ignore\020\000\022\010\n\004"
-    "APNS\020\001\022\023\n\017SendAfterOnline\020\002\"\332\001\n\013PBAPNSEv"
+    "APNS\020\001\022\023\n\017SendAfterOnline\020\002\"\350\001\n\013PBAPNSEv"
     "ent\022\n\n\002op\030\001 \002(\005\022\r\n\005token\030\002 \002(\t\022\016\n\006appKey"
-    "\030\003 \002(\t\022\016\n\006userId\030\004 \002(\t\022\016\n\006typeId\030\005 \002(\005\"["
-    "\n\003Ops\022\n\n\006Online\020\001\022\r\n\tKeepAlive\020\002\022\013\n\007Push"
-    "Ack\020\003\022\013\n\007Offline\020\004\022\t\n\005Error\020\000\022\t\n\005Sleep\020\005"
-    "\022\t\n\005Awake\020\006\"#\n\013DeviceTypes\022\007\n\003iOS\020\001\022\013\n\007A"
-    "ndroid\020\002B\033\n\027com.argo.qpush.protobufP\001", 557);
+    "\030\003 \002(\t\022\016\n\006userId\030\004 \002(\t\022\016\n\006typeId\030\005 \002(\005\022\014"
+    "\n\004read\030\006 \001(\005\"[\n\003Ops\022\n\n\006Online\020\001\022\r\n\tKeepA"
+    "live\020\002\022\013\n\007PushAck\020\003\022\013\n\007Offline\020\004\022\t\n\005Erro"
+    "r\020\000\022\t\n\005Sleep\020\005\022\t\n\005Awake\020\006\"#\n\013DeviceTypes"
+    "\022\007\n\003iOS\020\001\022\013\n\007Android\020\002B\033\n\027com.argo.qpush"
+    ".protobufP\001", 571);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "pb_message.proto", &protobuf_RegisterTypes);
   PBAPNSUserInfo::default_instance_ = new PBAPNSUserInfo();
@@ -1178,6 +1180,7 @@ const int PBAPNSEvent::kTokenFieldNumber;
 const int PBAPNSEvent::kAppKeyFieldNumber;
 const int PBAPNSEvent::kUserIdFieldNumber;
 const int PBAPNSEvent::kTypeIdFieldNumber;
+const int PBAPNSEvent::kReadFieldNumber;
 #endif  // !_MSC_VER
 
 PBAPNSEvent::PBAPNSEvent()
@@ -1201,6 +1204,7 @@ void PBAPNSEvent::SharedCtor() {
   appkey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   userid_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   typeid__ = 0;
+  read_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1262,6 +1266,7 @@ void PBAPNSEvent::Clear() {
       }
     }
     typeid__ = 0;
+    read_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1351,6 +1356,22 @@ bool PBAPNSEvent::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(48)) goto parse_read;
+        break;
+      }
+
+      // optional int32 read = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_read:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &read_)));
+          set_has_read();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1410,6 +1431,11 @@ void PBAPNSEvent::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->typeid_(), output);
   }
 
+  // optional int32 read = 6;
+  if (has_read()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(6, this->read(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1458,6 +1484,11 @@ void PBAPNSEvent::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->typeid_(), target);
   }
 
+  // optional int32 read = 6;
+  if (has_read()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(6, this->read(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -1504,6 +1535,13 @@ int PBAPNSEvent::ByteSize() const {
           this->typeid_());
     }
 
+    // optional int32 read = 6;
+    if (has_read()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->read());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -1546,6 +1584,9 @@ void PBAPNSEvent::MergeFrom(const PBAPNSEvent& from) {
     if (from.has_typeid_()) {
       set_typeid_(from.typeid_());
     }
+    if (from.has_read()) {
+      set_read(from.read());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1575,6 +1616,7 @@ void PBAPNSEvent::Swap(PBAPNSEvent* other) {
     std::swap(appkey_, other->appkey_);
     std::swap(userid_, other->userid_);
     std::swap(typeid__, other->typeid__);
+    std::swap(read_, other->read_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

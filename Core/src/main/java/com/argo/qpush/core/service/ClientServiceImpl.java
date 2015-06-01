@@ -84,6 +84,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     }
 
     @Override
+    @TxMain
     public int countOfflineByType(Integer productId, Integer typeId){
         long now = new Date().getTime()/1000 - epoch - 86400;
         String sql = "select count(1) from client where productId = ? and typeId = ? and lastOnline >= ?";
@@ -100,6 +101,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     }
 
     @Override
+    @TxMain
     public void updateStatus(long id, int statusId) {
         long ts = new Date().getTime() / 1000 - epoch;
         String sql = "update client set lastOnline=?, statusId=? where id = ?";
@@ -107,6 +109,14 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     }
 
     @Override
+    @TxMain
+    public void updateBadge(String userId, int count) {
+        String sql = "update client set badge = badge + ? where userId = ?";
+        this.mainJdbc.update(sql, count, userId);
+    }
+
+    @Override
+    @TxMain
     public void updateOfflineTs(long id, int lastSendTs) {
         String sql = "update client set lastSendAt=?, statusId=? where id = ?";
         this.mainJdbc.update(sql, lastSendTs, ClientStatus.Offline, id);

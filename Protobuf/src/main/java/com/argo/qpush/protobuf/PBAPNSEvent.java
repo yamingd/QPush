@@ -79,6 +79,11 @@ public  final class PBAPNSEvent extends
             typeId_ = input.readInt32();
             break;
           }
+          case 48: {
+            bitField0_ |= 0x00000020;
+            read_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -489,12 +494,29 @@ public  final class PBAPNSEvent extends
     return typeId_;
   }
 
+  // optional int32 read = 6;
+  public static final int READ_FIELD_NUMBER = 6;
+  private int read_;
+  /**
+   * <code>optional int32 read = 6;</code>
+   */
+  public boolean hasRead() {
+    return ((bitField0_ & 0x00000020) == 0x00000020);
+  }
+  /**
+   * <code>optional int32 read = 6;</code>
+   */
+  public int getRead() {
+    return read_;
+  }
+
   private void initFields() {
     op_ = 0;
     token_ = "";
     appKey_ = "";
     userId_ = "";
     typeId_ = 0;
+    read_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -543,6 +565,9 @@ public  final class PBAPNSEvent extends
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       output.writeInt32(5, typeId_);
     }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      output.writeInt32(6, read_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -571,6 +596,10 @@ public  final class PBAPNSEvent extends
     if (((bitField0_ & 0x00000010) == 0x00000010)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(5, typeId_);
+    }
+    if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(6, read_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -698,6 +727,8 @@ public  final class PBAPNSEvent extends
       bitField0_ = (bitField0_ & ~0x00000008);
       typeId_ = 0;
       bitField0_ = (bitField0_ & ~0x00000010);
+      read_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000020);
       return this;
     }
 
@@ -746,6 +777,10 @@ public  final class PBAPNSEvent extends
         to_bitField0_ |= 0x00000010;
       }
       result.typeId_ = typeId_;
+      if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        to_bitField0_ |= 0x00000020;
+      }
+      result.read_ = read_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -782,6 +817,9 @@ public  final class PBAPNSEvent extends
       }
       if (other.hasTypeId()) {
         setTypeId(other.getTypeId());
+      }
+      if (other.hasRead()) {
+        setRead(other.getRead());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -1114,6 +1152,39 @@ public  final class PBAPNSEvent extends
     public Builder clearTypeId() {
       bitField0_ = (bitField0_ & ~0x00000010);
       typeId_ = 0;
+      onChanged();
+      return this;
+    }
+
+    // optional int32 read = 6;
+    private int read_ ;
+    /**
+     * <code>optional int32 read = 6;</code>
+     */
+    public boolean hasRead() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int32 read = 6;</code>
+     */
+    public int getRead() {
+      return read_;
+    }
+    /**
+     * <code>optional int32 read = 6;</code>
+     */
+    public Builder setRead(int value) {
+      bitField0_ |= 0x00000020;
+      read_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 read = 6;</code>
+     */
+    public Builder clearRead() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      read_ = 0;
       onChanged();
       return this;
     }

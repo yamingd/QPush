@@ -85,6 +85,9 @@ public class OneSendThread implements Callable<Integer> {
                 continue;
             }
 
+            //显示在客户端
+            message.setBadge(cc.getBadge() + 1);
+
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
                 c.send(thisProg, message);

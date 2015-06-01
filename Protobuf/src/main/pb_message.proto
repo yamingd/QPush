@@ -48,4 +48,5 @@ message PBAPNSEvent {
     required string appKey = 3;
     required string userId = 4;
     required int32 typeId = 5;
+    optional int32 read = 6;
 }

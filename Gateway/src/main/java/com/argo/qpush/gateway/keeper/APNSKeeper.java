@@ -1,6 +1,7 @@
 package com.argo.qpush.gateway.keeper;
 
 import com.argo.qpush.core.entity.*;
+import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.ProductService;
 import com.argo.qpush.gateway.SentProgress;
 import com.google.common.collect.Maps;
@@ -94,6 +95,7 @@ public class APNSKeeper implements InitializingBean {
                     String json = message.asJson();
                     service.push(cc.getDeviceToken(), json);
                     progress.incrSuccess();
+                    ClientServiceImpl.instance.updateBadge(cc.getUserId(), 1);
                 }
             }catch(Exception e){
                 logger.error("Push Failed", e);

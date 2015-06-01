@@ -48,12 +48,12 @@ public class AppPayload implements Serializable {
      * 当Client是离线状态时. 怎么处理消息
      * @OfflineMode
      */
-    public Integer offlineMode;
+    public Integer offlineMode = OfflineMode.Ignore.ordinal();
 
     /**
      * 发送到人得状态.(0:所有,1:在线)
      */
-    public Integer toMode;
+    public Integer toMode = 0;
 
     @Override
     public String toString() {

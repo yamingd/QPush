@@ -111,6 +111,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     @Override
     @TxMain
     public void updateBadge(String userId, int count) {
+        logger.debug("updateBadge, userId={}", userId);
         String sql = "update client set badge = badge + ? where userId = ?";
         this.mainJdbc.update(sql, count, userId);
     }

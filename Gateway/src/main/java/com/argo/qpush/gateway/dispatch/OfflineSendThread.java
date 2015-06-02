@@ -9,6 +9,7 @@ import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -67,7 +68,7 @@ public class OfflineSendThread implements Callable<Integer> {
 
             if (total > 0) {
                 try {
-                    message.getClients().clear();
+                    message.setClients(new ArrayList<String>());
                     message.getClients().add(this.userId);
                     PayloadServiceImpl.instance.updateSendStatus(message, total);
                 } catch (Exception e) {

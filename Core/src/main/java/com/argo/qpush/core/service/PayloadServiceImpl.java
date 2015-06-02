@@ -223,6 +223,11 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
+                if (logger.isDebugEnabled()) {
+                    logger.debug("updateSendStatus, payloadId={}", message.getId());
+                }
+
+
                 String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
                 mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime() / 1000, message.getId());
 

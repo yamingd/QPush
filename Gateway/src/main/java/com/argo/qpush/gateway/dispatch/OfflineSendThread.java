@@ -65,10 +65,14 @@ public class OfflineSendThread implements Callable<Integer> {
 
             int total = progress.getSuccess().get();
 
-            try {
-                PayloadServiceImpl.instance.updateSendStatus(message, total);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+            if (total > 0) {
+                try {
+                    message.getClients().clear();
+                    message.getClients().add(this.userId);
+                    PayloadServiceImpl.instance.updateSendStatus(message, total);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
 
             return total;

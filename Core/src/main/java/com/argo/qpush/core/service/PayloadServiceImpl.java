@@ -219,22 +219,43 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     public void updateSendStatus(final Payload message, final int counting) {
 
         jdbcExecutor.submit(new Runnable() {
+
             @Override
             public void run() {
 
                 String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
                 mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime() / 1000, message.getId());
 
-                sql = "update payload_client set tryLimit=tryLimit-1, statusId=?, createTime=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
+                sql = "update payload_client set tryLimit=tryLimit-1, statusId=?, onlineMode=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
 
                 List<Object[]> args = Lists.newArrayList();
                 for (String userId : message.getClients()) {
+
                     PushError error = message.getFailedClients().get(userId);
                     int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
-                    args.add(new Object[]{statusId, new Date().getTime() / 1000,
-                            error != null ? error.getCode() : null,
-                            error != null ? error.getMsg() : null,
-                            message.getId(), userId});
+                    int onlineMode = 0;
+
+                    if (error != null && (error.getCode() == PushError.NoClient
+                            || error.getCode() == PushError.NoDevivceToken
+                            || error.getCode() == PushError.WaitOnline)){
+
+                        //离线消息在用户上线时的处理方式
+                        if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                            onlineMode = 0; //忽略
+                        }else{
+                            onlineMode = 1; //发送
+                        }
+
+                    }
+
+                    args.add(new Object[]{statusId,
+                                    onlineMode,
+                                    error != null ? error.getCode() : null,
+                                    error != null ? error.getMsg() : null,
+                            message.getId(),
+                            userId}
+                    );
+
                 }
                 mainJdbc.batchUpdate(sql, args);
 
@@ -244,6 +265,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                     logger.debug("updateSendStatus OK!");
                 }
             }
+
         });
 
     }

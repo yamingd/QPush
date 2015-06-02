@@ -285,7 +285,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
         long ts = calendar.getTime().getTime() / 1000;
 
-        String sql = "select payloadId from payload_client where productId=? and userId = ? and onlineMode=? and createTime >= ? order by id desc limit 0, 10";
+        String sql = "select payloadId from payload_client where productId=? and userId = ? and onlineMode=? and createTime >= ? order by id desc limit 0, 100";
         List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, 1, ts);
         return list;
     }

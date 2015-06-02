@@ -73,5 +73,5 @@ public interface PayloadService {
      * @param userId
      * @return
      */
-    List<Long> findLatest(int productId, String userId, long start);
+    List<Long> findLatestToOfflineClients(int productId, String userId, long start);
 }

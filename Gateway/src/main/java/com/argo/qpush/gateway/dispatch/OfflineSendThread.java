@@ -34,7 +34,7 @@ public class OfflineSendThread implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        List<Long> ids = PayloadServiceImpl.instance.findLatest(product.getId(), userId, 0);
+        List<Long> ids = PayloadServiceImpl.instance.findLatestToOfflineClients(product.getId(), userId, 0);
         logger.info("Found Offline Message. userId={}, productId={}, total={}", userId, product, ids.size());
         if(ids == null || ids.size() == 0){
             return 0;

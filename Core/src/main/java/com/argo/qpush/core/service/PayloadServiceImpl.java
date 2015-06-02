@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -276,9 +277,16 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @Override
-    public List<Long> findLatest(int productId, String userId, long start){
-        String sql = "select payloadId from payload_client where productId=? and userId = ? and onlineMode=? and id > ? order by id desc limit 0, 10";
-        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, 1, start);
+    public List<Long> findLatestToOfflineClients(int productId, String userId, long start){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -3);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+
+        long ts = calendar.getTime().getTime() / 1000;
+
+        String sql = "select payloadId from payload_client where productId=? and userId = ? and onlineMode=? and createTime >= ? order by id desc limit 0, 10";
+        List<Long> list = this.mainJdbc.queryForList(sql, Long.class, productId, userId, 1, ts);
         return list;
     }
 

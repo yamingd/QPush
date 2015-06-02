@@ -30,7 +30,7 @@ public class Connection {
     public Connection(Channel channel) {
         this.channel = channel;
         logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + channel.hashCode());
-        lastOpTime = (int) (new Date().getTime() - epoch);
+        lastOpTime = (int) (new Date().getTime() / 1000 - epoch);
     }
 
     public int getLastOpTime() {

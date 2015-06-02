@@ -112,8 +112,13 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     @TxMain
     public void updateBadge(String userId, int count) {
         logger.debug("updateBadge, userId={}", userId);
-        String sql = "update client set badge = badge + ? where userId = ?";
-        this.mainJdbc.update(sql, count, userId);
+        if (count > 0) {
+            String sql = "update client set badge = badge + ? where userId = ?";
+            this.mainJdbc.update(sql, count, userId);
+        }else{
+            String sql = "update client set badge = IF(badge + ? > 0, badge + ?, 0) where id = ?";
+            this.mainJdbc.update(sql, count, count, userId);
+        }
     }
 
     @Override

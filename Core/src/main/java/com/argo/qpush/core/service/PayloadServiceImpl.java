@@ -239,6 +239,10 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                 for (String userId : message.getClients()) {
 
                     PushStatus error = message.getStatus().get(userId);
+                    if (error == null){
+                        continue;
+                    }
+
                     int statusId = error.getCode();
                     if (error.getCode() >= 10){
                         statusId = 3;
@@ -264,11 +268,12 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                                     onlineMode,
                                     error != null ? error.getCode() : null,
                                     error != null ? error.getMsg() : null,
-                            message.getId(),
-                            userId}
-                    );
+                                    message.getId(),
+                                    userId}
+                            );
 
                 }
+
                 mainJdbc.batchUpdate(sql, args);
 
                 MetricBuilder.jdbcUpdateMeter.mark(2);
@@ -321,6 +326,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                         userId};
 
                 mainJdbc.update(sql, args);
+
+                MetricBuilder.jdbcUpdateMeter.mark(1);
 
             }
         });

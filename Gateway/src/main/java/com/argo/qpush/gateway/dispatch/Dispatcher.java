@@ -104,6 +104,7 @@ public class Dispatcher extends Thread {
                 }
             }
         });
+        thread1.setDaemon(true);
         thread1.start();
 
         // 广播 推送
@@ -126,6 +127,7 @@ public class Dispatcher extends Thread {
                 }
             }
         });
+        thread2.setDaemon(true);
         thread2.start();
 
         //TODO: 离线
@@ -149,6 +151,7 @@ public class Dispatcher extends Thread {
                 }
             }
         });
+        thread3.setDaemon(true);
         thread3.start();
 
         logger.info("Dispatcher running. " + this.product);
@@ -239,10 +242,13 @@ public class Dispatcher extends Thread {
     protected int doSinglePush() {
         List<Payload> items = queue.getNormalItems(this.singleCursor);
         if (items.size() == 0){
+            if (logger.isDebugEnabled()) {
+                logger.debug("Dispatcher Single, {}, total = {}, cursor= {}", product, items.size(), this.singleCursor);
+            }
             return 0;
         }
 
-        logger.info("Dispatcher Single, " + product + ", total = " + items.size());
+        logger.info("Dispatcher Single, {}, total = {}, cursor= {}", product, items.size(), this.singleCursor);
 
         SentProgress overall = new SentProgress(items.size());
         for(Payload item : items){

@@ -25,6 +25,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
 
     public static final byte[] QPUSH_PENDING = "qpush:pending".getBytes();
     public static final byte[] QPUSH_PK = "pk:payload".getBytes();
+    public static final String KEY_Q_FORMAT = "qpush:{%s:%s}.q";
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -45,10 +46,13 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     public List<Payload> getNormalItems(PayloadCursor cursor) {
         BinaryJedis jedis =  redisBucket.getResource();
         try {
-            byte[] key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 0).getBytes();
+            byte[] key = String.format(KEY_Q_FORMAT, cursor.getProduct().getId(), 0).getBytes();
             List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
                 byte[] t = jedis.lpop(key);
+                if (logger.isDebugEnabled()){
+                    logger.debug("t = {}", new String(t));
+                }
                 if (t==null || t.length == 0){
                     break;
                 }
@@ -56,7 +60,8 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
                     Payload item = MessageUtils.asT(Payload.class, t);
                     ids.add(item);
                 } catch (IOException e) {
-                    logger.error("解析消息错误", e);
+                    logger.error("t = {}", new String(t));
+                    logger.error("解析消息错误. ", e);
                 }
             }
             if (ids.size() > 0){
@@ -76,7 +81,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
     public List<Payload> getBroadcastItems(PayloadCursor cursor) {
         BinaryJedis jedis =  redisBucket.getResource();
         try {
-            byte[] key = String.format("qpush:{%s:%s}.q", cursor.getProduct().getId(), 1).getBytes();
+            byte[] key = String.format(KEY_Q_FORMAT, cursor.getProduct().getId(), 1).getBytes();
             List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
                 byte[] t = jedis.lpop(key);
@@ -107,7 +112,7 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
             payload.setId(id);
             payload.setStatusId(PayloadStatus.Pending0);
             payload.setCreateAt(new Date().getTime()/1000);
-            String key = String.format("qpush:{%s:%s}.q", payload.getProductId(), payload.getBroadcast());
+            String key = String.format(KEY_Q_FORMAT, payload.getProductId(), payload.getBroadcast());
             long ret = jedis.rpush(key.getBytes(), MessageUtils.asBytes(payload));
             long total = jedis.incr(QPUSH_PENDING);
             redisBucket.returnResource(jedis);

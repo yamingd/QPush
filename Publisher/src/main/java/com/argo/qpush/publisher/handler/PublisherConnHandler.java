@@ -7,6 +7,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,21 +61,27 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void ack(ChannelHandlerContext ctx, String msg) {
+    private void ack(final ChannelHandlerContext ctx, String msg) {
         //回复客户端.
         byte[] bytes = msg.getBytes();
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)
         data.writeBytes(bytes);
-        ChannelFuture cf = ctx.channel().writeAndFlush(data);
-        if(cf.isDone() && cf.cause() != null){
-            cf.cause().printStackTrace();
-            ctx.close();
-        }
+        final ChannelFuture cf = ctx.channel().writeAndFlush(data);
+        cf.addListener(new GenericFutureListener<Future<? super Void>>() {
+            @Override
+            public void operationComplete(Future<? super Void> future) throws Exception {
+                if(cf.cause() != null){
+                    logger.error("Ack Error.", cf.cause());
+                    ctx.close();
+                }
+            }
+        });
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         logger.info("channelReadComplete: {}", ctx.channel().hashCode());
+        ctx.flush();
     }
 
     /**

@@ -50,11 +50,11 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
             List<Payload> ids = Lists.newArrayList();
             for (int i = 0; i < cursor.getLimit(); i++) {
                 byte[] t = jedis.lpop(key);
-                if (logger.isDebugEnabled()){
-                    logger.debug("t = {}", new String(t));
-                }
                 if (t==null || t.length == 0){
                     break;
+                }
+                if (logger.isDebugEnabled()){
+                    logger.debug("t = {}", new String(t));
                 }
                 try {
                     Payload item = MessageUtils.asT(Payload.class, t);

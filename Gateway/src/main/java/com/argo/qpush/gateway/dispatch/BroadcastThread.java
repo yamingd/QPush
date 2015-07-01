@@ -55,7 +55,7 @@ public class BroadcastThread implements Callable<Integer> {
                 int cid = temp[s+i];
                 Connection c = ConnectionKeeper.get(cid);
                 if(c!=null){
-                    c.send(progress, message);
+                    c.send(message);
                 }else{
                     progress.incrFailed();
                 }

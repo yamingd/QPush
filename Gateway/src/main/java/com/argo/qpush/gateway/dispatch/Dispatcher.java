@@ -286,7 +286,7 @@ public class Dispatcher extends Thread {
                 message.setStatusId(PayloadStatus.Sent);
                 PayloadServiceImpl.instance.saveAfterSent(message);
             }else {
-                PayloadServiceImpl.instance.updateSendStatus(message, total);
+                PayloadServiceImpl.instance.updateSendStatus(message);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -53,7 +53,7 @@ public class OfflineSendThread implements Callable<Integer> {
             SentProgress progress = new SentProgress(1);
             Connection c = ConnectionKeeper.get(product.getAppKey(), this.userId);
             if(c != null) {
-                c.send(progress, message);
+                c.send(message);
             }else{
                 progress.incrFailed();
             }
@@ -70,7 +70,7 @@ public class OfflineSendThread implements Callable<Integer> {
                 try {
                     message.setClients(new ArrayList<String>());
                     message.getClients().add(this.userId);
-                    PayloadServiceImpl.instance.updateSendStatus(message, total);
+                    PayloadServiceImpl.instance.updateSendStatus(message);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }

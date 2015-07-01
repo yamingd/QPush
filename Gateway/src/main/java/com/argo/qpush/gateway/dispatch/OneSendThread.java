@@ -66,14 +66,13 @@ public class OneSendThread implements Callable<Integer> {
         }
 
         SentProgress thisProg = new SentProgress(message.getClients().size());
+        boolean towait = false;
         for (String client : message.getClients()){
 
             Client cc = ClientServiceImpl.instance.findByUserId(client);
             if (cc == null){
                 //离线
                 logger.error("Client not found. client=" + client);
-                thisProg.incrFailed();
-
                 if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                     thisProg.incrFailed();
                     message.addFailedClient(client, new PushError(PushError.NoClient));
@@ -90,6 +89,7 @@ public class OneSendThread implements Callable<Integer> {
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
                 c.send(thisProg, message);
+                towait = true;
             }else{
 
                 if (!cc.isDevice(ClientType.iOS)){
@@ -127,13 +127,15 @@ public class OneSendThread implements Callable<Integer> {
             }
         }
 
-        try {
-            thisProg.getCountDownLatch().await();
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+        if (towait){
+            try {
+                thisProg.getCountDownLatch().await();
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
 
-        logger.info("SingSend Summary. id=" + message.getId() + ", " + thisProg);
+        logger.info("SingSend Summary. id={}, {}", message.getId(), thisProg);
 
         int total = thisProg.getSuccess().get();
 

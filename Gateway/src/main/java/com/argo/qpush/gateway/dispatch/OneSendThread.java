@@ -131,7 +131,7 @@ public class OneSendThread implements Callable<Integer> {
         if (thisProg.getCountDownLatch().getCount() > 0){
 
             if (logger.isDebugEnabled()){
-                logger.debug("total to wait: {}, count: {}", towait, thisProg.getCountDownLatch().getCount());
+                logger.debug("total {} to wait: {}, count: {}", message.getClients().size(), towait, thisProg.getCountDownLatch().getCount());
             }
 
             try {

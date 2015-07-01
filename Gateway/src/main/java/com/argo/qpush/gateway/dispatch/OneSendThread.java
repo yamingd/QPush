@@ -91,9 +91,6 @@ public class OneSendThread implements Callable<Integer> {
             if(c != null) {
                 c.send(thisProg, message);
                 towait ++;
-                if (logger.isDebugEnabled()){
-                    logger.debug("to wait: {}", towait);
-                }
             }else{
 
                 if (!cc.isDevice(ClientType.iOS)){
@@ -134,7 +131,7 @@ public class OneSendThread implements Callable<Integer> {
         if (thisProg.getCountDownLatch().getCount() > 0){
 
             if (logger.isDebugEnabled()){
-                logger.debug("to wait: {}", towait);
+                logger.debug("total to wait: {}", towait);
             }
 
             try {

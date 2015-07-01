@@ -2,6 +2,7 @@ package com.argo.qpush.publisher;
 
 import com.argo.qpush.publisher.handler.PublisherConnHandler;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -34,6 +35,7 @@ public class ServerMain {
         try {
 
             ServerBootstrap serverBootstrap = new ServerBootstrap(); // 服务器助手类
+            serverBootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
             // 简历新的accept连接，用于构建serverSocketChannel的工厂类
             serverBootstrap.group(parentGroup, childGroup)
                     .channel(NioServerSocketChannel.class)

@@ -12,7 +12,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -36,8 +35,6 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
     protected static final RowMapper<PayloadHistory> PayloadHistory_ROWMAPPER = new BeanPropertyRowMapper<PayloadHistory>(
             PayloadHistory.class);
-
-    private ThreadPoolTaskExecutor jdbcExecutor = null;
 
     @Override
     public Payload getSimple(long id) {
@@ -380,31 +377,5 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     @Override
     public void afterPropertiesSet() throws Exception {
         instance = this;
-        int limit = Integer.parseInt(appConfigs.getProperty("jdbc.executors", "100"));
-
-        //实际扫描线程池
-        jdbcExecutor = new ThreadPoolTaskExecutor();
-        jdbcExecutor.setCorePoolSize(limit/5);
-        jdbcExecutor.setMaxPoolSize(limit);
-        jdbcExecutor.setWaitForTasksToCompleteOnShutdown(true);
-        jdbcExecutor.afterPropertiesSet();
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!stopping) {
-
-                    logger.info("JdbcExecutor Status\n. {}", jdbcExecutor.getThreadPoolExecutor());
-
-                    try {
-                        Thread.sleep(10 * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        thread.start();
     }
 }

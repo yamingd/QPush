@@ -3,6 +3,7 @@ package com.argo.qpush.gateway;
 import com.argo.qpush.gateway.handler.MobileMessageHandler;
 import com.argo.qpush.gateway.handler.PBByteArrayDecoder;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -31,6 +32,7 @@ public class ServerMain {
         EventLoopGroup childGroup = new NioEventLoopGroup(); // 用于处理parentGroup接收并注册给child的连接中的信息
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap(); // 服务器助手类
+            serverBootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
             // 简历新的accept连接，用于构建serverSocketChannel的工厂类
             serverBootstrap.group(parentGroup, childGroup)
                     .channel(NioServerSocketChannel.class)

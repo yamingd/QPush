@@ -51,7 +51,7 @@ public class Connection {
      */
     public void send(final Payload message){
         // 组装消息包
-        if(channel.isOpen()){
+        if(channel.isWritable()){
             try {
                 byte[] msg = message.asAPNSMessage().toByteArray();
                 send(message, msg);

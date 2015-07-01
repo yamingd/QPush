@@ -1,5 +1,6 @@
 package com.argo.qpush.core.service;
 
+import com.argo.qpush.core.JdbcExecutor;
 import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.RedisBucket;
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ public abstract class BaseService implements InitializingBean, DisposableBean {
 
     @Autowired
     protected RedisBucket redisBucket;
+
+    @Autowired
+    protected JdbcExecutor jdbcExecutor;
 
     @Override
     public void destroy() throws Exception {

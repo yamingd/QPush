@@ -6,7 +6,7 @@ import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.PayloadServiceImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
@@ -74,25 +74,33 @@ public class Connection {
         try {
             final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
             data.writeBytes(msg);
-            final ChannelPromise cf = channel.newPromise();
-            cf.addListener(new GenericFutureListener<Future<? super Void>>() {
+
+            //http://normanmaurer.me/presentations/2014-facebook-eng-netty/slides.html#28.0
+            channel.eventLoop().execute(new Runnable() {
                 @Override
-                public void operationComplete(Future<? super Void> future) throws Exception {
-                    if(cf.cause() != null){
-                        logger.error("{}, Send Error.", channel, cf.cause());
-                        PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.WriterError, cf.cause().getMessage()));
-                    }else {
-                        updateOpTime();
-                        PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.Success));
-                        ClientServiceImpl.instance.updateBadge(userId, 1);
-                        if (logger.isDebugEnabled()){
-                            logger.debug("Send Done, userId={}, messageId={}", userId, message.getId());
+                public void run() {
+
+                    final ChannelFuture cf = channel.writeAndFlush(data);
+                    cf.addListener(new GenericFutureListener<Future<? super Void>>() {
+                        @Override
+                        public void operationComplete(Future<? super Void> future) throws Exception {
+                            if(cf.cause() != null){
+                                logger.error("{}, Send Error.", channel, cf.cause());
+                                PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.WriterError, cf.cause().getMessage()));
+                            }else {
+                                updateOpTime();
+                                PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.Success));
+                                ClientServiceImpl.instance.updateBadge(userId, 1);
+                                if (logger.isDebugEnabled()){
+                                    logger.debug("Send Done, userId={}, messageId={}", userId, message.getId());
+                                }
+                            }
                         }
-                    }
+                    });
                 }
+
             });
 
-            channel.writeAndFlush(data, cf);
 
         } catch (Exception e) {
             message.setStatus(userId, new PushStatus(PushStatus.UnKnown, e.getMessage()));

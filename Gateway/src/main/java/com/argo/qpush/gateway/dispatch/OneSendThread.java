@@ -1,6 +1,5 @@
 package com.argo.qpush.gateway.dispatch;
 
-import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.*;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.PayloadServiceImpl;
@@ -13,9 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -61,13 +58,17 @@ public class OneSendThread implements Callable<Integer> {
         }
 
         if (message.getClients() == null || message.getClients().size() == 0){
-            this.progress.incrFailed();
             logger.error("Message Clients is Empty. {}", message);
+            message.setStatusId(PayloadStatus.Failed);
+            message.setTotalUsers(0);
+            PayloadServiceImpl.instance.add(message);
             return 0;
         }
 
-        SentProgress thisProg = new SentProgress(message.getClients().size());
-        int towait = 0;
+        message.setStatusId(PayloadStatus.Pending);
+        message.setTotalUsers(0);
+        PayloadServiceImpl.instance.add(message);
+
         for (String client : message.getClients()){
 
             Client cc = ClientServiceImpl.instance.findByUserId(client);
@@ -75,10 +76,7 @@ public class OneSendThread implements Callable<Integer> {
                 //离线
                 logger.error("Client not found. client=" + client);
                 if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                    thisProg.incrFailed();
-                    message.addFailedClient(client, new PushError(PushError.NoClient));
-                }else{
-                    thisProg.incrSuccess();
+                    message.setStatus(client, new PushStatus(PushStatus.NoClient));
                 }
 
                 continue;
@@ -89,15 +87,13 @@ public class OneSendThread implements Callable<Integer> {
 
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
-                c.send(thisProg, message);
-                towait ++;
+                c.send(message);
             }else{
 
                 if (!cc.isDevice(ClientType.iOS)){
                     //不是iOS, 可以不继续跑
                     logger.error("Client is not iOS. client=" + client);
-                    thisProg.incrFailed();
-                    message.addFailedClient(cc.getUserId(), new PushError(PushError.NoConnections));
+                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NoConnections));
                     continue;
                 }
 
@@ -105,10 +101,9 @@ public class OneSendThread implements Callable<Integer> {
                     logger.error("Client's deviceToken not found. client=" + client);
 
                     if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                        thisProg.incrFailed();
-                        message.addFailedClient(cc.getUserId(), new PushError(PushError.NoDevivceToken));
+                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
                     }else{
-                        thisProg.incrSuccess();
+                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
                     }
 
                     continue;
@@ -116,56 +111,22 @@ public class OneSendThread implements Callable<Integer> {
 
                 if (0 == message.getToMode()){
                     if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
-                        APNSKeeper.instance.push(thisProg, this.product, cc, message);
+                        APNSKeeper.instance.push(this.product, cc, message);
                     }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                        thisProg.incrFailed();
-                        message.addFailedClient(cc.getUserId(), new PushError(PushError.WaitOnline));
+                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
                     }
                 }else{
-                    thisProg.incrSuccess();
+                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
                 }
 
             }
         }
 
-        if (thisProg.getCountDownLatch().getCount() > 0){
-
-            if (logger.isDebugEnabled()){
-                logger.debug("total {} to wait: {}, count: {}", message.getClients().size(), towait, thisProg.getCountDownLatch().getCount());
-            }
-
-            try {
-                thisProg.getCountDownLatch().await(100 * towait, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-
-        logger.info("SingSend Summary. id={}, {}", message.getId(), thisProg);
-
-        int total = thisProg.getSuccess().get();
-
-        if (total > 0) {
-            MetricBuilder.pushMeter.mark(total);
-            MetricBuilder.pushSingleMeter.mark(total);
-        }
-
-        try {
-            if (message.getStatusId().intValue() == PayloadStatus.Pending0) {
-                message.setTotalUsers(total);
-                message.setSentDate(new Date().getTime()/1000);
-                message.setStatusId(PayloadStatus.Sent);
-                PayloadServiceImpl.instance.saveAfterSent(message);
-            }else {
-                PayloadServiceImpl.instance.updateSendStatus(message, total);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        PayloadServiceImpl.instance.updateSendStatus(message);
 
         this.progress.incrSuccess();
 
-        return total;
+        return message.getClients().size();
 
     }
 

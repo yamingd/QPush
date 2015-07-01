@@ -5,14 +5,12 @@ import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadHistory;
 import com.argo.qpush.core.entity.PayloadStatus;
-import com.argo.qpush.core.entity.PushError;
+import com.argo.qpush.core.entity.PushStatus;
 import com.argo.qpush.protobuf.PBAPNSMessage;
 import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -84,35 +82,38 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             return;
         }
 
-        final String sql = "insert into payload(title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast)values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String sql = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate, offlineMode, toMode)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        KeyHolder holder = new GeneratedKeyHolder();
-        this.mainJdbc.update(new PreparedStatementCreator() {
+        mainJdbc.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(
                     Connection connection) throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(sql,
                         Statement.RETURN_GENERATED_KEYS);
-                ps.setObject(1, payload.getTitle());
-                ps.setObject(2, payload.getBadge());
-                ps.setObject(3, payload.getExtras());
-                ps.setObject(4, payload.getSound());
-                ps.setObject(5, payload.getProductId());
-                ps.setObject(6, 0);
-                ps.setObject(7, new Date().getTime()/1000);
-                ps.setObject(8, PayloadStatus.Pending);
-                ps.setObject(9, payload.getBroadcast());
+
+                ps.setObject(1, payload.getId());
+                ps.setObject(2, payload.getTitle());
+                ps.setObject(3, payload.getBadge());
+                ps.setObject(4, payload.getExtras());
+                ps.setObject(5, payload.getSound());
+                ps.setObject(6, payload.getProductId());
+                ps.setObject(7, payload.getTotalUsers());
+                ps.setObject(8, payload.getCreateAt());
+                ps.setObject(9, payload.getStatusId());
+                ps.setObject(10, payload.getBroadcast());
+                ps.setObject(11, payload.getSentDate());
+                ps.setObject(12, payload.getOfflineMode());
+                ps.setObject(13, payload.getToMode());
+
                 return ps;
             }
-        }, holder);
-
-        payload.setId(holder.getKey().longValue());
+        });
 
         if (payload.getClients() != null){
             List<Object[]> args = Lists.newArrayList();
-            final String sql0 = "insert into payload_client(payloadId, userId, productId)values(?, ?, ?)";
+            final String sql0 = "insert into payload_client(payloadId, userId, productId, statusId, createTime)values(?, ?, ?, ?, ?)";
             for(String userId : payload.getClients()){
-                args.add(new Object[]{payload.getId(), userId, payload.getProductId()});
+                args.add(new Object[]{payload.getId(), userId, payload.getProductId(), 1, new Date().getTime()/1000});
             }
             this.mainJdbc.batchUpdate(sql0, args);
         }
@@ -167,13 +168,13 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                     List<Object[]> args = Lists.newArrayList();
                     final String sql0 = "insert into payload_client(payloadId, userId, productId, statusId, createTime, onlineMode, errorId, errorMsg)values(?, ?, ?, ?, ?, ?, ?, ?)";
                     for(String userId : payload.getClients()){
-                        PushError error = payload.getFailedClients().get(userId);
+                        PushStatus error = payload.getStatus().get(userId);
                         int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
                         int onlineMode = 0;
 
-                        if (error != null && (error.getCode() == PushError.NoClient
-                                            || error.getCode() == PushError.NoDevivceToken
-                                            || error.getCode() == PushError.WaitOnline)){
+                        if (error != null && (error.getCode() == PushStatus.NoClient
+                                            || error.getCode() == PushStatus.NO_DEVICE_TOKEN
+                                            || error.getCode() == PushStatus.WaitOnline)){
 
                             //离线消息在用户上线时的处理方式
                             if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
@@ -217,7 +218,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
     @Override
     @TxMain
-    public void updateSendStatus(final Payload message, final int counting) {
+    public void updateSendStatus(final Payload message) {
 
         jdbcExecutor.submit(new Runnable() {
 
@@ -228,22 +229,26 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                     logger.debug("updateSendStatus, payloadId={}", message.getId());
                 }
 
-
-                String sql = "update payload set statusId=?, totalUsers=totalUsers+?, sentDate=? where id = ?";
-                mainJdbc.update(sql, counting > 0 ? PayloadStatus.Sent : PayloadStatus.Pending, counting, new Date().getTime() / 1000, message.getId());
+                int total = message.getStatus().size();
+                String sql = "update payload set statusId=?, totalUsers = ?, sentDate=? where id = ?";
+                mainJdbc.update(sql, PayloadStatus.Sent, total, new Date().getTime() / 1000, message.getId());
 
                 sql = "update payload_client set tryLimit=tryLimit-1, statusId=?, onlineMode=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
 
                 List<Object[]> args = Lists.newArrayList();
                 for (String userId : message.getClients()) {
 
-                    PushError error = message.getFailedClients().get(userId);
-                    int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
+                    PushStatus error = message.getStatus().get(userId);
+                    int statusId = error.getCode();
+                    if (error.getCode() >= 10){
+                        statusId = 3;
+                    }
+
                     int onlineMode = 0;
 
-                    if (error != null && (error.getCode() == PushError.NoClient
-                            || error.getCode() == PushError.NoDevivceToken
-                            || error.getCode() == PushError.WaitOnline)){
+                    if (error != null && (error.getCode() == PushStatus.NoClient
+                            || error.getCode() == PushStatus.NO_DEVICE_TOKEN
+                            || error.getCode() == PushStatus.WaitOnline)){
 
                         //离线消息在用户上线时的处理方式
                         if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
@@ -254,7 +259,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                     }
 
-                    args.add(new Object[]{statusId,
+                    args.add(new Object[]{
+                                    statusId,
                                     onlineMode,
                                     error != null ? error.getCode() : null,
                                     error != null ? error.getMsg() : null,
@@ -273,6 +279,53 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             }
 
         });
+
+    }
+
+    @Override
+    public void updateSendStatus(final Payload message, final String userId, final PushStatus error) {
+
+        jdbcExecutor.submit(new Runnable() {
+
+            @Override
+            public void run() {
+
+                String sql = "update payload_client set tryLimit=tryLimit-1, statusId=?, onlineMode=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
+
+                int statusId = error.getCode();
+                if (error.getCode() >= 10){
+                    statusId = 3;
+                }
+
+                int onlineMode = 0;
+
+                if (error != null && (error.getCode() == PushStatus.NoClient
+                        || error.getCode() == PushStatus.NO_DEVICE_TOKEN
+                        || error.getCode() == PushStatus.WaitOnline)){
+
+                    //离线消息在用户上线时的处理方式
+                    if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                        onlineMode = 0; //忽略
+                    }else{
+                        onlineMode = 1; //发送
+                    }
+
+                }
+
+                Object[] args = new Object[]{
+                        statusId,
+                        onlineMode,
+                        error != null ? error.getCode() : null,
+                        error != null ? error.getMsg() : null,
+                        message.getId(),
+                        userId};
+
+                mainJdbc.update(sql, args);
+
+            }
+        });
+
+
 
     }
 

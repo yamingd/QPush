@@ -3,7 +3,6 @@ package com.argo.qpush.gateway.keeper;
 import com.argo.qpush.core.entity.*;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.ProductService;
-import com.argo.qpush.gateway.SentProgress;
 import com.google.common.collect.Maps;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
@@ -78,34 +77,30 @@ public class APNSKeeper implements InitializingBean {
      *
      * 使用APNS服务推送到苹果
      *
-     * @param progress
      * @param product
      * @param cc
      * @param message
      *
      */
-    public void push(SentProgress progress, Product product, Client cc, Payload message){
+    public void push(Product product, Client cc, Payload message){
         ApnsService service = get(product);
         if (service != null){
             try{
                 if (StringUtils.isBlank(cc.getDeviceToken()) || "NULL".equalsIgnoreCase(cc.getDeviceToken())){
-                    progress.incrFailed();
-                    message.addFailedClient(cc.getUserId(), new PushError(PushError.NoDevivceToken));
+                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
                 }else {
                     String json = message.asJson();
                     service.push(cc.getDeviceToken(), json);
-                    progress.incrSuccess();
+                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Success));
                     ClientServiceImpl.instance.updateBadge(cc.getUserId(), 1);
                 }
             }catch(Exception e){
                 logger.error("Push Failed", e);
-                progress.incrFailed();
-                message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushError, e.getMessage()));
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.iOSPushError, e.getMessage()));
             }
         }else{
             logger.error("iOS Push Service Not Found.");
-            progress.incrFailed();
-            message.addFailedClient(cc.getUserId(), new PushError(PushError.iOSPushConfigError));
+            message.setStatus(cc.getUserId(), new PushStatus(PushStatus.iOSPushConfigError));
         }
     }
 

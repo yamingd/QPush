@@ -1,8 +1,9 @@
 package com.argo.qpush.gateway;
 
 import com.argo.qpush.core.entity.Payload;
-import com.argo.qpush.core.entity.PushError;
+import com.argo.qpush.core.entity.PushStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
+import com.argo.qpush.core.service.PayloadServiceImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -46,55 +47,52 @@ public class Connection {
 
     /**
      * 发送消息
-     * @param progress
      * @param message
      */
-    public void send(final SentProgress progress, final Payload message){
+    public void send(final Payload message){
         // 组装消息包
         if(channel.isOpen()){
             try {
                 byte[] msg = message.asAPNSMessage().toByteArray();
-                send(progress, message, msg);
+                send(message, msg);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                progress.incrFailed();
-                message.addFailedClient(this.userId, new PushError(PushError.UnKnown, e.getMessage()));
+                message.setStatus(this.userId, new PushStatus(PushStatus.UnKnown, e.getMessage()));
             }
         }else{
-            progress.incrFailed();
-            message.addFailedClient(this.userId, new PushError(PushError.ChannelClosed, null));
+            message.setStatus(this.userId, new PushStatus(PushStatus.ChannelClosed, null));
             logger.error("Send Error. Channel is closed. {}, {}", channel, message);
         }
     }
 
     /**
      * 发送消息
-     * @param progress
      * @param message
      * @param msg
      */
-    public void send(final SentProgress progress, final Payload message, final byte[] msg) {
+    public void send(final Payload message, final byte[] msg) {
         try {
             final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
             data.writeBytes(msg);
-            final ChannelFuture cf = channel.writeAndFlush(data);
+            final ChannelFuture cf = channel.write(data);
             cf.addListener(new GenericFutureListener<Future<? super Void>>() {
                 @Override
                 public void operationComplete(Future<? super Void> future) throws Exception {
                     if(cf.cause() != null){
                         logger.error("{}, Send Error.", channel, cf.cause());
-                        progress.incrFailed();
-                        message.addFailedClient(userId, new PushError(PushError.WriterError, cf.cause().getMessage()));
+                        PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.WriterError, cf.cause().getMessage()));
                     }else {
                         updateOpTime();
-                        progress.incrSuccess();
+                        PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.Success));
                         ClientServiceImpl.instance.updateBadge(userId, 1);
+                        if (logger.isDebugEnabled()){
+                            logger.debug("Send Done, userId={}, messageId={}", userId, message.getId());
+                        }
                     }
                 }
             });
         } catch (Exception e) {
-            progress.incrFailed();
-            message.addFailedClient(userId, new PushError(PushError.UnKnown, e.getMessage()));
+            message.setStatus(userId, new PushStatus(PushStatus.UnKnown, e.getMessage()));
             logger.error(e.getMessage(), e);
         }
     }

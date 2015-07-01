@@ -231,14 +231,14 @@ public class Payload implements Serializable {
         this.toMode = message.toMode;
     }
 
-    private Map<String, PushError> failedClients = Maps.newConcurrentMap();
+    private Map<String, PushStatus> status = Maps.newConcurrentMap();
 
-    public Map<String, PushError> getFailedClients() {
-        return failedClients;
+    public Map<String, PushStatus> getStatus() {
+        return status;
     }
 
-    public void addFailedClient(String userId, PushError error){
-        failedClients.put(userId, error);
+    public void setStatus(String userId, PushStatus status){
+        this.status.put(userId, status);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.argo.qpush.core.service;
 
 import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Payload;
+import com.argo.qpush.core.entity.PushStatus;
 
 import java.util.List;
 
@@ -62,11 +63,17 @@ public interface PayloadService {
     /**
      * 更新发送状态
      * @param message
-     * @param counting
      */
     @TxMain
-    void updateSendStatus(Payload message, int counting);
+    void updateSendStatus(Payload message);
 
+    /**
+     *
+     * @param message
+     * @param userId
+     * @param pushStatus
+     */
+    void updateSendStatus(Payload message, String userId, PushStatus pushStatus);
     /**
      * 读取离线消息
      * @param productId

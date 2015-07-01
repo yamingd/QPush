@@ -8,6 +8,7 @@ import com.argo.qpush.core.entity.PayloadStatus;
 import com.argo.qpush.core.entity.PushStatus;
 import com.argo.qpush.protobuf.PBAPNSMessage;
 import com.google.common.collect.Lists;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -274,7 +275,11 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                 }
 
-                mainJdbc.batchUpdate(sql, args);
+                try {
+                    mainJdbc.batchUpdate(sql, args);
+                } catch (Exception e) {
+                    logger.error("UpdateSendStatus Error.", e);
+                }
 
                 MetricBuilder.jdbcUpdateMeter.mark(2);
 
@@ -288,6 +293,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @Override
+    @TxMain
     public void updateSendStatus(final Payload message, final String userId, final PushStatus error) {
 
         jdbcExecutor.submit(new Runnable() {
@@ -295,12 +301,17 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                String sql = "update payload_client set tryLimit=tryLimit-1, statusId=?, onlineMode=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
+                if (logger.isDebugEnabled()) {
+                    logger.debug("updateSendStatus, payloadId={}, userId={}", message.getId(), userId);
+                }
+
+                String sql = "update payload_client set tryLimit = tryLimit-1, statusId=?, onlineMode=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
 
                 int statusId = error.getCode();
                 if (error.getCode() >= 10){
                     statusId = 3;
                 }
+
 
                 int onlineMode = 0;
 
@@ -325,9 +336,17 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                         message.getId(),
                         userId};
 
-                mainJdbc.update(sql, args);
+                try {
+                    mainJdbc.update(sql, args);
+                } catch (DataAccessException e) {
+                    logger.error("UpdateSendStatus Error.", e);
+                }
 
                 MetricBuilder.jdbcUpdateMeter.mark(1);
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("updateSendStatus OK!");
+                }
 
             }
         });

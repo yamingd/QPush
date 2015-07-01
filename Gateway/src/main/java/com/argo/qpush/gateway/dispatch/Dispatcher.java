@@ -242,9 +242,6 @@ public class Dispatcher extends Thread {
     protected int doSinglePush() {
         List<Payload> items = queue.getNormalItems(this.singleCursor);
         if (items.size() == 0){
-            if (logger.isDebugEnabled()) {
-                logger.debug("Dispatcher Single, {}, total = {}, cursor= {}", product, items.size(), this.singleCursor);
-            }
             return 0;
         }
 

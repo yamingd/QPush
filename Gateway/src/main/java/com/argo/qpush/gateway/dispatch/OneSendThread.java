@@ -131,7 +131,7 @@ public class OneSendThread implements Callable<Integer> {
             }
         }
 
-        if (towait > 0){
+        if (thisProg.getCountDownLatch().getCount() > 0){
 
             if (logger.isDebugEnabled()){
                 logger.debug("to wait: {}", towait);

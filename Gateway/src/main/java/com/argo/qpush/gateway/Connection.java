@@ -77,6 +77,9 @@ public class Connection {
         try {
             final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
             data.writeBytes(msg);
+            if (logger.isDebugEnabled()){
+                logger.debug("send via tcp connection. {}, userId={}", message.getId(), userId);
+            }
             final ChannelFuture cf = channel.writeAndFlush(data);
             cf.addListener(new GenericFutureListener<Future<? super Void>>() {
                 @Override

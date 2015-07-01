@@ -53,9 +53,6 @@ public class PayloadRedisQueue implements PayloadQueue, InitializingBean {
                 if (t==null || t.length == 0){
                     break;
                 }
-                if (logger.isDebugEnabled()){
-                    logger.debug("t = {}", new String(t));
-                }
                 try {
                     Payload item = MessageUtils.asT(Payload.class, t);
                     ids.add(item);

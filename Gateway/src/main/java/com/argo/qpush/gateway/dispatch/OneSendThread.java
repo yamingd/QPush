@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -66,7 +67,7 @@ public class OneSendThread implements Callable<Integer> {
         }
 
         SentProgress thisProg = new SentProgress(message.getClients().size());
-        boolean towait = false;
+        int towait = 0;
         for (String client : message.getClients()){
 
             Client cc = ClientServiceImpl.instance.findByUserId(client);
@@ -89,7 +90,10 @@ public class OneSendThread implements Callable<Integer> {
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
                 c.send(thisProg, message);
-                towait = true;
+                towait ++;
+                if (logger.isDebugEnabled()){
+                    logger.debug("to wait: {}", towait);
+                }
             }else{
 
                 if (!cc.isDevice(ClientType.iOS)){
@@ -127,9 +131,14 @@ public class OneSendThread implements Callable<Integer> {
             }
         }
 
-        if (towait){
+        if (towait > 0){
+
+            if (logger.isDebugEnabled()){
+                logger.debug("to wait: {}", towait);
+            }
+
             try {
-                thisProg.getCountDownLatch().await();
+                thisProg.getCountDownLatch().await(500 * towait, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }

@@ -114,7 +114,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             List<Object[]> args = Lists.newArrayList();
             final String sql0 = "insert into payload_client(payloadId, userId, productId, statusId, createTime)values(?, ?, ?, ?, ?)";
             for(String userId : payload.getClients()){
-                args.add(new Object[]{payload.getId(), userId, payload.getProductId(), 1, new Date().getTime()/1000});
+                args.add(new Object[]{payload.getId(), userId, payload.getProductId(), 0, new Date().getTime()/1000});
             }
             this.mainJdbc.batchUpdate(sql0, args);
         }

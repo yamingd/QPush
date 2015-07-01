@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -40,6 +39,7 @@ public class OneSendThread implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        long ts0 = System.currentTimeMillis();
         int ret = 0;
         try {
             ret = doSend();
@@ -47,6 +47,8 @@ public class OneSendThread implements Callable<Integer> {
             this.progress.incrFailed();
             logger.error(e.getMessage(), e);
         }
+        long duration = System.currentTimeMillis() - ts0;
+        logger.info("Send Duration={} ms. total={}, ", duration, ret);
         return ret;
     }
 
@@ -65,9 +67,6 @@ public class OneSendThread implements Callable<Integer> {
 
         SentProgress thisProg = new SentProgress(message.getClients().size());
         for (String client : message.getClients()){
-            if (logger.isDebugEnabled()){
-                logger.debug("Send Message to {}, {}", client, message);
-            }
 
             Client cc = ClientServiceImpl.instance.findByUserId(client);
             if (cc == null){
@@ -129,7 +128,7 @@ public class OneSendThread implements Callable<Integer> {
         }
 
         try {
-            thisProg.getCountDownLatch().await(message.getClients().size() * 5, TimeUnit.SECONDS);
+            thisProg.getCountDownLatch().await();
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
         }

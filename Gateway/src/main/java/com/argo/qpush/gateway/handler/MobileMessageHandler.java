@@ -17,6 +17,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,20 +59,26 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             cc = PBAPNSEvent.newBuilder().mergeFrom(bytes).build();
         } catch (Exception e) {
             logger.error("Invalid Data Package.", e);
-            ack(ctx, null, "invalid_msg");
+            ctx.close();
             return;
         }
 
         ReferenceCountUtil.release(msg);
 
+        if (logger.isDebugEnabled()){
+            logger.debug("Got Message. {}", cc);
+        }
+
+        if (StringUtils.isEmpty(cc.getUserId()) || cc.getOp() <= 0){
+            logger.error("Invalid Client!! so close connection!! ");
+            ctx.close();
+            return;
+        }
+
         if (cc.getTypeId() == PBAPNSEvent.DeviceTypes.Android_VALUE){
             MetricBuilder.clientAndroidMeter.mark();
         }else if (cc.getTypeId() == PBAPNSEvent.DeviceTypes.iOS_VALUE){
             MetricBuilder.clientIOSMeter.mark();
-        }
-
-        if (logger.isDebugEnabled()){
-            logger.debug("Got Message. {}", cc);
         }
 
         if(cc.getOp() == PBAPNSEvent.Ops.Online_VALUE){

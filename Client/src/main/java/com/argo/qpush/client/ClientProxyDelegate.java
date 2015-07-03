@@ -41,7 +41,7 @@ public class ClientProxyDelegate {
     private volatile boolean stopping = false;
     private CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    private void ClientProxyDelegate(){
+    static {
 
         messagePack.register(AppPayload.class);
 
@@ -49,7 +49,7 @@ public class ClientProxyDelegate {
 
     }
 
-    private void loadConfig() {
+    private static void loadConfig() {
         try {
             props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("qpush_client.properties"));
         } catch (FileNotFoundException e) {

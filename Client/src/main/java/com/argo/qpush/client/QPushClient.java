@@ -28,28 +28,38 @@ public class QPushClient {
     public static boolean send(final AppPayload payload) throws IOException {
         final byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
 
-         ClientProxyDelegate.instance.get(new ChannelAvaliable() {
-            @Override
-            public void execute(final Channel c) {
-                final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
-                data.writeBytes(bytes);
-                final ChannelFuture cf = c.writeAndFlush(data);
-                cf.addListener(new GenericFutureListener<Future<? super java.lang.Void>>() {
-                    @Override
-                    public void operationComplete(Future<? super Void> future) throws Exception {
-                        if(cf.cause() != null){
-                            logger.error("Send Error: " + payload + "\n", cf.cause());
-                            c.close();
-                            ClientProxyDelegate.instance.remove(c);
-                            ClientProxyDelegate.instance.newChannel();
-                        }else{
-                            logger.info("Send OK: " + payload + "\n");
-                        }
-                    }
-                });
-            }
-        });
+        trySend(payload, bytes, 3);
 
         return true;
+    }
+
+    private static void trySend(final AppPayload payload, final byte[] bytes, final int limit) {
+        if (limit <= 0){
+            logger.error("TrySend Failure.");
+            return;
+        }
+
+        ClientProxyDelegate.instance.get(new ChannelAvaliable() {
+           @Override
+           public void execute(final Channel c) {
+               final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
+               data.writeBytes(bytes);
+               final ChannelFuture cf = c.writeAndFlush(data);
+               cf.addListener(new GenericFutureListener<Future<? super Void>>() {
+                   @Override
+                   public void operationComplete(Future<? super Void> future) throws Exception {
+                       if(cf.cause() != null){
+                           logger.error("Send Error: " + payload + "\n", cf.cause());
+                           c.close();
+                           ClientProxyDelegate.instance.remove(c);
+                           ClientProxyDelegate.instance.newChannel();
+                           trySend(payload, bytes, limit-1);
+                       }else{
+                           logger.info("Send OK: " + payload + "\n");
+                       }
+                   }
+               });
+           }
+       });
     }
 }

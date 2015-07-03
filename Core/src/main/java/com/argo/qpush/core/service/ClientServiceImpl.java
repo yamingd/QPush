@@ -53,7 +53,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
                         Statement.RETURN_GENERATED_KEYS);
                 ps.setObject(1, client.getProductId());
                 ps.setObject(2, client.getUserId());
-                ps.setObject(3, client.getDeviceToken());
+                ps.setObject(3, client.getDeviceToken().equalsIgnoreCase("null") ? null : client.getDeviceToken());
                 ps.setObject(4, new Date());
                 ps.setObject(5, ClientStatus.Online);
                 ps.setObject(6, client.getTypeId());

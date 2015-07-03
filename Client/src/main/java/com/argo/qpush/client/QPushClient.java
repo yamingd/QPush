@@ -21,6 +21,10 @@ public class QPushClient {
         ClientProxyDelegate.instance.start();
     }
 
+    public static void close(){
+        ClientProxyDelegate.instance.close();
+    }
+
     public static boolean send(final AppPayload payload) throws IOException {
         final byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
 

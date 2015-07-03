@@ -41,18 +41,27 @@ public class ClientProxyDelegate {
     private volatile boolean stopping = false;
     private CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    static{
+    private void ClientProxyDelegate(){
 
         messagePack.register(AppPayload.class);
 
+        loadConfig();
+
+    }
+
+    private void loadConfig() {
         try {
             props.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("qpush_client.properties"));
         } catch (FileNotFoundException e) {
+            props = null;
             logger.error("配置文件未找到", e);
         } catch (IOException e) {
+            props = null;
             logger.error("配置文件加载失败", e);
         }
-
+        if (props == null){
+            throw new RuntimeException("qpush_client.properties not found.");
+        }
     }
 
     public void start() {
@@ -60,6 +69,14 @@ public class ClientProxyDelegate {
     }
 
     private void connect(){
+
+        if (props == null){
+            loadConfig();
+            if (props == null){
+                throw new RuntimeException("qpush_client.properties not found.");
+            }
+        }
+
         port = Integer.parseInt(props.getProperty("port", "8081"));
         host = props.getProperty("host", "127.0.0.1");
         logger.info("QPush server. connecting... host=" + host + "/" + port);
@@ -161,12 +178,4 @@ public class ClientProxyDelegate {
         return stopping;
     }
 
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                System.out.println("Shutdown Hook is running !");
-                ClientProxyDelegate.instance.close();
-            }
-        });
-    }
 }

@@ -47,6 +47,8 @@ public class OnNewlyAddThread implements Callable<Boolean> {
         //如不是旧客户端. 则推送旧消息
         if (!isNew) {
             client.setDeviceToken(cc.getToken());
+            client.setTypeId(cc.getTypeId());
+
             Dispatcher dispatcher = DispatcherRunner.instance.get(cc.getAppKey());
             if (dispatcher != null) {
                 dispatcher.pushOfflinePayload(cc.getUserId());

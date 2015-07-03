@@ -247,16 +247,9 @@ public class Dispatcher extends Thread {
 
         logger.info("Dispatcher Single, {}, total = {}, cursor= {}", product, items.size(), this.singleCursor);
 
-        SentProgress overall = new SentProgress(items.size());
         for(Payload item : items){
             // create a single thread for a single message.
-            this.singlePool.submit(new OneSendThread(this.product, item, overall));
-        }
-
-        try {
-            overall.getCountDownLatch().await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            this.singlePool.submit(new OneSendThread(this.product, item));
         }
 
         int size = items.size();

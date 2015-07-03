@@ -4,7 +4,6 @@ import com.argo.qpush.core.entity.*;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.gateway.Connection;
-import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.APNSKeeper;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import com.argo.qpush.protobuf.PBAPNSMessage;
@@ -26,13 +25,11 @@ public class OneSendThread implements Callable<Integer> {
 
     private Payload message;
     private Product product;
-    private SentProgress progress;
 
-    public OneSendThread(final Product product, final Payload message, final SentProgress progress) {
+    public OneSendThread(final Product product, final Payload message) {
         super();
         this.message = message;
         this.product = product;
-        this.progress = progress;
     }
 
     @Override
@@ -42,7 +39,6 @@ public class OneSendThread implements Callable<Integer> {
         try {
             ret = doSend();
         } catch (Exception e) {
-            this.progress.incrFailed();
             logger.error(e.getMessage(), e);
         }
         long duration = System.currentTimeMillis() - ts0;
@@ -53,7 +49,6 @@ public class OneSendThread implements Callable<Integer> {
     private Integer doSend() throws Exception {
 
         if(message == null){
-            this.progress.incrFailed();
             return 0;
         }
 
@@ -123,8 +118,6 @@ public class OneSendThread implements Callable<Integer> {
         }
 
         PayloadServiceImpl.instance.updateSendStatus(message);
-
-        this.progress.incrSuccess();
 
         return message.getClients().size();
 

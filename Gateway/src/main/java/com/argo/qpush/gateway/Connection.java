@@ -72,13 +72,14 @@ public class Connection {
      */
     public void send(final Payload message, final byte[] msg) {
         try {
-            final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
-            data.writeBytes(msg);
 
             //http://normanmaurer.me/presentations/2014-facebook-eng-netty/slides.html#28.0
             channel.eventLoop().execute(new Runnable() {
                 @Override
                 public void run() {
+
+                    final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
+                    data.writeBytes(msg);
 
                     final ChannelFuture cf = channel.writeAndFlush(data);
                     cf.addListener(new GenericFutureListener<Future<? super Void>>() {

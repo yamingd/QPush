@@ -177,9 +177,13 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     private void ack(final ChannelHandlerContext ctx, PBAPNSEvent cc, final String result){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
-        PBAPNSUserInfo.Builder infoBuilder = PBAPNSUserInfo.newBuilder();
-        infoBuilder.setKey("msg").setValue(result).setKey("kindId").setValue(SYNC);
+
+        PBAPNSUserInfo.Builder infoBuilder = PBAPNSUserInfo.newBuilder().setKey("msg").setValue(result);
         builder.addUserInfo(infoBuilder);
+
+        infoBuilder = PBAPNSUserInfo.newBuilder().setKey("kindId").setValue(SYNC);
+        builder.addUserInfo(infoBuilder);
+
         byte[] bytes = builder.build().toByteArray();
 
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)

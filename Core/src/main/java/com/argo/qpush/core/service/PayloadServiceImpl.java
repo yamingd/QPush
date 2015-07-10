@@ -210,14 +210,14 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
     @Override
     public List<Payload> findNormalList(int productId, long start, int page, int limit){
-        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and tryLimit > 0 and id > ? order by id limit ?, ?";
+        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 0, PayloadStatus.Pending, start, offset, limit);
     }
 
     @Override
     public List<Payload> findBrodcastList(int productId, long start, int page, int limit){
-        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and tryLimit > 0 and id > ? order by id limit ?, ?";
+        String sql = "select * from payload where productId = ? and broadcast=? and statusId=? and id > ? order by id limit ?, ?";
         int offset = (page - 1) * limit;
         return mainJdbc.query(sql, Payload_ROWMAPPER, productId, 1, PayloadStatus.Pending, start, offset, limit);
     }

@@ -60,9 +60,11 @@ public class OneSendThread implements Callable<Integer> {
             return 0;
         }
 
-        message.setStatusId(PayloadStatus.Pending);
-        message.setTotalUsers(0);
-        PayloadServiceImpl.instance.add(message);
+        if (message.getStatusId().intValue() == PayloadStatus.Pending0) {
+            message.setStatusId(PayloadStatus.Pending);
+            message.setTotalUsers(0);
+            PayloadServiceImpl.instance.add(message);
+        }
 
         for (String client : message.getClients()){
 

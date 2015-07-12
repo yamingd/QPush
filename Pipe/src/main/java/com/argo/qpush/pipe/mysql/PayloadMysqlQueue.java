@@ -15,6 +15,7 @@ import java.util.List;
  *
  * Created by yaming_deng on 14-8-8.
  */
+@Deprecated
 @Component("payloadMysqlQueue")
 public class PayloadMysqlQueue implements PayloadQueue {
 

@@ -87,7 +87,6 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (null != conn){
                 logger.error("你已经在线了!. KickOff cc={}, conn={}", cc, conn);
                 ack(ctx, cc, MULTI_CLIENTS);
-                conn.close();
             }
 
             conn = new Connection(ctx.channel());

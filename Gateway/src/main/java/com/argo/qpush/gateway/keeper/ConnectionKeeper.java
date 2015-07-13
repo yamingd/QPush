@@ -61,7 +61,6 @@ public class ConnectionKeeper {
             //关闭旧连接.
             Connection c = pools.remove(cid);
             if (c != null) {
-                c.close();
                 ServerMetrics.decrConnection();
             }
         }

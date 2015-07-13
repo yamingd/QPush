@@ -187,6 +187,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)
         data.writeBytes(bytes);
+
         final ChannelFuture cf = ctx.channel().writeAndFlush(data);
         cf.addListener(new GenericFutureListener<Future<? super Void>>() {
             @Override

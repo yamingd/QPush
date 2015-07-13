@@ -32,7 +32,7 @@ public class Dispatcher extends Thread {
     public static final String DISPATCHER_THREAD_MAX = "dispatcher.thread_max";
     public static final String DISPATCHER_BROADCAST_LIMIT = "dispatcher.broadcast_limit";
 
-    protected static Logger logger = LoggerFactory.getLogger(Dispatcher.class);
+    protected Logger logger = null;
 
     private Properties conf;
     private PayloadQueue queue;
@@ -47,6 +47,7 @@ public class Dispatcher extends Thread {
     private volatile boolean stopping;
 
     public Dispatcher(Properties conf, Product product, PayloadQueue queue) {
+        logger = LoggerFactory.getLogger(Dispatcher.class.getName()+"[" + product.getId()+"]");
         this.conf = conf;
         this.queue = queue;
         this.product = product;
@@ -80,7 +81,7 @@ public class Dispatcher extends Thread {
             e.printStackTrace();
         }
 
-        logger.info("Dispatcher start to run. " + this.product);
+        logger.info("Dispatcher start to run");
 
         final int min = Integer.parseInt(this.conf.getProperty(DISPATCHER_INTERVAL, "1000"));
 
@@ -245,7 +246,7 @@ public class Dispatcher extends Thread {
             return 0;
         }
 
-        logger.info("Dispatcher Single, {}, total = {}, cursor= {}", product, items.size(), this.singleCursor);
+        logger.info("Dispatcher Single, total = {}, cursor= {}", items.size(), this.singleCursor);
 
         for(Payload item : items){
             // create a single thread for a single message.

@@ -48,7 +48,7 @@ public class MessageHandlerPoolTasks implements InitializingBean, DisposableBean
             public void run() {
                 while (!stopping) {
 
-                    logger.info("{}", poolTaskExecutor.getThreadPoolExecutor());
+                    logger.info("MessageHandlerPoolTasks: {}", poolTaskExecutor.getThreadPoolExecutor());
 
                     try {
                         Thread.sleep(10 * 1000);

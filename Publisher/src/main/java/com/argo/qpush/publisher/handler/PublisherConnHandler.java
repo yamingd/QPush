@@ -56,8 +56,6 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             ack(ctx, STATUS_500);
-        }finally {
-            ctx.fireChannelRead(msg);
         }
     }
 
@@ -99,7 +97,7 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx)
             throws Exception {
-        logger.info("channelInactive: " + ctx.channel().hashCode());
+        logger.info("channelInactive: {}", ctx.channel().hashCode());
         ctx.close();
     }
 

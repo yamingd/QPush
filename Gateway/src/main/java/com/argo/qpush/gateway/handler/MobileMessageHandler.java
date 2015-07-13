@@ -85,7 +85,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
             Connection conn = ConnectionKeeper.get(cc.getAppKey(), cc.getUserId());
             if (null != conn){
-                logger.error("你已经在线了!. cc={}, conn={}", cc, conn);
+                logger.error("你已经在线了!. KickOff cc={}, conn={}", cc, conn);
                 ack(ctx, cc, MULTI_CLIENTS);
                 conn.close();
             }

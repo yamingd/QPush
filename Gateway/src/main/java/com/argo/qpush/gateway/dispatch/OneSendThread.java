@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
  */
 public class OneSendThread implements Callable<Integer> {
 
+    public static final String NULL = "NULL";
     protected static Logger logger = LoggerFactory.getLogger(OneSendThread.class);
 
     private Payload message;
@@ -54,9 +55,15 @@ public class OneSendThread implements Callable<Integer> {
 
         if (message.getClients() == null || message.getClients().size() == 0){
             logger.error("Message Clients is Empty. {}", message);
-            message.setStatusId(PayloadStatus.Failed);
-            message.setTotalUsers(0);
-            PayloadServiceImpl.instance.add(message);
+            if (message.getStatusId().intValue() == PayloadStatus.Pending0) {
+                message.setStatusId(PayloadStatus.Failed);
+                message.setTotalUsers(0);
+                PayloadServiceImpl.instance.add(message);
+            }else{
+                message.setStatusId(PayloadStatus.Failed);
+                message.setTotalUsers(0);
+                PayloadServiceImpl.instance.updateSendStatus(message);
+            }
             return 0;
         }
 
@@ -71,7 +78,7 @@ public class OneSendThread implements Callable<Integer> {
             Client cc = ClientServiceImpl.instance.findByUserId(client);
             if (cc == null){
                 //离线
-                logger.error("Client not found. client=" + client);
+                logger.error("Client not found. client={}", client);
                 if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                     message.setStatus(client, new PushStatus(PushStatus.NoClient));
                 }
@@ -89,13 +96,13 @@ public class OneSendThread implements Callable<Integer> {
 
                 if (!cc.isDevice(ClientType.iOS)){
                     //不是iOS, 可以不继续跑
-                    logger.error("Client is not iOS. client=" + client);
+                    logger.error("Client is not iOS. client={}, ", client);
                     message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NoConnections));
                     continue;
                 }
 
-                if (StringUtils.isBlank(cc.getDeviceToken()) || "NULL".equalsIgnoreCase(cc.getDeviceToken())){
-                    logger.error("Client's deviceToken not found. client=" + client);
+                if (StringUtils.isBlank(cc.getDeviceToken()) || NULL.equalsIgnoreCase(cc.getDeviceToken())){
+                    logger.error("Client's deviceToken not found. client={},", client);
 
                     if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                         message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));

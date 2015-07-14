@@ -5,8 +5,8 @@ import com.argo.qpush.core.entity.PushStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.PayloadServiceImpl;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
@@ -23,14 +23,14 @@ public class Connection {
 
     protected Logger logger = null;
 
-    private final Channel channel;
+    private final ChannelHandlerContext context;
     private String appKey;
     private String userId;
     private int lastOpTime;
 
-    public Connection(Channel channel) {
-        this.channel = channel;
-        logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + channel.hashCode());
+    public Connection(ChannelHandlerContext context) {
+        this.context = context;
+        logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + context.channel().hashCode());
         lastOpTime = (int) (new Date().getTime() / 1000 - epoch);
     }
 
@@ -51,7 +51,7 @@ public class Connection {
      */
     public void send(final Payload message){
         // 组装消息包
-        if(channel.isWritable()){
+        if(context.channel().isWritable()){
             try {
                 byte[] msg = message.asAPNSMessage().toByteArray();
                 send(message, msg);
@@ -61,7 +61,7 @@ public class Connection {
             }
         }else{
             message.setStatus(this.userId, new PushStatus(PushStatus.ChannelClosed, null));
-            logger.error("Send Error. Channel is closed. {}, {}", channel, message);
+            logger.error("Send Error. Channel is closed. {}, {}", context, message);
         }
     }
 
@@ -73,33 +73,25 @@ public class Connection {
     public void send(final Payload message, final byte[] msg) {
         try {
 
-            //http://normanmaurer.me/presentations/2014-facebook-eng-netty/slides.html#28.0
-            channel.eventLoop().execute(new Runnable() {
+            final ByteBuf data = context.alloc().buffer(msg.length); // (2)
+            data.writeBytes(msg);
+
+            final ChannelFuture cf = context.writeAndFlush(data);
+            cf.addListener(new GenericFutureListener<Future<? super Void>>() {
                 @Override
-                public void run() {
-
-                    final ByteBuf data = channel.config().getAllocator().buffer(msg.length); // (2)
-                    data.writeBytes(msg);
-
-                    final ChannelFuture cf = channel.writeAndFlush(data);
-                    cf.addListener(new GenericFutureListener<Future<? super Void>>() {
-                        @Override
-                        public void operationComplete(Future<? super Void> future) throws Exception {
-                            if(cf.cause() != null){
-                                logger.error("{}, Send Error.", channel, cf.cause());
-                                PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.WriterError, cf.cause().getMessage()));
-                            }else {
-                                updateOpTime();
-                                PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.Success));
-                                ClientServiceImpl.instance.updateBadge(userId, 1);
-                                if (logger.isDebugEnabled()){
-                                    logger.debug("Send Done, userId={}, messageId={}", userId, message.getId());
-                                }
-                            }
+                public void operationComplete(Future<? super Void> future) throws Exception {
+                    if(cf.cause() != null){
+                        logger.error("{}, Send Error.", context, cf.cause());
+                        PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.WriterError, cf.cause().getMessage()));
+                    }else {
+                        updateOpTime();
+                        PayloadServiceImpl.instance.updateSendStatus(message, userId, new PushStatus(PushStatus.Success));
+                        ClientServiceImpl.instance.updateBadge(userId, 1);
+                        if (logger.isDebugEnabled()){
+                            logger.debug("Send Done, userId={}, messageId={}", userId, message.getId());
                         }
-                    });
+                    }
                 }
-
             });
 
 
@@ -126,22 +118,22 @@ public class Connection {
     }
 
     public void close(){
-        channel.close();
+        context.close();
     }
 
-    public Channel getChannel() {
-        return channel;
+    public ChannelHandlerContext getContext() {
+        return context;
     }
 
     @Override
     public int hashCode() {
-        return channel.hashCode();
+        return context.hashCode();
     }
 
     @Override
     public String toString() {
         return "Connection{" +
-                "channel=" + channel +
+                "context=" + context +
                 ", appKey='" + appKey + '\'' +
                 ", userId='" + userId + '\'' +
                 ", lastOpTime=" + lastOpTime +

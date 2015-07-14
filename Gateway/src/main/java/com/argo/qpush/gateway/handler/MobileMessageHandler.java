@@ -89,7 +89,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
             }
 
-            conn = new Connection(ctx.channel());
+            conn = new Connection(ctx);
             conn.setUserId(pbapnsEvent.getUserId());
             conn.setAppKey(pbapnsEvent.getAppKey());
             ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
@@ -123,7 +123,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Awake_VALUE){
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (null == conn){
-                conn = new Connection(ctx.channel());
+                conn = new Connection(ctx);
                 conn.setUserId(pbapnsEvent.getUserId());
                 conn.setAppKey(pbapnsEvent.getAppKey());
                 ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
@@ -177,6 +177,10 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void ack(final ChannelHandlerContext ctx, final Connection cc, PBAPNSEvent event, final String result){
+        if (cc==null || cc.getContext() == null){
+            return;
+        }
+
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         builder.setAps(PBAPNSBody.newBuilder().setAlert("ack").setBadge(0));
 
@@ -191,7 +195,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         final ByteBuf data = ctx.alloc().buffer(bytes.length); // (2)
         data.writeBytes(bytes);
 
-        final ChannelFuture cf = cc.getChannel().writeAndFlush(data);
+        final ChannelFuture cf = cc.getContext().writeAndFlush(data);
         cf.addListener(new GenericFutureListener<Future<? super Void>>() {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {

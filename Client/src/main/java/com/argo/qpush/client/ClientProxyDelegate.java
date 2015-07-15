@@ -101,7 +101,7 @@ public class ClientProxyDelegate {
             });
 
             // Start the client.
-            for(int i=0; i<workerGroup.executorCount() * 10; i++){
+            for(int i=0; i<workerGroup.executorCount() * 2; i++){
                 ChannelFuture f = newChannel();
                 if (f!=null) {
                     try {

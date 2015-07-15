@@ -17,7 +17,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         if (logger.isDebugEnabled()) {
             logger.debug("channelActive: {}", ctx.channel());
         }
-        ClientProxyDelegate.instance.save(ctx.channel());
+        ClientProxyDelegate.instance.save(ctx);
     }
 
     @Override
@@ -26,12 +26,11 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         if (logger.isDebugEnabled()) {
             logger.debug("channelRead: {} -- > {} ", ctx.channel(), jsonString);
         }
-        ctx.fireChannelRead(msg);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ClientProxyDelegate.instance.remove(ctx.channel());
+        ClientProxyDelegate.instance.remove(ctx);
         cause.printStackTrace();
         ctx.close();
         reconnect();
@@ -41,7 +40,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.fireChannelInactive();
         logger.error("channelInactive: {}", ctx.channel());
-        ClientProxyDelegate.instance.remove(ctx.channel());
+        ClientProxyDelegate.instance.remove(ctx);
         reconnect();
     }
 

@@ -9,8 +9,6 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,7 @@ public class ClientProxyDelegate {
     public static MessagePack messagePack = new MessagePack();
     public static ClientProxyDelegate instance = new ClientProxyDelegate();
 
-    private ConcurrentSkipListSet<Channel> channelList = new ConcurrentSkipListSet<Channel>();
+    private ConcurrentSkipListSet<ChannelHandlerContext> channelList = new ConcurrentSkipListSet<ChannelHandlerContext>();
     private final Bootstrap b = new Bootstrap(); // (1)
     private NioEventLoopGroup workerGroup;
     private String host;
@@ -135,37 +133,20 @@ public class ClientProxyDelegate {
         return f;
     }
 
-    public void save(Channel c){
+    public void save(ChannelHandlerContext c){
         channelList.add(c);
     }
 
-    public void get(final ChannelAvaliable task){
-        Channel c = channelList.pollFirst();
+    public void get(final ChannelAvailable task){
+        ChannelHandlerContext c = channelList.pollFirst();
         if (c == null){
-            final ChannelFuture f = newChannel();
-            if (f == null){
-                return;
-            }
-
-            f.addListener(new GenericFutureListener<Future<? super java.lang.Void>>() {
-                @Override
-                public void operationComplete(Future<? super Void> future) throws Exception {
-                    if (future.cause() == null){
-                        final Channel c0 = f.channel();
-                        task.execute(c0);
-                    }else{
-                        logger.error("QPush newChannel.", f.cause());
-                    }
-                }
-            });
-
-        }else{
-            task.execute(c);
-            channelList.add(c);
+            logger.error("No ChannelAvailable");
         }
+        task.execute(c);
+        channelList.add(c);
     }
 
-    public void remove(Channel c){
+    public void remove(ChannelHandlerContext c){
         channelList.remove(c);
     }
 

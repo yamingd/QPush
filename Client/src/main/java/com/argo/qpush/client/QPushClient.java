@@ -1,8 +1,8 @@
 package com.argo.qpush.client;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
@@ -39,10 +39,11 @@ public class QPushClient {
             return;
         }
 
-        ClientProxyDelegate.instance.get(new ChannelAvaliable() {
+        ClientProxyDelegate.instance.get(new ChannelAvailable() {
+
            @Override
-           public void execute(final Channel c) {
-               final ByteBuf data = c.config().getAllocator().buffer(bytes.length); // (2)
+           public void execute(final ChannelHandlerContext c) {
+               final ByteBuf data = c.alloc().buffer(bytes.length); // (2)
                data.writeBytes(bytes);
                final ChannelFuture cf = c.writeAndFlush(data);
                cf.addListener(new GenericFutureListener<Future<? super Void>>() {

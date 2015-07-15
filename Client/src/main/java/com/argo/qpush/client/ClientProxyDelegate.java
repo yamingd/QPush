@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
@@ -31,7 +31,7 @@ public class ClientProxyDelegate {
     public static MessagePack messagePack = new MessagePack();
     public static ClientProxyDelegate instance = new ClientProxyDelegate();
 
-    private ConcurrentSkipListSet<ChannelHandlerContext> channelList = new ConcurrentSkipListSet<ChannelHandlerContext>();
+    private ConcurrentLinkedDeque<ChannelHandlerContext> channelList = new ConcurrentLinkedDeque<ChannelHandlerContext>();
     private final Bootstrap b = new Bootstrap(); // (1)
     private NioEventLoopGroup workerGroup;
     private String host;
@@ -101,7 +101,7 @@ public class ClientProxyDelegate {
             });
 
             // Start the client.
-            for(int i=0; i<workerGroup.executorCount(); i++){
+            for(int i=0; i<workerGroup.executorCount() * 10; i++){
                 ChannelFuture f = newChannel();
                 if (f!=null) {
                     try {
@@ -138,7 +138,7 @@ public class ClientProxyDelegate {
     }
 
     public void get(final ChannelAvailable task){
-        ChannelHandlerContext c = channelList.pollFirst();
+        ChannelHandlerContext c = channelList.pop();
         if (c == null){
             logger.error("No ChannelAvailable");
         }

@@ -66,6 +66,7 @@ public class Dispatcher extends Thread {
         exe.setCorePoolSize(min);
         exe.setMaxPoolSize(max);
         exe.setWaitForTasksToCompleteOnShutdown(true);
+        exe.setThreadGroupName("Dispatcher[" + product.getId()+"]");
         exe.afterPropertiesSet();
 
         return exe;
@@ -106,6 +107,7 @@ public class Dispatcher extends Thread {
             }
         });
         thread1.setDaemon(true);
+        thread1.setName(String.format("Dispatcher-Single[%s]", product.getId()));
         thread1.start();
 
         // 广播 推送
@@ -129,6 +131,7 @@ public class Dispatcher extends Thread {
             }
         });
         thread2.setDaemon(true);
+        thread2.setName(String.format("Dispatcher-broadcast[%s]", product.getId()));
         thread2.start();
 
         //TODO: 离线
@@ -153,6 +156,7 @@ public class Dispatcher extends Thread {
             }
         });
         thread3.setDaemon(true);
+        thread2.setName(String.format("Dispatcher-Status[%s]", product.getId()));
         thread3.start();
 
         logger.info("Dispatcher running. " + this.product);

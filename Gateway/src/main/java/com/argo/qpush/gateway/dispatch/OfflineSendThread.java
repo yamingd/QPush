@@ -4,12 +4,10 @@ import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.Product;
 import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.gateway.Connection;
-import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.ConnectionKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -45,39 +43,16 @@ public class OfflineSendThread implements Callable<Integer> {
             this.doSendMessage(message);
         }
 
-        return 0;
+        return list.size();
     }
 
     private Integer doSendMessage(Payload message){
         if(message != null){
-            SentProgress progress = new SentProgress(1);
             Connection c = ConnectionKeeper.get(product.getAppKey(), this.userId);
             if(c != null) {
                 c.send(message);
-            }else{
-                progress.incrFailed();
+                return 1;
             }
-
-            try {
-                progress.getCountDownLatch().await();
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            }
-
-            int total = progress.getSuccess().get();
-
-            if (total > 0) {
-                try {
-                    message.setClients(new ArrayList<String>());
-                    message.getClients().add(this.userId);
-                    PayloadServiceImpl.instance.updateSendStatus(message);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-
-            return total;
-
         }
 
         return 0;

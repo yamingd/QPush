@@ -56,7 +56,7 @@ public class QPushClient {
                            ClientProxyDelegate.instance.newChannel();
                            trySend(payload, bytes, limit-1);
                        }else{
-                           logger.info("Send OK: " + payload + "\n");
+                           //logger.info("Send OK: " + payload + "\n");
                        }
                    }
                });

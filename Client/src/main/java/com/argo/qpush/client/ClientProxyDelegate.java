@@ -141,9 +141,10 @@ public class ClientProxyDelegate {
         ChannelHandlerContext c = channelList.pop();
         if (c == null){
             logger.error("No ChannelAvailable");
+            return;
         }
-        task.execute(c);
         channelList.add(c);
+        task.execute(c);
     }
 
     public void remove(ChannelHandlerContext c){

@@ -38,6 +38,9 @@ public class DispatcherRunner implements InitializingBean, ApplicationContextAwa
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private APNSKeeper apnsKeeper;
+
     private PayloadQueue payloadQueue;
 
     private List<Product> productList;

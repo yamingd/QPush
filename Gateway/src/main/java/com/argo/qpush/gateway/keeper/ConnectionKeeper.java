@@ -65,7 +65,7 @@ public class ConnectionKeeper {
             }
         }
 
-        cid = conn.getContext().hashCode();
+        cid = conn.getContext().channel().hashCode();
         ClientKeeper.add(productId, token, cid);
         pools.put(cid, conn);
 

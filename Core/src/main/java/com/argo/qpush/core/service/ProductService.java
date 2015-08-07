@@ -10,6 +10,18 @@ import java.util.List;
  */
 public interface ProductService {
 
+    /**
+     *
+     * @param key
+     * @return
+     */
+    Integer getProductId(String key);
+
+    /**
+     *
+     * @param key
+     * @return
+     */
     Product findByKey(String key);
 
     @TxMain

@@ -1,5 +1,6 @@
 package com.argo.qpush.client;
 
+import com.google.common.base.Objects;
 import org.msgpack.annotation.Message;
 
 import java.io.Serializable;
@@ -36,9 +37,9 @@ public class AppPayload implements Serializable {
      */
     public Map<String, String> ext;
     /**
-     * 应用标示.
+     * Topic标示.
      */
-    public String appkey;
+    public Integer topicObjectId;
     /**
      * 是否广播
      */
@@ -57,14 +58,16 @@ public class AppPayload implements Serializable {
 
     @Override
     public String toString() {
-        return "AppPayload{" +
-                "title='" + title + '\'' +
-                ", badge=" + badge +
-                ", sound='" + sound + '\'' +
-                ", clients=" + clients +
-                ", ext=" + ext +
-                ", appkey='" + appkey + '\'' +
-                ", broadcast=" + broadcast +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("title", title)
+                .add("badge", badge)
+                .add("sound", sound)
+                .add("clients", clients)
+                .add("ext", ext)
+                .add("topicObjectId", topicObjectId)
+                .add("broadcast", broadcast)
+                .add("offlineMode", offlineMode)
+                .add("toMode", toMode)
+                .toString();
     }
 }

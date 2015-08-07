@@ -1,11 +1,11 @@
 package com.argo.qpush.publisher.handler;
 
 import com.argo.qpush.client.PayloadMessage;
+import com.argo.qpush.client.RequestMessage;
+import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.entity.Payload;
-import com.argo.qpush.core.entity.Product;
 import com.argo.qpush.core.service.ProductService;
 import com.argo.qpush.pipe.PayloadQueue;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -17,13 +17,12 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by yaming_deng on 2014/9/25.
  */
 @Component
-public class PayloadHandler implements InitializingBean, ApplicationContextAware {
+public class PayloadHandler implements InitializingBean, ApplicationContextAware, RequestHandler {
 
     protected static Logger logger = LoggerFactory.getLogger(PayloadHandler.class);
 
@@ -40,8 +39,6 @@ public class PayloadHandler implements InitializingBean, ApplicationContextAware
 
     @Autowired
     private ProductService productService;
-
-    private ConcurrentMap<String, Integer> productIdMaps = Maps.newConcurrentMap();
 
     private PayloadQueue queue;
 
@@ -63,23 +60,14 @@ public class PayloadHandler implements InitializingBean, ApplicationContextAware
      * 保存Payload到 Queue.
      * Queue 根据配置项payloadQueue决定
      *
-     * @param message
+     * @param request
      */
-    public void save(PayloadMessage message) {
-        Integer pid = productIdMaps.get(message.appkey);
-        if (null == pid) {
-            Product product = productService.findByKey(message.appkey);
-            if (product == null){
-                logger.error("Product not found. appkey=" + message.appkey);
-                return;
-            }
-            pid = product.getId();
-            productIdMaps.put(message.appkey, pid);
-        }
-
-        Payload payload = new Payload(message);
+    @Override
+    public void handle(RequestMessage request) throws Exception {
+        Integer pid = productService.getProductId(request.getAppkey());
+        PayloadMessage data = MessageUtils.asT(PayloadMessage.class, request.getData());
+        Payload payload = new Payload(data);
         payload.setProductId(pid);
         queue.add(payload);
-
     }
 }

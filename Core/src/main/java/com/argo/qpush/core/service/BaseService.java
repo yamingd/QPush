@@ -84,10 +84,22 @@ public abstract class BaseService implements InitializingBean, DisposableBean {
         BinaryJedis jedis =  redisBucket.getResource();
         try {
 
-            String ret = jedis.set(key.getBytes(), MessageUtils.asBytes(item));
-            if (logger.isDebugEnabled()){
-                logger.debug("putItemToRedis: {}", ret);
-            }
+            byte[] bytes = key.getBytes();
+            String ret = jedis.set(bytes, MessageUtils.asBytes(item));
+            jedis.expire(bytes, 3600);
+
+        }catch (Exception e) {
+            logger.error("读取产品信息错误", e);
+            redisBucket.returnBrokenResource(jedis);
+        }finally {
+            redisBucket.returnResource(jedis);
+        }
+    }
+
+    public void delCache(String key){
+        BinaryJedis jedis =  redisBucket.getResource();
+        try {
+            jedis.del(key.getBytes());
         }catch (Exception e) {
             logger.error("读取产品信息错误", e);
             redisBucket.returnBrokenResource(jedis);

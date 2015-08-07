@@ -2,6 +2,7 @@ package com.argo.qpush.core.service;
 
 import com.argo.qpush.core.TxMain;
 import com.argo.qpush.core.entity.Product;
+import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by yaming_deng on 14-8-8.
@@ -24,8 +26,25 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     public static ProductService instance;
 
+    private ConcurrentMap<String, Product> productIdMaps = Maps.newConcurrentMap();
+
     protected static final RowMapper<Product> Product_ROWMAPPER = new BeanPropertyRowMapper<Product>(
             Product.class);
+
+    @Override
+    public Integer getProductId(String key) {
+        Product product = productIdMaps.get(key);
+        if (null == product){
+            product = findByKey(key);
+            if (null != product) {
+                productIdMaps.put(key, product);
+                return product.getId();
+            }
+            logger.error("Product not found. appkey=" + key);
+            return null;
+        }
+        return product.getId();
+    }
 
     @Override
     public Product findByKey(String key){
@@ -88,6 +107,10 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        List<Product> list = this.findAll();
+        for (Product item : list){
+            productIdMaps.put(item.getAppKey(), item);
+        }
         instance = this;
     }
 }

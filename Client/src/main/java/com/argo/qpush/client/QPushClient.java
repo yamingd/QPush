@@ -25,15 +25,51 @@ public class QPushClient {
         ClientProxyDelegate.instance.close();
     }
 
-    public static boolean send(final AppPayload payload) throws IOException {
-        final byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
+    /**
+     * 发送Payload
+     * @param appKey
+     * @param payload
+     * @return
+     * @throws IOException
+     */
+    public static boolean sendPayload(final String appKey, final AppPayload payload) throws IOException {
 
-        trySend(payload, bytes, 3);
+        AppRequest request = new AppRequest();
+        request.setAppkey(appKey);
+        request.setTypeId(AppRequest.APP_REQUEST_TYPE_PAYLOAD);
+
+        byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
+        request.setData(bytes);
+
+        bytes = ClientProxyDelegate.messagePack.write(request);
+        trySend(payload.toString(), bytes, 3);
 
         return true;
     }
 
-    private static void trySend(final AppPayload payload, final byte[] bytes, final int limit) {
+    /**
+     * 发送Topic操作
+     * @param appKey
+     * @param payload
+     * @return
+     * @throws IOException
+     */
+    public static boolean sendTopic(final String appKey, int typeId, final AppTopic payload) throws IOException {
+
+        AppRequest request = new AppRequest();
+        request.setAppkey(appKey);
+        request.setTypeId(typeId);
+
+        byte[] bytes = ClientProxyDelegate.messagePack.write(payload);
+        request.setData(bytes);
+
+        bytes = ClientProxyDelegate.messagePack.write(request);
+        trySend(payload.toString(), bytes, 3);
+
+        return true;
+    }
+
+    private static void trySend(final String payload, final byte[] bytes, final int limit) {
         if (limit <= 0){
             logger.error("TrySend Failure.");
             return;

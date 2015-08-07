@@ -1,5 +1,6 @@
 package com.argo.qpush.client;
 
+import com.google.common.base.Objects;
 import org.msgpack.annotation.Message;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class PayloadMessage {
     /**
      * 应用标示.
      */
-    public String appkey;
+    public Integer topicObjectId;
     /**
      * 是否广播
      */
@@ -53,14 +54,16 @@ public class PayloadMessage {
 
     @Override
     public String toString() {
-        return "PayloadMessage{" +
-                "title='" + title + '\'' +
-                ", badge=" + badge +
-                ", sound='" + sound + '\'' +
-                ", clients=" + clients +
-                ", ext=" + ext +
-                ", appkey='" + appkey + '\'' +
-                ", broadcast=" + broadcast +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("title", title)
+                .add("badge", badge)
+                .add("sound", sound)
+                .add("clients", clients)
+                .add("ext", ext)
+                .add("topicObjectId", topicObjectId)
+                .add("broadcast", broadcast)
+                .add("offlineMode", offlineMode)
+                .add("toMode", toMode)
+                .toString();
     }
 }

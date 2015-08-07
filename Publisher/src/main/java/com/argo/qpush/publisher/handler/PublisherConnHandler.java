@@ -1,6 +1,6 @@
 package com.argo.qpush.publisher.handler;
 
-import com.argo.qpush.client.PayloadMessage;
+import com.argo.qpush.client.RequestMessage;
 import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.core.MetricBuilder;
 import io.netty.buffer.ByteBuf;
@@ -11,8 +11,6 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * Created by yaming_deng on 14-8-6.
@@ -47,13 +45,17 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
         byte[] dd = (byte[])msg;
 
         try {
-            PayloadMessage message = MessageUtils.asT(PayloadMessage.class, dd);
-            if (logger.isDebugEnabled()){
-                logger.debug("Payload. message={}", message);
+
+            RequestMessage requestMessage = MessageUtils.asT(RequestMessage.class, dd);
+            if (requestMessage.getTypeId() == RequestMessage.REQUEST_TYPE_PAYLOAD) {
+                PayloadHandler.instance.handle(requestMessage);
+            }else{
+                TopicHandler.instance.handle(requestMessage);
             }
-            PayloadHandler.instance.save(message);
+
             ack(ctx, STATUS_200);
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             ack(ctx, STATUS_500);
         }

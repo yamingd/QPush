@@ -7,7 +7,7 @@
 #
 # Host: (MySQL 10.0.19-MariaDB-log)
 # Database: qpush
-# Generation Time: 2015-07-09 09:23:06 +0000
+# Generation Time: 2015-08-07 03:40:39 +0000
 # ************************************************************
 
 
@@ -77,7 +77,7 @@ CREATE TABLE `payload_client` (
   `payloadId` bigint(20) NOT NULL COMMENT '推送消息id',
   `userId` varchar(50) NOT NULL DEFAULT '' COMMENT '需要推送到用户id',
   `productId` int(11) DEFAULT NULL COMMENT '关联的产品id',
-  `statusId` smallint(1) NOT NULL DEFAULT '0' COMMENT '推送状态(0: 推送中, 1: 成功, 3: 失败, 2: 忽略)',
+  `statusId` smallint(1) NOT NULL DEFAULT '0' COMMENT '推送状态(0: 推送中, 2: 成功, 3: 失败)',
   `onlineMode` tinyint(1) NOT NULL DEFAULT '0' COMMENT '上线后失败消息处理(0:忽略,1:发送)',
   `createTime` int(11) DEFAULT NULL COMMENT '记录时间',
   `tryLimit` smallint(1) NOT NULL DEFAULT '3' COMMENT '最多尝试次数',
@@ -124,6 +124,42 @@ CREATE TABLE `product` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_product_key` (`appKey`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产品表';
+
+
+
+# Dump of table topic
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `topic`;
+
+CREATE TABLE `topic` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) DEFAULT NULL,
+  `productId` int(11) NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1/0(启用/停用)',
+  `totalClient` int(11) NOT NULL DEFAULT '0',
+  `addAt` int(11) NOT NULL COMMENT '添加时间戳',
+  `objectId` bigint(11) NOT NULL COMMENT '唯一的标示(有业务系统传入)',
+  PRIMARY KEY (`id`),
+  KEY `ix_topic_objectId` (`objectId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table topic_client
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `topic_client`;
+
+CREATE TABLE `topic_client` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `topicId` int(11) NOT NULL,
+  `clientId` int(11) DEFAULT NULL,
+  `userId` varchar(32) NOT NULL DEFAULT '',
+  `addAt` int(11) NOT NULL COMMENT '添加时间戳',
+  PRIMARY KEY (`id`),
+  KEY `ix_topic_client_topicId` (`topicId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

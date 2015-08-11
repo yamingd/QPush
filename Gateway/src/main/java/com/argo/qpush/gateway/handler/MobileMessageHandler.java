@@ -83,16 +83,23 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Online_VALUE){
 
+            boolean newDevice = false;
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (null != conn){
-                logger.error("你已经在线了!. KickOff pbapnsEvent={}, conn={}", pbapnsEvent, conn);
-                ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
+                if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
+                    //只有设备标示不一样才算是重复登录
+                    newDevice = true;
+                    logger.error("你已经在线了!. KickOff pbapnsEvent={}, conn={}", pbapnsEvent, conn);
+                    ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
+                }
             }
-
-            conn = new Connection(ctx);
-            conn.setUserId(pbapnsEvent.getUserId());
-            conn.setAppKey(pbapnsEvent.getAppKey());
-            ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
+            if (newDevice) {
+                conn = new Connection(ctx);
+                conn.setUserId(pbapnsEvent.getUserId());
+                conn.setAppKey(pbapnsEvent.getAppKey());
+                conn.setToken(pbapnsEvent.getToken());
+                ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
+            }
             //记录客户端
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(pbapnsEvent));
             ack(ctx, conn, pbapnsEvent, SYNC);

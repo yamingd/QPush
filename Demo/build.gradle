@@ -1,0 +1,8 @@
+
+description = 'demo'
+dependencies {
+  compile project(':qpush.client')
+  compile project(':qpush-gateway')
+  compile project(':qpush-publisher')
+    compile group: 'mysql', name: 'mysql-connector-java', version:'5.1.34'
+}

@@ -1,0 +1,5 @@
+
+description = 'client'
+dependencies {
+    compile group: 'io.netty', name: 'netty-all', version:'4.0.15.Final'
+}

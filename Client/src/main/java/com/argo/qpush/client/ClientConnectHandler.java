@@ -49,6 +49,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
+        logger.info("reconnect....");
         ClientProxyDelegate.instance.newChannel();
     }
 

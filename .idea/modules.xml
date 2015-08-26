@@ -4,13 +4,18 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Client/Client.iml" filepath="$PROJECT_DIR$/Client/Client.iml" />
       <module fileurl="file://$PROJECT_DIR$/Core/Core.iml" filepath="$PROJECT_DIR$/Core/Core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Demo/Demo.iml" filepath="$PROJECT_DIR$/Demo/Demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/Gateway/Gateway.iml" filepath="$PROJECT_DIR$/Gateway/Gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/Pipe/Pipe.iml" filepath="$PROJECT_DIR$/Pipe/Pipe.iml" />
       <module fileurl="file://$PROJECT_DIR$/Protobuf/Protobuf.iml" filepath="$PROJECT_DIR$/Protobuf/Protobuf.iml" />
       <module fileurl="file://$PROJECT_DIR$/Publisher/Publisher.iml" filepath="$PROJECT_DIR$/Publisher/Publisher.iml" />
       <module fileurl="file://$PROJECT_DIR$/QPush.iml" filepath="$PROJECT_DIR$/QPush.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Demo/demo.iml" filepath="$PROJECT_DIR$/Demo/demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Core/qpush-core.iml" filepath="$PROJECT_DIR$/Core/qpush-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gateway/qpush-gateway.iml" filepath="$PROJECT_DIR$/Gateway/qpush-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Pipe/qpush-pipe.iml" filepath="$PROJECT_DIR$/Pipe/qpush-pipe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Protobuf/qpush-protobuf.iml" filepath="$PROJECT_DIR$/Protobuf/qpush-protobuf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Publisher/qpush-publisher.iml" filepath="$PROJECT_DIR$/Publisher/qpush-publisher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Client/qpush.client.iml" filepath="$PROJECT_DIR$/Client/qpush.client.iml" />
     </modules>
   </component>
 </project>
-

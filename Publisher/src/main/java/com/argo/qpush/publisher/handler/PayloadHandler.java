@@ -66,6 +66,9 @@ public class PayloadHandler implements InitializingBean, ApplicationContextAware
     public void handle(RequestMessage request) throws Exception {
         Integer pid = productService.getProductId(request.getAppkey());
         PayloadMessage data = MessageUtils.asT(PayloadMessage.class, request.getData());
+        if (logger.isDebugEnabled()){
+            logger.debug("PayloadMessage: {}", data);
+        }
         Payload payload = new Payload(data);
         payload.setProductId(pid);
         queue.add(payload);

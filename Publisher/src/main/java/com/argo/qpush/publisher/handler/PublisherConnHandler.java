@@ -47,6 +47,9 @@ public class PublisherConnHandler extends ChannelInboundHandlerAdapter {
         try {
 
             RequestMessage requestMessage = MessageUtils.asT(RequestMessage.class, dd);
+            if (logger.isDebugEnabled()){
+                logger.debug("RequestMessage: {}", requestMessage);
+            }
             if (requestMessage.getTypeId() == RequestMessage.REQUEST_TYPE_PAYLOAD) {
                 PayloadHandler.instance.handle(requestMessage);
             }else{

@@ -1,5 +1,6 @@
 package com.argo.qpush.client;
 
+import com.google.common.base.Objects;
 import org.msgpack.annotation.MessagePackMessage;
 
 import java.util.ArrayList;
@@ -25,4 +26,12 @@ public class TopicMessage {
      */
     public List<String> clientIds = new ArrayList<String>();
 
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("objectId", objectId)
+                .add("title", title)
+                .add("clientIds", clientIds)
+                .toString();
+    }
 }

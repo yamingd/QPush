@@ -54,6 +54,10 @@ public class TopicHandler implements InitializingBean, RequestHandler {
         Integer pid = productService.getProductId(request.getAppkey());
         final TopicMessage data = MessageUtils.asT(TopicMessage.class, request.getData());
 
+        if (logger.isDebugEnabled()){
+            logger.debug("TopicMessage: {}", data);
+        }
+
         final Topic topic = new Topic();
         topic.setObjectId(data.objectId);
         topic.setProductId(pid);

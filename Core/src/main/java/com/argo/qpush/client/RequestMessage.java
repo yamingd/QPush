@@ -1,5 +1,6 @@
 package com.argo.qpush.client;
 
+import com.google.common.base.Objects;
 import org.msgpack.annotation.MessagePackMessage;
 
 /**
@@ -40,5 +41,13 @@ public class RequestMessage {
 
     public void setAppkey(String appkey) {
         this.appkey = appkey;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("appkey", appkey)
+                .add("typeId", typeId)
+                .toString();
     }
 }

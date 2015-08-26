@@ -31,15 +31,15 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         ClientProxyDelegate.instance.remove(ctx);
-        cause.printStackTrace();
+        logger.error("Error. ", cause.getCause());
         ctx.close();
         reconnect();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ctx.fireChannelInactive();
         logger.error("channelInactive: {}", ctx.channel());
+        ctx.close();
         ClientProxyDelegate.instance.remove(ctx);
         reconnect();
     }

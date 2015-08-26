@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
@@ -125,11 +126,13 @@ public class ClientProxyDelegate {
     }
 
     public ChannelFuture newChannel(){
+
         ChannelFuture f = b.connect(host, port); // (5)
         if(f.cause() != null){
             logger.error("QPush newChannel.", f.cause());
             return null;
         }
+
         return f;
     }
 
@@ -138,13 +141,15 @@ public class ClientProxyDelegate {
     }
 
     public void get(final ChannelAvailable task){
-        ChannelHandlerContext c = channelList.pop();
-        if (c == null){
+        try {
+            ChannelHandlerContext c = channelList.pop();
+            channelList.add(c);
+            task.execute(c);
+        } catch (NoSuchElementException e) {
             logger.error("No ChannelAvailable");
-            return;
+            newChannel();
+            task.error(e);
         }
-        channelList.add(c);
-        task.execute(c);
     }
 
     public void remove(ChannelHandlerContext c){

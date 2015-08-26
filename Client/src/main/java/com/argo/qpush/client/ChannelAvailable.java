@@ -14,4 +14,8 @@ public interface ChannelAvailable {
      */
     void execute(final ChannelHandlerContext ctx);
 
+    /**
+     *
+     */
+    void error(Exception e);
 }

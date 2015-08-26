@@ -97,6 +97,11 @@ public class QPushClient {
                    }
                });
            }
-       });
+
+            @Override
+            public void error(Exception e) {
+                trySend(payload, bytes, limit-1);
+            }
+        });
     }
 }

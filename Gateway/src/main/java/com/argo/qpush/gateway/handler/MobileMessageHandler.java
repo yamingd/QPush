@@ -83,17 +83,19 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Online_VALUE){
 
-            boolean newDevice = false;
+            boolean newConnection = true;
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (null != conn){
                 if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
                     //只有设备标示不一样才算是重复登录
-                    newDevice = true;
+                    newConnection = true;
                     logger.error("你已经在线了!. KickOff pbapnsEvent={}, conn={}", pbapnsEvent, conn);
                     ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
+                }else{
+                    newConnection = false;
                 }
             }
-            if (newDevice) {
+            if (newConnection) {
                 conn = new Connection(ctx);
                 conn.setUserId(pbapnsEvent.getUserId());
                 conn.setAppKey(pbapnsEvent.getAppKey());

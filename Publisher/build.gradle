@@ -1,12 +1,19 @@
-
 description = 'publisher'
-dependencies {
-  compile project(':qpush-core')
-  compile project(':qpush-pipe')
-  compile project(':qpush-protobuf')
-    compile group: 'io.netty', name: 'netty-all', version:'4.0.15.Final'
-    compile group: 'org.springframework', name: 'spring-core', version:'3.2.11.RELEASE'
-    compile group: 'org.springframework', name: 'spring-context', version:'3.2.11.RELEASE'
-    compile group: 'org.springframework', name: 'spring-jdbc', version:'3.2.11.RELEASE'
-    compile group: 'com.codahale.metrics', name: 'metrics-core', version:'3.0.1'
+
+ext {
+    title = 'QPush Gateway'
+    mainclass = 'com.argo.qpush.publisher.ServerMain'
 }
+
+dependencies {
+    compile project(':qpush-core')
+    compile project(':qpush-pipe')
+    compile project(':qpush-protobuf')
+    compile group: 'io.netty', name: 'netty-all', version: '4.0.15.Final'
+    compile group: 'org.springframework', name: 'spring-core', version: '3.2.11.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context', version: '3.2.11.RELEASE'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '3.2.11.RELEASE'
+    compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.1'
+}
+
+apply from: '../jarwrap.gradle'

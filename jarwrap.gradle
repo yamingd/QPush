@@ -1,0 +1,49 @@
+//create a single Jar with all dependencies
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': title,
+                'Implementation-Version': version,
+                'Main-Class': mainclass
+    }
+
+    baseName = project.name + '-all'
+
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    with jar
+}
+
+task createJobJar(dependsOn:jar, type:Jar) {
+    manifest {
+        attributes(
+                "Implementation-Title": title
+                ,"Implementation-Version": version,
+                'Main-Class': mainclass
+        )
+    }
+
+    classifier 'all'
+    destinationDir new File("$buildDir")
+
+    into('lib'){
+        from configurations.compile
+    }
+
+    into('classes'){
+        from "$buildDir/classes/main"
+    }
+
+    into('classes'){
+        from "$projectDir/src/main/resources"
+    }
+
+    into('scripts'){
+        from "$projectDir/src/main/scripts"
+    }
+
+}

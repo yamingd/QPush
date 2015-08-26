@@ -1,4 +1,10 @@
 description = 'gateway'
+
+ext {
+    title = 'QPush Gateway'
+    mainclass = 'com.argo.qpush.gateway.ServerMain'
+}
+
 dependencies {
     compile project(':qpush-core')
     compile project(':qpush-pipe')
@@ -11,40 +17,4 @@ dependencies {
     compile group: 'com.notnoop.apns', name: 'apns', version: '0.2.3'
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from sourceSets.main.allSource
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
-//task zip(type: Zip, dependsOn: build) {
-//
-//    from zip.outputs.files
-//
-////    from('scripts/') {
-////        fileMode = 0755
-////        include '**/runXXX.sh'
-////        include '**/runXXX.bat'
-////    }
-//
-////    from('lib/') {
-////        include '**/*.jar'
-////        into('lib')
-////    }
-//
-//    from('resources/main') {
-//        include '*'
-//        into('classes')
-//    }
-//
-//}
+apply from: "../jarwrap.gradle"

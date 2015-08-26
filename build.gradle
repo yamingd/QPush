@@ -7,9 +7,18 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
-    options.encoding='UTF-8'
+
+    compileJava {
+        sourceCompatibility=1.7
+        targetCompatibility=1.7
+        options.encoding='UTF-8'
+    }
+
+    compileTestJava {
+        sourceCompatibility=1.7
+        targetCompatibility=1.7
+        options.encoding='UTF-8'
+    }
 
     repositories {
         mavenLocal()

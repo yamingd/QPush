@@ -1,13 +1,50 @@
-
 description = 'gateway'
 dependencies {
-  compile project(':qpush-core')
-  compile project(':qpush-pipe')
-  compile project(':qpush-protobuf')
-    compile group: 'io.netty', name: 'netty-all', version:'4.0.15.Final'
-    compile group: 'org.springframework', name: 'spring-core', version:'3.2.11.RELEASE'
-    compile group: 'org.springframework', name: 'spring-context', version:'3.2.11.RELEASE'
-    compile group: 'org.springframework', name: 'spring-jdbc', version:'3.2.11.RELEASE'
-    compile group: 'com.codahale.metrics', name: 'metrics-core', version:'3.0.1'
-    compile group: 'com.notnoop.apns', name: 'apns', version:'0.2.3'
+    compile project(':qpush-core')
+    compile project(':qpush-pipe')
+    compile project(':qpush-protobuf')
+    compile group: 'io.netty', name: 'netty-all', version: '4.0.15.Final'
+    compile group: 'org.springframework', name: 'spring-core', version: '3.2.11.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context', version: '3.2.11.RELEASE'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '3.2.11.RELEASE'
+    compile group: 'com.codahale.metrics', name: 'metrics-core', version: '3.0.1'
+    compile group: 'com.notnoop.apns', name: 'apns', version: '0.2.3'
 }
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from sourceSets.main.allSource
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+//task zip(type: Zip, dependsOn: build) {
+//
+//    from zip.outputs.files
+//
+////    from('scripts/') {
+////        fileMode = 0755
+////        include '**/runXXX.sh'
+////        include '**/runXXX.bat'
+////    }
+//
+////    from('lib/') {
+////        include '**/*.jar'
+////        into('lib')
+////    }
+//
+//    from('resources/main') {
+//        include '*'
+//        into('classes')
+//    }
+//
+//}

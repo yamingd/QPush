@@ -128,27 +128,35 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     }
 
     @Override
-    @TxMain
     public void updateBadge(final String userId, final int count) {
         jdbcExecutor.submit(new Runnable() {
             @Override
             public void run() {
 
-                int ret = 0;
-                if (count > 0) {
-                    ret = mainJdbc.update(SQL_updateBadge, count, userId);
-                }else{
-                    ret = mainJdbc.update(SQL_updateBadge2, count, count, userId);
-                }
-
-                if (ret > 0){
-                    String cacheKey = formatCacheKey(userId);
-                    delCache(cacheKey);
+                try {
+                    postUpdateBadge(count, userId);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
 
             }
         });
 
+    }
+
+    @TxMain
+    private void postUpdateBadge(int count, String userId) {
+        int ret = 0;
+        if (count > 0) {
+            ret = mainJdbc.update(SQL_updateBadge, count, userId);
+        }else{
+            ret = mainJdbc.update(SQL_updateBadge2, count, count, userId);
+        }
+
+        if (ret > 0){
+            String cacheKey = formatCacheKey(userId);
+            delCache(cacheKey);
+        }
     }
 
     @Override

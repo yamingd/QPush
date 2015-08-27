@@ -81,7 +81,6 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @Override
-    @TxMain
     public void add(final Payload payload){
         if (payload == null){
             return;
@@ -91,49 +90,10 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                mainJdbc.update(new PreparedStatementCreator() {
-                    @Override
-                    public PreparedStatement createPreparedStatement(
-                            Connection connection) throws SQLException {
-                        PreparedStatement ps = connection.prepareStatement(SQL_PAYLOAD_INSERT,
-                                Statement.RETURN_GENERATED_KEYS);
-
-                        ps.setObject(1, payload.getId());
-                        ps.setObject(2, payload.getTitle());
-                        ps.setObject(3, payload.getBadge());
-                        ps.setObject(4, payload.getExtras());
-                        ps.setObject(5, payload.getSound());
-                        ps.setObject(6, payload.getProductId());
-                        ps.setObject(7, payload.getTotalUsers());
-                        ps.setObject(8, payload.getCreateAt());
-                        ps.setObject(9, payload.getStatusId());
-                        ps.setObject(10, payload.getBroadcast());
-                        ps.setObject(11, payload.getSentDate());
-                        ps.setObject(12, payload.getOfflineMode());
-                        ps.setObject(13, payload.getToMode());
-
-                        return ps;
-                    }
-                });
-
-                if (payload.getClients() != null){
-
-                    mainJdbc.batchUpdate(SQL_PAYLOAD_CLIENT_INSERT, new BatchPreparedStatementSetter() {
-
-                        @Override
-                        public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                            preparedStatement.setObject(1, payload.getId());
-                            preparedStatement.setObject(2, payload.getClients().get(i));
-                            preparedStatement.setObject(3, payload.getProductId());
-                            preparedStatement.setObject(4, 0);
-                            preparedStatement.setObject(5, new Date().getTime()/1000);
-                        }
-
-                        @Override
-                        public int getBatchSize() {
-                            return payload.getClients().size();
-                        }
-                    });
+                try {
+                    postAddPayload(payload);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
 
             }
@@ -141,8 +101,55 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
     }
 
-    @Override
     @TxMain
+    private void postAddPayload(final Payload payload) {
+        mainJdbc.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(
+                    Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(SQL_PAYLOAD_INSERT,
+                        Statement.RETURN_GENERATED_KEYS);
+
+                ps.setObject(1, payload.getId());
+                ps.setObject(2, payload.getTitle());
+                ps.setObject(3, payload.getBadge());
+                ps.setObject(4, payload.getExtras());
+                ps.setObject(5, payload.getSound());
+                ps.setObject(6, payload.getProductId());
+                ps.setObject(7, payload.getTotalUsers());
+                ps.setObject(8, payload.getCreateAt());
+                ps.setObject(9, payload.getStatusId());
+                ps.setObject(10, payload.getBroadcast());
+                ps.setObject(11, payload.getSentDate());
+                ps.setObject(12, payload.getOfflineMode());
+                ps.setObject(13, payload.getToMode());
+
+                return ps;
+            }
+        });
+
+        if (payload.getClients() != null){
+
+            mainJdbc.batchUpdate(SQL_PAYLOAD_CLIENT_INSERT, new BatchPreparedStatementSetter() {
+
+                @Override
+                public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                    preparedStatement.setObject(1, payload.getId());
+                    preparedStatement.setObject(2, payload.getClients().get(i));
+                    preparedStatement.setObject(3, payload.getProductId());
+                    preparedStatement.setObject(4, 0);
+                    preparedStatement.setObject(5, new Date().getTime()/1000);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return payload.getClients().size();
+                }
+            });
+        }
+    }
+
+    @Override
     public void saveAfterSent(final Payload payload) throws Exception {
 
         if (payload == null){
@@ -157,90 +164,95 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                try {
-                    mainJdbc.update(new PreparedStatementCreator() {
-                        @Override
-                        public PreparedStatement createPreparedStatement(
-                                Connection connection) throws SQLException {
-
-                            PreparedStatement ps = connection.prepareStatement(SQL_PAYLOAD_INSERT,
-                                    Statement.RETURN_GENERATED_KEYS);
-
-                            ps.setObject(1, payload.getId());
-                            ps.setObject(2, payload.getTitle());
-                            ps.setObject(3, payload.getBadge());
-                            ps.setObject(4, payload.getExtras());
-                            ps.setObject(5, payload.getSound());
-                            ps.setObject(6, payload.getProductId());
-                            ps.setObject(7, payload.getTotalUsers());
-                            ps.setObject(8, payload.getCreateAt());
-                            ps.setObject(9, payload.getStatusId());
-                            ps.setObject(10, payload.getBroadcast());
-                            ps.setObject(11, payload.getSentDate());
-                            ps.setObject(12, payload.getOfflineMode());
-                            ps.setObject(13, payload.getToMode());
-
-                            return ps;
-                        }
-                    });
-                } catch (DataAccessException e) {
-                    logger.error("SQL_PAYLOAD_INSERT", e);
-                }
-
-                MetricBuilder.jdbcUpdateMeter.mark(1);
-
-                if (payload.getClients() != null){
-
-                    try {
-                        mainJdbc.batchUpdate(SQL_PAYLOAD_CLIENT_INSERT, new BatchPreparedStatementSetter() {
-
-                            @Override
-                            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-
-                                String userId = payload.getClients().get(i);
-                                PushStatus error = payload.getStatus().get(userId);
-                                int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
-                                int onlineMode = 0;
-
-                                if (error != null && (error.getCode() == PushStatus.NoClient
-                                        || error.getCode() == PushStatus.NO_DEVICE_TOKEN
-                                        || error.getCode() == PushStatus.WaitOnline)){
-
-                                    //离线消息在用户上线时的处理方式
-                                    if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
-                                        onlineMode = 0; //忽略
-                                    }else{
-                                        onlineMode = 1; //发送
-                                    }
-
-                                }
-
-                                preparedStatement.setObject(1, payload.getId());
-                                preparedStatement.setObject(2, userId);
-                                preparedStatement.setObject(3, payload.getProductId());
-                                preparedStatement.setObject(4, statusId);
-                                preparedStatement.setObject(5, new Date().getTime()/1000);
-                                preparedStatement.setObject(6, onlineMode);
-                                preparedStatement.setObject(7, error != null ? error.getCode() : null);
-                                preparedStatement.setObject(8, error != null ? error.getMsg() : null);
-                            }
-
-                            @Override
-                            public int getBatchSize() {
-                                return payload.getClients().size();
-                            }
-                        });
-
-                    } catch (DataAccessException e) {
-                        logger.error("SQL_PAYLOAD_CLIENT_INSERT", e);
-                    }
-
-                    MetricBuilder.jdbcUpdateMeter.mark(1);
-                }
+                postSaveAfterSent(payload);
 
             }
         });
 
+    }
+
+    @TxMain
+    private void postSaveAfterSent(final Payload payload) {
+        try {
+            mainJdbc.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(
+                        Connection connection) throws SQLException {
+
+                    PreparedStatement ps = connection.prepareStatement(SQL_PAYLOAD_INSERT,
+                            Statement.RETURN_GENERATED_KEYS);
+
+                    ps.setObject(1, payload.getId());
+                    ps.setObject(2, payload.getTitle());
+                    ps.setObject(3, payload.getBadge());
+                    ps.setObject(4, payload.getExtras());
+                    ps.setObject(5, payload.getSound());
+                    ps.setObject(6, payload.getProductId());
+                    ps.setObject(7, payload.getTotalUsers());
+                    ps.setObject(8, payload.getCreateAt());
+                    ps.setObject(9, payload.getStatusId());
+                    ps.setObject(10, payload.getBroadcast());
+                    ps.setObject(11, payload.getSentDate());
+                    ps.setObject(12, payload.getOfflineMode());
+                    ps.setObject(13, payload.getToMode());
+
+                    return ps;
+                }
+            });
+        } catch (DataAccessException e) {
+            logger.error("SQL_PAYLOAD_INSERT", e);
+        }
+
+        MetricBuilder.jdbcUpdateMeter.mark(1);
+
+        if (payload.getClients() != null){
+
+            try {
+                mainJdbc.batchUpdate(SQL_PAYLOAD_CLIENT_INSERT, new BatchPreparedStatementSetter() {
+
+                    @Override
+                    public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+
+                        String userId = payload.getClients().get(i);
+                        PushStatus error = payload.getStatus().get(userId);
+                        int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
+                        int onlineMode = 0;
+
+                        if (error != null && (error.getCode() == PushStatus.NoClient
+                                || error.getCode() == PushStatus.NO_DEVICE_TOKEN
+                                || error.getCode() == PushStatus.WaitOnline)){
+
+                            //离线消息在用户上线时的处理方式
+                            if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                                onlineMode = 0; //忽略
+                            }else{
+                                onlineMode = 1; //发送
+                            }
+
+                        }
+
+                        preparedStatement.setObject(1, payload.getId());
+                        preparedStatement.setObject(2, userId);
+                        preparedStatement.setObject(3, payload.getProductId());
+                        preparedStatement.setObject(4, statusId);
+                        preparedStatement.setObject(5, new Date().getTime()/1000);
+                        preparedStatement.setObject(6, onlineMode);
+                        preparedStatement.setObject(7, error != null ? error.getCode() : null);
+                        preparedStatement.setObject(8, error != null ? error.getMsg() : null);
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return payload.getClients().size();
+                    }
+                });
+
+            } catch (DataAccessException e) {
+                logger.error("SQL_PAYLOAD_CLIENT_INSERT", e);
+            }
+
+            MetricBuilder.jdbcUpdateMeter.mark(1);
+        }
     }
 
     @Override
@@ -258,7 +270,6 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @Override
-    @TxMain
     public void updateSendStatus(final Payload payload) {
 
         jdbcExecutor.submit(new Runnable() {
@@ -266,73 +277,78 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("updateSendStatus, payloadId={}", payload.getId());
-                }
+                postUpdateSendStatus(payload);
 
-                int total = payload.getStatus().size();
-
-                mainJdbc.update(SQL_UPDATE_PAYLOAD_STATUS, PayloadStatus.Sent, total, new Date().getTime() / 1000, payload.getId());
-
-                try {
-
-                    mainJdbc.batchUpdate(SQL_UPDATE_PAYLOAD_CLIENT_STATUS, new BatchPreparedStatementSetter() {
-
-                        @Override
-                        public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-
-                            String userId = payload.getClients().get(i);
-                            PushStatus error = payload.getStatus().get(userId);
-                            int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
-                            int onlineMode = 0;
-
-                            if (error != null && (error.getCode() == PushStatus.NoClient
-                                    || error.getCode() == PushStatus.NO_DEVICE_TOKEN
-                                    || error.getCode() == PushStatus.WaitOnline)){
-
-                                //离线消息在用户上线时的处理方式
-                                if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
-                                    onlineMode = 0; //忽略
-                                }else{
-                                    onlineMode = 1; //发送
-                                }
-
-                            }
-
-                            preparedStatement.setObject(1, statusId);
-                            preparedStatement.setObject(2, onlineMode);
-                            preparedStatement.setObject(3, error != null ? error.getCode() : null);
-                            preparedStatement.setObject(4, error != null ? error.getMsg() : null);
-
-                            preparedStatement.setObject(5, payload.getId());
-                            preparedStatement.setObject(6, userId);
-
-                        }
-
-                        @Override
-                        public int getBatchSize() {
-                            return payload.getClients().size();
-                        }
-                    });
-
-                } catch (DataAccessException e) {
-                    logger.error("SQL_PAYLOAD_CLIENT_INSERT", e);
-                }
-
-
-                MetricBuilder.jdbcUpdateMeter.mark(2);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("updateSendStatus OK!");
-                }
             }
 
         });
 
     }
 
-    @Override
     @TxMain
+    private void postUpdateSendStatus(final Payload payload) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSendStatus, payloadId={}", payload.getId());
+        }
+
+        int total = payload.getStatus().size();
+
+        mainJdbc.update(SQL_UPDATE_PAYLOAD_STATUS, PayloadStatus.Sent, total, new Date().getTime() / 1000, payload.getId());
+
+        try {
+
+            mainJdbc.batchUpdate(SQL_UPDATE_PAYLOAD_CLIENT_STATUS, new BatchPreparedStatementSetter() {
+
+                @Override
+                public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+
+                    String userId = payload.getClients().get(i);
+                    PushStatus error = payload.getStatus().get(userId);
+                    int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
+                    int onlineMode = 0;
+
+                    if (error != null && (error.getCode() == PushStatus.NoClient
+                            || error.getCode() == PushStatus.NO_DEVICE_TOKEN
+                            || error.getCode() == PushStatus.WaitOnline)){
+
+                        //离线消息在用户上线时的处理方式
+                        if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                            onlineMode = 0; //忽略
+                        }else{
+                            onlineMode = 1; //发送
+                        }
+
+                    }
+
+                    preparedStatement.setObject(1, statusId);
+                    preparedStatement.setObject(2, onlineMode);
+                    preparedStatement.setObject(3, error != null ? error.getCode() : null);
+                    preparedStatement.setObject(4, error != null ? error.getMsg() : null);
+
+                    preparedStatement.setObject(5, payload.getId());
+                    preparedStatement.setObject(6, userId);
+
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return payload.getClients().size();
+                }
+            });
+
+        } catch (DataAccessException e) {
+            logger.error("SQL_PAYLOAD_CLIENT_INSERT", e);
+        }
+
+
+        MetricBuilder.jdbcUpdateMeter.mark(2);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSendStatus OK!");
+        }
+    }
+
+    @Override
     public void updateSendStatus(final Payload message, final String userId, final PushStatus error) {
 
         jdbcExecutor.submit(new Runnable() {
@@ -340,56 +356,59 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             @Override
             public void run() {
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("updateSendStatus, payloadId={}, userId={}", message.getId(), userId);
-                }
-
-                int statusId = error.getCode();
-                if (error.getCode() >= 10){
-                    statusId = 3;
-                }
-
-
-                int onlineMode = 0;
-
-                if (error != null && (error.getCode() == PushStatus.NoClient
-                        || error.getCode() == PushStatus.NO_DEVICE_TOKEN
-                        || error.getCode() == PushStatus.WaitOnline)){
-
-                    //离线消息在用户上线时的处理方式
-                    if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
-                        onlineMode = 0; //忽略
-                    }else{
-                        onlineMode = 1; //发送
-                    }
-
-                }
-
-
-                try {
-
-                    mainJdbc.update(SQL_UPDATE_PAYLOAD_CLIENT_STATUS,
-                                    statusId, onlineMode,
-                                    error != null ? error.getCode() : null,
-                                    error != null ? error.getMsg() : null,
-                                    message.getId(),
-                                    userId);
-
-                } catch (DataAccessException e) {
-                    logger.error("UpdateSendStatus Error.", e);
-                }
-
-                MetricBuilder.jdbcUpdateMeter.mark(1);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("updateSendStatus OK!");
-                }
+                postUpdateSendStatus(message, userId, error);
 
             }
         });
 
+    }
+
+    @TxMain
+    private void postUpdateSendStatus(Payload message, String userId, PushStatus error) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSendStatus, payloadId={}, userId={}", message.getId(), userId);
+        }
+
+        int statusId = error.getCode();
+        if (error.getCode() >= 10){
+            statusId = 3;
+        }
 
 
+        int onlineMode = 0;
+
+        if (error != null && (error.getCode() == PushStatus.NoClient
+                || error.getCode() == PushStatus.NO_DEVICE_TOKEN
+                || error.getCode() == PushStatus.WaitOnline)){
+
+            //离线消息在用户上线时的处理方式
+            if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                onlineMode = 0; //忽略
+            }else{
+                onlineMode = 1; //发送
+            }
+
+        }
+
+
+        try {
+
+            mainJdbc.update(SQL_UPDATE_PAYLOAD_CLIENT_STATUS,
+                            statusId, onlineMode,
+                            error != null ? error.getCode() : null,
+                            error != null ? error.getMsg() : null,
+                            message.getId(),
+                            userId);
+
+        } catch (DataAccessException e) {
+            logger.error("UpdateSendStatus Error.", e);
+        }
+
+        MetricBuilder.jdbcUpdateMeter.mark(1);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSendStatus OK!");
+        }
     }
 
     @Override

@@ -156,70 +156,77 @@ public class TopicServiceImpl extends BaseService implements TopicService {
     }
 
     @Override
-    @TxMain
     public void removeTopic(final Topic topic) {
 
         jdbcExecutor.submit(new Runnable() {
             @Override
             public void run() {
 
-                try {
-                    if (topic.getId() == null){
-                        prepareTopic(topic);
-                    }
-                    if (topic.getId() == null){
-                        return;
-                    }
-
-                    String sql = "update topic set status = ? where id = ?";
-                    mainJdbc.update(sql, 0, topic.getId());
-
-                    sql = "delete from topic_client where topicId=?";
-                    mainJdbc.update(sql, topic.getId());
-
-                    String cacheKey = formatCacheKey(topic.getProductId(), topic.getObjectId());
-                    delCache(cacheKey);
-
-                } catch (DataAccessException e) {
-
-                    logger.error(e.getMessage(), e);
-
-                }
+                postRemoveTopic(topic);
 
             }
         });
 
+    }
 
+    @TxMain
+    private void postRemoveTopic(Topic topic) {
+        try {
+            if (topic.getId() == null){
+                prepareTopic(topic);
+            }
+            if (topic.getId() == null){
+                return;
+            }
+
+            String sql = "update topic set status = ? where id = ?";
+            mainJdbc.update(sql, 0, topic.getId());
+
+            sql = "delete from topic_client where topicId=?";
+            mainJdbc.update(sql, topic.getId());
+
+            String cacheKey = formatCacheKey(topic.getProductId(), topic.getObjectId());
+            delCache(cacheKey);
+
+        } catch (DataAccessException e) {
+
+            logger.error(e.getMessage(), e);
+
+        }
     }
 
     @Override
-    @TxMain
     public void removeTopicClients(final Topic topic, final List<String> clientIds) {
 
         jdbcExecutor.submit(new Runnable() {
             @Override
             public void run() {
 
-                try {
-                    if (topic.getId() == null){
-                        prepareTopic(topic);
-                    }
-                    if (topic.getId() == null){
-                        return;
-                    }
-                    String sql = "delete from topic_client where topicId=? and userId=?";
-                    for (int i = 0; i < clientIds.size(); i++) {
-                        String userId = clientIds.get(i);
-                        if (StringUtils.isEmpty(userId)){
-                            continue;
-                        }
-                        mainJdbc.update(sql, topic.getId(), userId);
-                    }
-                } catch (DataAccessException e) {
-                    logger.error(e.getMessage(), e);
-                }
+                postRemoveTopicClients(topic, clientIds);
 
             }
         });
+    }
+
+    @TxMain
+    private void postRemoveTopicClients(Topic topic, List<String> clientIds) {
+        try {
+            if (topic.getId() == null){
+                prepareTopic(topic);
+            }
+            if (topic.getId() == null){
+                return;
+            }
+            String sql = "delete from topic_client where topicId=? and userId=?";
+            for (int i = 0; i < clientIds.size(); i++) {
+                String userId = clientIds.get(i);
+                if (StringUtils.isEmpty(userId)){
+                    continue;
+                }
+                mainJdbc.update(sql, topic.getId(), userId);
+            }
+        } catch (DataAccessException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 }

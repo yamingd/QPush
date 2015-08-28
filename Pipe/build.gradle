@@ -3,3 +3,9 @@ dependencies {
     compile project(':qpush-core')
     compile 'redis.clients:jedis:2.6.2'
 }
+
+ext {
+    uploadArchive=true
+}
+
+apply from: '../maven_push.gradle'

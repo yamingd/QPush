@@ -26,10 +26,10 @@ public class QPushClient {
     }
 
     /**
-     * 发送Payload
+     * &#x53d1;&#x9001;Payload
      * @param appKey
      * @param payload
-     * @return
+     * @return boolean
      * @throws IOException
      */
     public static boolean sendPayload(final String appKey, final AppPayload payload) throws IOException {

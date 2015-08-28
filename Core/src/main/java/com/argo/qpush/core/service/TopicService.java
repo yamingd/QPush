@@ -13,7 +13,7 @@ public interface TopicService {
      *
      * @param productId
      * @param objectId
-     * @return
+     * @return Topic
      */
     Topic findByObjectId(Integer productId, Long objectId);
 

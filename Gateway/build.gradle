@@ -3,6 +3,7 @@ description = 'gateway'
 ext {
     title = 'QPush Gateway'
     mainclass = 'com.argo.qpush.gateway.ServerMain'
+    uploadArchive=true
 }
 
 dependencies {
@@ -18,3 +19,5 @@ dependencies {
 }
 
 apply from: "../jarwrap.gradle"
+
+apply from: '../maven_push.gradle'

@@ -51,7 +51,7 @@ public class ConnectionKeeper {
     /**
      * 添加连接
      *
-     * @param productId:   Product Id
+     * @param productId
      * @param token
      * @param conn
      */

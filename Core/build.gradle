@@ -12,3 +12,10 @@ dependencies {
     compile project(':qpush-protobuf')
     compile 'redis.clients:jedis:2.6.2'
 }
+
+
+ext {
+    uploadArchive=true
+}
+
+apply from: '../maven_push.gradle'

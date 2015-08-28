@@ -21,7 +21,7 @@ public class MessageUtils {
     /**
      * 序列为MessagePack
      * @param obj
-     * @return
+     * @return byte[]
      * @throws IOException
      */
     public static byte[] asBytes(Object obj) throws IOException {
@@ -33,7 +33,7 @@ public class MessageUtils {
      * @param clazz
      * @param bytes
      * @param <T>
-     * @return
+     * @return T
      * @throws IOException
      */
     public static <T> T asT(Class<?> clazz, byte[] bytes) throws IOException {

@@ -1,5 +1,12 @@
 
 description = 'client'
+
 dependencies {
     compile 'io.netty:netty-all:4.0.15.Final'
 }
+
+ext {
+    uploadArchive=true
+}
+
+apply from: '../maven_push.gradle'

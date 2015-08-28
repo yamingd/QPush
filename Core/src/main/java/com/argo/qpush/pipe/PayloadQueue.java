@@ -17,14 +17,14 @@ public interface PayloadQueue {
     /**
      * 非广播消息
      * @param cursor
-     * @return
+     * @return List
      */
     List<Payload> getNormalItems(PayloadCursor cursor);
 
     /**
      * 广播消息
      * @param cursor
-     * @return
+     * @return List
      */
     List<Payload> getBroadcastItems(PayloadCursor cursor);
 

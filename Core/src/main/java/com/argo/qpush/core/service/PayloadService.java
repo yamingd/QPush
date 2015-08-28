@@ -14,9 +14,15 @@ public interface PayloadService {
     /**
      * 读取详细. 仅是payload
      * @param id
-     * @return
+     * @return Payload
      */
     Payload getSimple(long id);
+
+    /**
+     *
+     * @param ids
+     * @return List
+     */
     List<Payload> getSimpleList(List<Long> ids);
     /**
      * 读取详细，包括clients
@@ -46,7 +52,7 @@ public interface PayloadService {
      * @param start
      * @param page
      * @param limit
-     * @return
+     * @return List
      */
     List<Payload> findNormalList(int productId, long start, int page, int limit);
 
@@ -56,7 +62,7 @@ public interface PayloadService {
      * @param start
      * @param page
      * @param limit
-     * @return
+     * @return List
      */
     List<Payload> findBrodcastList(int productId, long start, int page, int limit);
 
@@ -78,7 +84,7 @@ public interface PayloadService {
      * 读取离线消息
      * @param productId
      * @param userId
-     * @return
+     * @return List
      */
     List<Long> findLatestToOfflineClients(int productId, String userId, long start);
 }

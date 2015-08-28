@@ -28,6 +28,21 @@ subprojects {
         mavenCentral()
     }
 
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from sourceSets.main.allSource
+    }
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives jar
+        archives javadocJar
+        archives sourcesJar
+    }
 
     dependencies {
         compile 'org.apache.commons:commons-lang3:3.3.2'

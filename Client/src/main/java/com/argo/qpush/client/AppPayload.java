@@ -47,7 +47,7 @@ public class AppPayload implements Serializable {
 
     /**
      * 当Client是离线状态时. 怎么处理消息
-     * @OfflineMode
+     * @see OfflineMode
      */
     public Integer offlineMode = OfflineMode.Ignore.ordinal();
 

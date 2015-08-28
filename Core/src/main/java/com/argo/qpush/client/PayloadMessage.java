@@ -43,7 +43,7 @@ public class PayloadMessage {
     public Boolean broadcast;
     /**
      * 当Client是离线状态时. 怎么处理消息
-     * @OfflineMode
+     * @see com.argo.qpush.protobuf.PBAPNSMessage.OfflineModes
      */
     public Integer offlineMode;
 

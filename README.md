@@ -42,3 +42,6 @@ Payload follows Apple's APNS message structure. as following
 ```
 *userInfo* part is optional.
 and at the mean time. Apple's APNS message is limited to **256 bytes**. you should keep that in mind.
+
+### 使用
+https://github.com/yamingd/QPush/wiki

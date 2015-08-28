@@ -1,6 +1,5 @@
-
 description = 'pipe'
 dependencies {
-  compile project(':qpush-core')
-    compile group: 'redis.clients', name: 'jedis', version:'2.6.2'
+    compile project(':qpush-core')
+    compile 'redis.clients:jedis:2.6.2'
 }

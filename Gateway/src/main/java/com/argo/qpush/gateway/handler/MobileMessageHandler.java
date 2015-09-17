@@ -131,6 +131,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (conn != null) {
                 ack(ctx, conn, pbapnsEvent, SYNC);
+
+                ConnectionKeeper.remove(conn.getAppKey(), conn.getUserId());
+                conn.close();
             }
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Awake_VALUE){

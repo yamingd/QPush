@@ -55,7 +55,7 @@ public class ClientKeeper {
      * 移除一个客户端连接
      * @param key
      * @param token
-     * @return
+     * @return Integer
      */
     public static Integer remove(String key, String token){
         ConcurrentHashMap<String, Integer> m = mapping.get(key);
@@ -70,7 +70,7 @@ public class ClientKeeper {
      * 取得一个客户端连接标示
      * @param key
      * @param token
-     * @return
+     * @return Integer
      */
     public static Integer get(String key, String token){
         ConcurrentHashMap<String, Integer> m = mapping.get(key);
@@ -83,7 +83,7 @@ public class ClientKeeper {
     /**
      * 获取某产品的所有客户端链接标示
      * @param key
-     * @return
+     * @return Collection
      */
     public static Collection<Integer> gets(String key){
         ConcurrentHashMap<String, Integer> m = mapping.get(key);
@@ -96,7 +96,7 @@ public class ClientKeeper {
     /**
      * 计算某产品的客户端链接总数
      * @param key
-     * @return
+     * @return Integer
      */
     public static Integer count(String key){
         ConcurrentHashMap<String, Integer> m = mapping.get(key);

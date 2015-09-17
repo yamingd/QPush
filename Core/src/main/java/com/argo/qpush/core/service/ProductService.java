@@ -13,14 +13,14 @@ public interface ProductService {
     /**
      *
      * @param key
-     * @return
+     * @return Integer
      */
     Integer getProductId(String key);
 
     /**
      *
      * @param key
-     * @return
+     * @return Product
      */
     Product findByKey(String key);
 

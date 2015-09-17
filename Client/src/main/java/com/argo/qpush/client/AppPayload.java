@@ -56,6 +56,11 @@ public class AppPayload implements Serializable {
      */
     public Integer toMode = 0;
 
+    /**
+     * apnsMode
+     */
+    public Integer apnsMode = APNSMode.All.ordinal();
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -67,6 +72,7 @@ public class AppPayload implements Serializable {
                 .add("topicObjectId", topicObjectId)
                 .add("broadcast", broadcast)
                 .add("offlineMode", offlineMode)
+                .add("apnsMode", apnsMode)
                 .add("toMode", toMode)
                 .toString();
     }

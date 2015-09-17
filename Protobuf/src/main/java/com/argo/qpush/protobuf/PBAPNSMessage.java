@@ -80,6 +80,11 @@ public  final class PBAPNSMessage extends
             userInfo_.add(input.readMessage(com.argo.qpush.protobuf.PBAPNSUserInfo.PARSER, extensionRegistry));
             break;
           }
+          case 32: {
+            bitField0_ |= 0x00000004;
+            apnsMode_ = input.readInt32();
+            break;
+          }
         }
       }
     } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -213,6 +218,88 @@ public  final class PBAPNSMessage extends
     // @@protoc_insertion_point(enum_scope:message.PBAPNSMessage.OfflineModes)
   }
 
+  /**
+   * Protobuf enum {@code message.PBAPNSMessage.APNSModes}
+   */
+  public enum APNSModes
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>All = 0;</code>
+     */
+    All(0, 0),
+    /**
+     * <code>Signined = 1;</code>
+     */
+    Signined(1, 1),
+    ;
+
+    /**
+     * <code>All = 0;</code>
+     */
+    public static final int All_VALUE = 0;
+    /**
+     * <code>Signined = 1;</code>
+     */
+    public static final int Signined_VALUE = 1;
+
+
+    public final int getNumber() { return value; }
+
+    public static APNSModes valueOf(int value) {
+      switch (value) {
+        case 0: return All;
+        case 1: return Signined;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<APNSModes>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<APNSModes>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<APNSModes>() {
+            public APNSModes findValueByNumber(int number) {
+              return APNSModes.valueOf(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return com.argo.qpush.protobuf.PBAPNSMessage.getDescriptor().getEnumTypes().get(1);
+    }
+
+    private static final APNSModes[] VALUES = values();
+
+    public static APNSModes valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int index;
+    private final int value;
+
+    private APNSModes(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:message.PBAPNSMessage.APNSModes)
+  }
+
   private int bitField0_;
   // optional int32 offlineMode = 1;
   public static final int OFFLINEMODE_FIELD_NUMBER = 1;
@@ -288,10 +375,27 @@ public  final class PBAPNSMessage extends
     return userInfo_.get(index);
   }
 
+  // optional int32 apnsMode = 4;
+  public static final int APNSMODE_FIELD_NUMBER = 4;
+  private int apnsMode_;
+  /**
+   * <code>optional int32 apnsMode = 4;</code>
+   */
+  public boolean hasApnsMode() {
+    return ((bitField0_ & 0x00000004) == 0x00000004);
+  }
+  /**
+   * <code>optional int32 apnsMode = 4;</code>
+   */
+  public int getApnsMode() {
+    return apnsMode_;
+  }
+
   private void initFields() {
     offlineMode_ = 0;
     aps_ = com.argo.qpush.protobuf.PBAPNSBody.getDefaultInstance();
     userInfo_ = java.util.Collections.emptyList();
+    apnsMode_ = 0;
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
@@ -324,6 +428,9 @@ public  final class PBAPNSMessage extends
     for (int i = 0; i < userInfo_.size(); i++) {
       output.writeMessage(3, userInfo_.get(i));
     }
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      output.writeInt32(4, apnsMode_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -344,6 +451,10 @@ public  final class PBAPNSMessage extends
     for (int i = 0; i < userInfo_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, userInfo_.get(i));
+    }
+    if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(4, apnsMode_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -477,6 +588,8 @@ public  final class PBAPNSMessage extends
       } else {
         userInfoBuilder_.clear();
       }
+      apnsMode_ = 0;
+      bitField0_ = (bitField0_ & ~0x00000008);
       return this;
     }
 
@@ -526,6 +639,10 @@ public  final class PBAPNSMessage extends
       } else {
         result.userInfo_ = userInfoBuilder_.build();
       }
+      if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        to_bitField0_ |= 0x00000004;
+      }
+      result.apnsMode_ = apnsMode_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -573,6 +690,9 @@ public  final class PBAPNSMessage extends
             userInfoBuilder_.addAllMessages(other.userInfo_);
           }
         }
+      }
+      if (other.hasApnsMode()) {
+        setApnsMode(other.getApnsMode());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -999,6 +1119,39 @@ public  final class PBAPNSMessage extends
         userInfo_ = null;
       }
       return userInfoBuilder_;
+    }
+
+    // optional int32 apnsMode = 4;
+    private int apnsMode_ ;
+    /**
+     * <code>optional int32 apnsMode = 4;</code>
+     */
+    public boolean hasApnsMode() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 apnsMode = 4;</code>
+     */
+    public int getApnsMode() {
+      return apnsMode_;
+    }
+    /**
+     * <code>optional int32 apnsMode = 4;</code>
+     */
+    public Builder setApnsMode(int value) {
+      bitField0_ |= 0x00000008;
+      apnsMode_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional int32 apnsMode = 4;</code>
+     */
+    public Builder clearApnsMode() {
+      bitField0_ = (bitField0_ & ~0x00000008);
+      apnsMode_ = 0;
+      onChanged();
+      return this;
     }
 
     // @@protoc_insertion_point(builder_scope:message.PBAPNSMessage)

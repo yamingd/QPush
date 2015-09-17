@@ -115,7 +115,16 @@ public class OneSendThread implements Callable<Integer> {
 
                 if (0 == message.getToMode()){
                     if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
-                        APNSKeeper.instance.push(this.product, cc, message);
+                        if (PBAPNSMessage.APNSModes.Signined_VALUE == message.getApnsMode()){
+                            if (0 == cc.getStatusId()){
+                                // 已退出
+                                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
+                            }else{
+                                APNSKeeper.instance.push(this.product, cc, message);
+                            }
+                        }else {
+                            APNSKeeper.instance.push(this.product, cc, message);
+                        }
                     }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                         message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
                     }

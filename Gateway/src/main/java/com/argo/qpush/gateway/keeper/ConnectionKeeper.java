@@ -78,7 +78,7 @@ public class ConnectionKeeper {
      * 获取连接
      *
      * @param token
-     * @return
+     * @return Connection
      */
     public static Connection get(String productId, String token) {
         Integer cid = ClientKeeper.get(productId, token);

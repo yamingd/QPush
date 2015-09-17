@@ -5,6 +5,7 @@ import com.argo.qpush.core.MessageUtils;
 import com.argo.qpush.protobuf.PBAPNSBody;
 import com.argo.qpush.protobuf.PBAPNSMessage;
 import com.argo.qpush.protobuf.PBAPNSUserInfo;
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.msgpack.annotation.MessagePackMessage;
@@ -66,9 +67,20 @@ public class Payload implements Serializable {
     private Integer broadcast;
     private Long sentDate;
 
+    /**
+     * 端是离线时，消息推送模式
+     */
     private Integer offlineMode;
 
+    /**
+     * 消息推送模式
+     */
     private Integer toMode;
+
+    /**
+     * APNS 推送模式
+     */
+    private Integer apnsMode;
 
     public Long getId() {
         return id;
@@ -186,6 +198,14 @@ public class Payload implements Serializable {
         this.toMode = toMode;
     }
 
+    public Integer getApnsMode() {
+        return apnsMode;
+    }
+
+    public void setApnsMode(Integer apnsMode) {
+        this.apnsMode = apnsMode;
+    }
+
     public PBAPNSMessage asAPNSMessage(){
         PBAPNSMessage.Builder builder = PBAPNSMessage.newBuilder();
         if (this.badge == null){
@@ -229,6 +249,7 @@ public class Payload implements Serializable {
         this.broadcast = message.broadcast == null || !message.broadcast ? 0 : 1;
         this.offlineMode = message.offlineMode;
         this.toMode = message.toMode;
+        this.apnsMode = message.apnsMode;
     }
 
     private Map<String, PushStatus> status = Maps.newConcurrentMap();
@@ -243,19 +264,21 @@ public class Payload implements Serializable {
 
     @Override
     public String toString() {
-        return "Payload{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", badge=" + badge +
-                ", extras='" + extras + '\'' +
-                ", sound='" + sound + '\'' +
-                ", productId=" + productId +
-                ", totalUsers=" + totalUsers +
-                ", createAt=" + createAt +
-                ", statusId=" + statusId +
-                ", clients=" + clients +
-                ", broadcast=" + broadcast +
-                ", sentDate=" + sentDate +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("id", id)
+                .add("title", title)
+                .add("badge", badge)
+                .add("extras", extras)
+                .add("sound", sound)
+                .add("productId", productId)
+                .add("totalUsers", totalUsers)
+                .add("createAt", createAt)
+                .add("statusId", statusId)
+                .add("broadcast", broadcast)
+                .add("sentDate", sentDate)
+                .add("offlineMode", offlineMode)
+                .add("toMode", toMode)
+                .add("apnsMode", apnsMode)
+                .toString();
     }
 }

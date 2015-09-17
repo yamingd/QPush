@@ -59,6 +59,25 @@ inline bool PBAPNSMessage_OfflineModes_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<PBAPNSMessage_OfflineModes>(
     PBAPNSMessage_OfflineModes_descriptor(), name, value);
 }
+enum PBAPNSMessage_APNSModes {
+  PBAPNSMessage_APNSModes_All = 0,
+  PBAPNSMessage_APNSModes_Signined = 1
+};
+bool PBAPNSMessage_APNSModes_IsValid(int value);
+const PBAPNSMessage_APNSModes PBAPNSMessage_APNSModes_APNSModes_MIN = PBAPNSMessage_APNSModes_All;
+const PBAPNSMessage_APNSModes PBAPNSMessage_APNSModes_APNSModes_MAX = PBAPNSMessage_APNSModes_Signined;
+const int PBAPNSMessage_APNSModes_APNSModes_ARRAYSIZE = PBAPNSMessage_APNSModes_APNSModes_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* PBAPNSMessage_APNSModes_descriptor();
+inline const ::std::string& PBAPNSMessage_APNSModes_Name(PBAPNSMessage_APNSModes value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    PBAPNSMessage_APNSModes_descriptor(), value);
+}
+inline bool PBAPNSMessage_APNSModes_Parse(
+    const ::std::string& name, PBAPNSMessage_APNSModes* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<PBAPNSMessage_APNSModes>(
+    PBAPNSMessage_APNSModes_descriptor(), name, value);
+}
 enum PBAPNSEvent_Ops {
   PBAPNSEvent_Ops_Online = 1,
   PBAPNSEvent_Ops_KeepAlive = 2,
@@ -395,6 +414,30 @@ class PBAPNSMessage : public ::google::protobuf::Message {
     return PBAPNSMessage_OfflineModes_Parse(name, value);
   }
 
+  typedef PBAPNSMessage_APNSModes APNSModes;
+  static const APNSModes All = PBAPNSMessage_APNSModes_All;
+  static const APNSModes Signined = PBAPNSMessage_APNSModes_Signined;
+  static inline bool APNSModes_IsValid(int value) {
+    return PBAPNSMessage_APNSModes_IsValid(value);
+  }
+  static const APNSModes APNSModes_MIN =
+    PBAPNSMessage_APNSModes_APNSModes_MIN;
+  static const APNSModes APNSModes_MAX =
+    PBAPNSMessage_APNSModes_APNSModes_MAX;
+  static const int APNSModes_ARRAYSIZE =
+    PBAPNSMessage_APNSModes_APNSModes_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  APNSModes_descriptor() {
+    return PBAPNSMessage_APNSModes_descriptor();
+  }
+  static inline const ::std::string& APNSModes_Name(APNSModes value) {
+    return PBAPNSMessage_APNSModes_Name(value);
+  }
+  static inline bool APNSModes_Parse(const ::std::string& name,
+      APNSModes* value) {
+    return PBAPNSMessage_APNSModes_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // optional int32 offlineMode = 1;
@@ -425,21 +468,31 @@ class PBAPNSMessage : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::message::PBAPNSUserInfo >*
       mutable_userinfo();
 
+  // optional int32 apnsMode = 4;
+  inline bool has_apnsmode() const;
+  inline void clear_apnsmode();
+  static const int kApnsModeFieldNumber = 4;
+  inline ::google::protobuf::int32 apnsmode() const;
+  inline void set_apnsmode(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:message.PBAPNSMessage)
  private:
   inline void set_has_offlinemode();
   inline void clear_has_offlinemode();
   inline void set_has_aps();
   inline void clear_has_aps();
+  inline void set_has_apnsmode();
+  inline void clear_has_apnsmode();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::message::PBAPNSBody* aps_;
-  ::google::protobuf::RepeatedPtrField< ::message::PBAPNSUserInfo > userinfo_;
   ::google::protobuf::int32 offlinemode_;
+  ::google::protobuf::int32 apnsmode_;
+  ::google::protobuf::RepeatedPtrField< ::message::PBAPNSUserInfo > userinfo_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
 
   friend void  protobuf_AddDesc_pb_5fmessage_2eproto();
   friend void protobuf_AssignDesc_pb_5fmessage_2eproto();
@@ -1050,6 +1103,28 @@ PBAPNSMessage::mutable_userinfo() {
   return &userinfo_;
 }
 
+// optional int32 apnsMode = 4;
+inline bool PBAPNSMessage::has_apnsmode() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void PBAPNSMessage::set_has_apnsmode() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void PBAPNSMessage::clear_has_apnsmode() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void PBAPNSMessage::clear_apnsmode() {
+  apnsmode_ = 0;
+  clear_has_apnsmode();
+}
+inline ::google::protobuf::int32 PBAPNSMessage::apnsmode() const {
+  return apnsmode_;
+}
+inline void PBAPNSMessage::set_apnsmode(::google::protobuf::int32 value) {
+  set_has_apnsmode();
+  apnsmode_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // PBAPNSEvent
@@ -1342,6 +1417,10 @@ namespace protobuf {
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::message::PBAPNSMessage_OfflineModes>() {
   return ::message::PBAPNSMessage_OfflineModes_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::message::PBAPNSMessage_APNSModes>() {
+  return ::message::PBAPNSMessage_APNSModes_descriptor();
 }
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::message::PBAPNSEvent_Ops>() {

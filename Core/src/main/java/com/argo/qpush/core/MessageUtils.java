@@ -58,7 +58,7 @@ public class MessageUtils {
      * 将一个对象转成json字符串
      *
      * @param obj
-     * @return
+     * @return String
      */
     public static String toJson(Object obj) {
         //创建GsonBuilder

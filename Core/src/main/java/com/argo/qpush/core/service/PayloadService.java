@@ -27,7 +27,7 @@ public interface PayloadService {
     /**
      * 读取详细，包括clients
      * @param id
-     * @return
+     * @return Payload
      */
     Payload get(long id);
 

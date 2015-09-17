@@ -54,4 +54,14 @@ public interface PBAPNSMessageOrBuilder
    */
   com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder getUserInfoOrBuilder(
       int index);
+
+  // optional int32 apnsMode = 4;
+  /**
+   * <code>optional int32 apnsMode = 4;</code>
+   */
+  boolean hasApnsMode();
+  /**
+   * <code>optional int32 apnsMode = 4;</code>
+   */
+  int getApnsMode();
 }

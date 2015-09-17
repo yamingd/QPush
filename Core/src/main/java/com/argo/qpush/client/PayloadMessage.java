@@ -52,6 +52,11 @@ public class PayloadMessage {
      */
     public Integer toMode;
 
+    /**
+     *
+     */
+    public Integer apnsMode;
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -64,6 +69,7 @@ public class PayloadMessage {
                 .add("broadcast", broadcast)
                 .add("offlineMode", offlineMode)
                 .add("toMode", toMode)
+                .add("apnsMode", apnsMode)
                 .toString();
     }
 }

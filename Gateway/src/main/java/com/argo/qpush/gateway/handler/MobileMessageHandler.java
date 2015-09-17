@@ -121,7 +121,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 public void run() {
                     Client c0 = ClientServiceImpl.instance.findByUserId(pbapnsEvent.getUserId());
                     if (c0 != null) {
-                        ClientServiceImpl.instance.updateStatus(c0.getId(), ClientStatus.Sleep);
+                        ClientServiceImpl.instance.updateStatus(c0, ClientStatus.Sleep);
                     }
                 }
 

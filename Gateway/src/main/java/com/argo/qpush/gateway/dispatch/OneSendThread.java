@@ -97,9 +97,7 @@ public class OneSendThread implements Callable<Integer> {
                     sendMessageToOfflineClient(client, cc);
                 }
             }else{
-
                 sendMessageToOfflineClient(client, cc);
-
             }
         }
 
@@ -117,10 +115,11 @@ public class OneSendThread implements Callable<Integer> {
             return;
         }
 
+        int offlineMode = message.getOfflineMode().intValue();
         if (StringUtils.isBlank(cc.getDeviceToken()) || NULL.equalsIgnoreCase(cc.getDeviceToken())){
             logger.error("Client's deviceToken not found. client={},", client);
 
-            if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+            if (offlineMode == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                 message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
             }else{
                 message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
@@ -130,7 +129,7 @@ public class OneSendThread implements Callable<Integer> {
         }
 
         if (0 == message.getToMode()){
-            if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
+            if (offlineMode == PBAPNSMessage.OfflineModes.APNS_VALUE) {
                 if (PBAPNSMessage.APNSModes.Signined_VALUE == message.getApnsMode()){
                     if (0 == cc.getStatusId()){
                         // 已退出
@@ -141,7 +140,7 @@ public class OneSendThread implements Callable<Integer> {
                 }else {
                     APNSKeeper.instance.push(this.product, cc, message);
                 }
-            }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+            }else if (offlineMode == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                 message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
             }
         }else{

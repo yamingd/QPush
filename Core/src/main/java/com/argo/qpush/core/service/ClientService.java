@@ -26,7 +26,7 @@ public interface ClientService {
     void updateOfflineTs(Client client, int lastSendTs);
 
     @TxMain
-    void updateStatus(long id, int statusId);
+    void updateStatus(Client client, int statusId);
 
     @TxMain
     void updateBadge(String userId, int count);

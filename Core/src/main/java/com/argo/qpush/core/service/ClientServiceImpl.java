@@ -122,9 +122,12 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     @TxMain
-    public void updateStatus(long id, int statusId) {
+    public void updateStatus(Client client, int statusId) {
         long ts = EpochTime.now();
-        this.mainJdbc.update(SQL_updateStatus, ts, statusId, id);
+        this.mainJdbc.update(SQL_updateStatus, ts, statusId, client.getId());
+
+        String cacheKey = formatCacheKey(client.getUserId());
+        delCache(cacheKey);
     }
 
     @Override

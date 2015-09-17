@@ -2,6 +2,7 @@ package com.argo.qpush.gateway.handler;
 
 import com.argo.qpush.core.MetricBuilder;
 import com.argo.qpush.core.entity.Client;
+import com.argo.qpush.core.entity.ClientStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.Connection;
 import com.argo.qpush.gateway.keeper.ClientKeeper;
@@ -120,14 +121,17 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 public void run() {
                     Client c0 = ClientServiceImpl.instance.findByUserId(pbapnsEvent.getUserId());
                     if (c0 != null) {
-                        ClientServiceImpl.instance.updateStatus(c0.getId(), 2);
+                        ClientServiceImpl.instance.updateStatus(c0.getId(), ClientStatus.Sleep);
                     }
                 }
 
             });
+
             //心跳
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-            ack(ctx, conn, pbapnsEvent, SYNC);
+            if (conn != null) {
+                ack(ctx, conn, pbapnsEvent, SYNC);
+            }
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Awake_VALUE){
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
@@ -142,6 +146,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(pbapnsEvent));
             //心跳
             ack(ctx, conn, pbapnsEvent, SYNC);
+
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.PushAck_VALUE){
             //推送反馈
             if (pbapnsEvent.getRead() > 0){

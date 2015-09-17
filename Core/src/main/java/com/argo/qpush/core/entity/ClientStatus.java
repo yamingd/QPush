@@ -9,4 +9,6 @@ public interface ClientStatus {
     final int Offline = 0;
 
     final int Online = 1;
+
+    final int Sleep = 2;
 }

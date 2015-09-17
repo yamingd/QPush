@@ -91,46 +91,14 @@ public class OneSendThread implements Callable<Integer> {
 
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
-                c.send(message);
+                if (ClientStatus.Online == cc.getStatusId()){
+                    c.send(message);
+                }else{
+                    sendMessageToOfflineClient(client, cc);
+                }
             }else{
 
-                if (!cc.isDevice(ClientType.iOS)){
-                    //不是iOS, 可以不继续跑
-                    logger.error("Client is not iOS. client={}, ", client);
-                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NoConnections));
-                    continue;
-                }
-
-                if (StringUtils.isBlank(cc.getDeviceToken()) || NULL.equalsIgnoreCase(cc.getDeviceToken())){
-                    logger.error("Client's deviceToken not found. client={},", client);
-
-                    if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
-                    }else{
-                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
-                    }
-
-                    continue;
-                }
-
-                if (0 == message.getToMode()){
-                    if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
-                        if (PBAPNSMessage.APNSModes.Signined_VALUE == message.getApnsMode()){
-                            if (0 == cc.getStatusId()){
-                                // 已退出
-                                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
-                            }else{
-                                APNSKeeper.instance.push(this.product, cc, message);
-                            }
-                        }else {
-                            APNSKeeper.instance.push(this.product, cc, message);
-                        }
-                    }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
-                    }
-                }else{
-                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
-                }
+                sendMessageToOfflineClient(client, cc);
 
             }
         }
@@ -139,6 +107,46 @@ public class OneSendThread implements Callable<Integer> {
 
         return message.getClients().size();
 
+    }
+
+    private void sendMessageToOfflineClient(String client, Client cc) {
+        if (!cc.isDevice(ClientType.iOS)){
+            //不是iOS, 可以不继续跑
+            logger.error("Client is not iOS. client={}, ", client);
+            message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NoConnections));
+            return;
+        }
+
+        if (StringUtils.isBlank(cc.getDeviceToken()) || NULL.equalsIgnoreCase(cc.getDeviceToken())){
+            logger.error("Client's deviceToken not found. client={},", client);
+
+            if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
+            }else{
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
+            }
+
+            return;
+        }
+
+        if (0 == message.getToMode()){
+            if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.APNS_VALUE) {
+                if (PBAPNSMessage.APNSModes.Signined_VALUE == message.getApnsMode()){
+                    if (0 == cc.getStatusId()){
+                        // 已退出
+                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
+                    }else{
+                        APNSKeeper.instance.push(this.product, cc, message);
+                    }
+                }else {
+                    APNSKeeper.instance.push(this.product, cc, message);
+                }
+            }else if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
+            }
+        }else{
+            message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
+        }
     }
 
 }

@@ -31,7 +31,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     public static final String SQL_UPDATE_PAYLOAD_STATUS = "update payload set statusId=?, totalUsers = ?, sentDate=? where id = ?";
     public static final String SQL_UPDATE_PAYLOAD_CLIENT_STATUS = "update payload_client set tryLimit=tryLimit-1, statusId=?, onlineMode=?, errorId=?, errorMsg=? where payloadId = ? and userId = ?";
 
-    public static final String SQL_PAYLOAD_INSERT = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate, offlineMode, toMode)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public static final String SQL_PAYLOAD_INSERT = "insert into payload(id, title, badge, extras, sound, productId, totalUsers, createAt, statusId, broadcast, sentDate, offlineMode, toMode, apnsMode)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     public static final String SQL_PAYLOAD_CLIENT_INSERT = "insert into payload_client(payloadId, userId, productId, statusId, createTime)values(?, ?, ?, ?, ?)";
     public static final String SQL_FIND_LATEST_OFFLINE_LIST = "select payloadId from payload_client where productId=? and userId = ? and onlineMode=? and createTime >= ? order by id desc limit 0, 100";
 
@@ -123,6 +123,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                 ps.setObject(11, payload.getSentDate());
                 ps.setObject(12, payload.getOfflineMode());
                 ps.setObject(13, payload.getToMode());
+                ps.setObject(14, payload.getApnsMode());
 
                 return ps;
             }
@@ -195,6 +196,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                     ps.setObject(11, payload.getSentDate());
                     ps.setObject(12, payload.getOfflineMode());
                     ps.setObject(13, payload.getToMode());
+                    ps.setObject(14, payload.getApnsMode());
 
                     return ps;
                 }

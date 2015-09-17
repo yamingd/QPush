@@ -44,10 +44,6 @@ public class APNSKeeper implements InitializingBean {
 
     public ApnsService get(Product product){
 
-        if (product.getClientTypeid().intValue() != ClientType.iOS){
-            return null;
-        }
-
         if (StringUtils.isBlank(product.getDevCertPath())
                 || StringUtils.isBlank(product.getDevCertPass())
                 || StringUtils.isBlank(product.getCertPath())

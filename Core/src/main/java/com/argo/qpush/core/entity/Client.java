@@ -160,4 +160,8 @@ public class Client {
                 ", lastOnline=" + lastOnline +
                 '}';
     }
+
+    public boolean supportAPNS() {
+        return ClientType.iPhone == this.typeId || ClientType.iPad == this.typeId;
+    }
 }

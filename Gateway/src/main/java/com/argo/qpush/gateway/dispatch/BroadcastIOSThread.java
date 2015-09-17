@@ -1,16 +1,11 @@
 package com.argo.qpush.gateway.dispatch;
 
-import com.argo.qpush.core.entity.Client;
-import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.Product;
-import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.SentProgress;
-import com.argo.qpush.gateway.keeper.APNSKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -45,10 +40,10 @@ public class BroadcastIOSThread implements Callable<Integer> {
             return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){
-            List<Client> clients = ClientServiceImpl.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
-            for (Client c : clients){
-                APNSKeeper.instance.push(this.product, c, message);
-            }
+//            List<Client> clients = ClientServiceImpl.instance.findOfflineByType(this.product.getId(), ClientType.iOS, this.start, this.limit);
+//            for (Client c : clients){
+//                APNSKeeper.instance.push(this.product, c, message);
+//            }
             return 1;
         }else{
             progress.incrFailed();

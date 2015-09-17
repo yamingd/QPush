@@ -5,7 +5,8 @@ package com.argo.qpush.core.entity;
  */
 public interface ClientType {
 
-    final Integer iOS = 1;
-    final Integer Android = 2;
+    final int iPhone = 1;
+    final int iPad = 2;
+    final int Android = 3;
 
 }

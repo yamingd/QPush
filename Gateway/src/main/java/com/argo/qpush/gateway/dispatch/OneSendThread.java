@@ -110,7 +110,7 @@ public class OneSendThread implements Callable<Integer> {
     }
 
     private void sendMessageToOfflineClient(String client, Client cc) {
-        if (!cc.isDevice(ClientType.iOS)){
+        if (!cc.supportAPNS()){
             //不是iOS, 可以不继续跑
             logger.error("Client is not iOS. client={}, ", client);
             message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NoConnections));

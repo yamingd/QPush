@@ -1,11 +1,9 @@
 package com.argo.qpush.gateway.dispatch;
 
 import com.argo.qpush.core.MetricBuilder;
-import com.argo.qpush.core.entity.ClientType;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadStatus;
 import com.argo.qpush.core.entity.Product;
-import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.gateway.SentProgress;
 import com.argo.qpush.gateway.keeper.ClientKeeper;
@@ -198,9 +196,7 @@ public class Dispatcher extends Thread {
 
                     int total0 = ClientKeeper.count(product.getAppKey());
                     int total1 = 0;
-                    if (product.getClientTypeid().intValue() == ClientType.iOS) {
-                        total1 = ClientServiceImpl.instance.countOfflineByType(product.getId(), ClientType.iOS);
-                    }
+
                     if (total0 + total1 == 0) {
                         saveBroadcastStatus(item, 0);
                     } else {
@@ -209,10 +205,6 @@ public class Dispatcher extends Thread {
                         //step1
                         if (total0 > 0) {
                             doBroadcastToClients(item, total0, progress1);
-                        }
-                        //step2
-                        if (total1 >0) {
-                            doBroadcastToIOSClients(item, total1, progress1);
                         }
                         //wait to be finished.
                         try {

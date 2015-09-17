@@ -161,8 +161,11 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     @TxMain
-    public void updateOfflineTs(long id, int lastSendTs) {
+    public void updateOfflineTs(Client client, int lastSendTs) {
         String sql = SQL_updateOfflineTs;
-        this.mainJdbc.update(sql, lastSendTs, ClientStatus.Offline, id);
+        this.mainJdbc.update(sql, lastSendTs, ClientStatus.Offline, client.getId());
+
+        String cacheKey = formatCacheKey(client.getUserId());
+        delCache(cacheKey);
     }
 }

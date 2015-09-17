@@ -167,9 +167,10 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             //离线
             final Connection connection = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (connection != null) {
-                ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
 
+                ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
                 connection.close();
+
                 logger.info("Client disconnect: {}", pbapnsEvent);
 
                 MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
@@ -178,7 +179,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                     public void run() {
                         Client c0 = ClientServiceImpl.instance.findByUserId(pbapnsEvent.getUserId());
                         if (c0 != null) {
-                            ClientServiceImpl.instance.updateOfflineTs(c0.getId(), connection.getLastOpTime());
+                            ClientServiceImpl.instance.updateOfflineTs(c0, connection.getLastOpTime());
                         }
                     }
 
@@ -263,7 +264,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                     Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
                     if (null != client){
                         logger.info("Client offline: {}", client);
-                        ClientServiceImpl.instance.updateOfflineTs(client.getId(), connection.getLastOpTime());
+                        ClientServiceImpl.instance.updateOfflineTs(client, connection.getLastOpTime());
                     }
                 }
             });

@@ -23,7 +23,7 @@ public interface ClientService {
     void updateOnlineTs(Client client);
 
     @TxMain
-    void updateOfflineTs(long id, int lastSendTs);
+    void updateOfflineTs(Client client, int lastSendTs);
 
     @TxMain
     void updateStatus(long id, int statusId);

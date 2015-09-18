@@ -84,7 +84,9 @@ public class ConnectionKeeper {
         Integer cid = ClientKeeper.remove(productId, token);
         if(cid != null){
             Connection c = pools.remove(cid);
-            logger.debug("remove connection: {} / {}", cid, c);
+            if (logger.isDebugEnabled()) {
+                logger.debug("remove connection: {} / {}", cid, c);
+            }
             if (c == null) {
                 return c;
             }

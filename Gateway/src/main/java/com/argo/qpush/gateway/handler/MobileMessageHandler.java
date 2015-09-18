@@ -119,9 +119,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (conn != null) {
                 conn.close();
                 ctx.close();
-                if (logger.isDebugEnabled()){
-                    logger.debug("Client go to sleep and close connection. {}", pbapnsEvent);
-                }
+                logger.info("Client go to sleep and close connection. {}", pbapnsEvent);
             }
 
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
@@ -140,9 +138,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
             }
 
-            if (logger.isDebugEnabled()){
-                logger.debug("Client awake and rebuild connection. {}", pbapnsEvent);
-            }
+            logger.info("Client awake and rebuild connection. {}", pbapnsEvent);
 
             //记录客户端
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(pbapnsEvent));
@@ -172,9 +168,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
                 connection.close();
 
-                if (logger.isDebugEnabled()){
-                    logger.debug("Client go offline and close connection. {}", pbapnsEvent);
-                }
+                logger.info("Client go offline and close connection. {}", pbapnsEvent);
 
                 MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
 

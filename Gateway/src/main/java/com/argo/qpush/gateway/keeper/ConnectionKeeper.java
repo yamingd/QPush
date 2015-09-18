@@ -57,7 +57,7 @@ public class ConnectionKeeper {
      */
     public static boolean add(String productId, String token, Connection conn) {
         Integer cid = ClientKeeper.get(productId, token);
-        if ( cid != null){
+        if (cid != null){
             //关闭旧连接.
             Connection c = pools.remove(cid);
             if (c != null) {
@@ -83,7 +83,11 @@ public class ConnectionKeeper {
     public static Connection get(String productId, String token) {
         Integer cid = ClientKeeper.get(productId, token);
         if(cid != null) {
-            return pools.get(cid);
+            Connection c = pools.get(cid);
+            if (logger.isDebugEnabled()){
+                logger.debug("get connection: {} / {}", cid, c);
+            }
+            return c;
         }
         return null;
     }
@@ -102,6 +106,7 @@ public class ConnectionKeeper {
         Integer cid = ClientKeeper.remove(productId, token);
         if(cid != null){
             Connection c = pools.remove(cid);
+            logger.debug("remove connection: {} / {}", cid, c);
             if (c == null) {
                 return c;
             }

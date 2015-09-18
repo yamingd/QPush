@@ -44,7 +44,7 @@ public class BroadcastThread implements Callable<Integer> {
             return 0;
         }
         if(message.getClients() == null || message.getClients().size() == 0){
-            Collection<Integer> cids = ClientKeeper.gets(product.getAppKey());
+            Collection<Integer> cids = ClientKeeper.getAll(product.getAppKey());
             int s = start * limit;
             if(cids.size() < limit){
                 limit = cids.size();

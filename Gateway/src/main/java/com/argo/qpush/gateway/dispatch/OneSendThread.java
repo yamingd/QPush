@@ -94,7 +94,7 @@ public class OneSendThread implements Callable<Integer> {
 
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
-                if (ClientStatus.Online == cc.getStatusId()){
+                if (c.getStatusId() == ClientStatus.Online){
                     c.send(message);
                     message.setStatus(client, new PushStatus(PushStatus.TcpSent));
                 }else{

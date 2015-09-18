@@ -5,7 +5,6 @@ import com.argo.qpush.gateway.ServerMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,27 +24,6 @@ public class ConnectionKeeper {
         // 初始化所有app mapping
         ServerMetrics.log();
         ClientKeeper.init();
-    }
-
-    /**
-     * 移除所有链接.
-     *
-     * @param productId
-     */
-    public static void removeAll(String productId) {
-        int t = 0;
-        Collection<Integer> cs = ClientKeeper.gets(productId);
-        for (Integer cid : cs){
-            Connection c = pools.remove(cid);
-            if (c != null) {
-                c.close();
-                t++;
-            }
-        }
-        if (t > 0) {
-            ServerMetrics.updateConnection(-1 * t);
-            ClientKeeper.unregistry(productId);
-        }
     }
 
     /**

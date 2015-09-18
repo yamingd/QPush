@@ -9,7 +9,7 @@ dependencies {
     }
     compile 'com.jolbox:bonecp-spring:0.8.0.RELEASE'
     compile 'com.codahale.metrics:metrics-core:3.0.1'
-    compile project(':qpush-protobuf')
+    compile project(':Protobuf')
     compile 'redis.clients:jedis:2.6.2'
 }
 

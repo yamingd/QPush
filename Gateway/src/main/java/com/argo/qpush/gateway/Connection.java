@@ -1,5 +1,6 @@
 package com.argo.qpush.gateway;
 
+import com.argo.qpush.core.entity.ClientStatus;
 import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PushStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
@@ -28,11 +29,13 @@ public class Connection {
     private String userId;
     private String token;
     private int lastOpTime;
+    private int statusId;
 
     public Connection(ChannelHandlerContext context) {
         this.context = context;
         logger = LoggerFactory.getLogger(Connection.class.getName() + ".Channel." + context.channel().hashCode());
         lastOpTime = (int) (new Date().getTime() / 1000 - epoch);
+        statusId = ClientStatus.Online;
     }
 
     public int getLastOpTime() {
@@ -126,6 +129,14 @@ public class Connection {
         this.token = token;
     }
 
+    public int getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(int statusId) {
+        this.statusId = statusId;
+    }
+
     public void close(){
         context.close();
     }
@@ -136,7 +147,7 @@ public class Connection {
 
     @Override
     public int hashCode() {
-        return context.hashCode();
+        return 31 * userId.hashCode() * token.hashCode();
     }
 
     @Override

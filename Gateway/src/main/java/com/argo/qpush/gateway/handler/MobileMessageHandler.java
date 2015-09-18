@@ -87,11 +87,13 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (null != conn){
                 if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
+                    ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
                     //只有设备标示不一样才算是重复登录
                     newConnection = true;
                     logger.error("你已经在线了!. KickOff pbapnsEvent={}, conn={}", pbapnsEvent, conn);
                     ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
                 }else{
+                    conn.setStatusId(ClientStatus.Online);
                     newConnection = false;
                 }
             }
@@ -115,17 +117,19 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
 
-            Connection conn = ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (conn != null) {
-                conn.close();
-                ctx.close();
-                logger.info("Client go to sleep and close connection. {}", pbapnsEvent);
+                conn.setStatusId(ClientStatus.Sleep);
             }
 
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
+
+                    logger.info("Client go to sleep and close connection. {}", pbapnsEvent);
+                    ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
                     ClientServiceImpl.instance.updateStatus(pbapnsEvent.getUserId(), ClientStatus.Sleep);
+
                 }
             });
 
@@ -136,6 +140,8 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 conn.setUserId(pbapnsEvent.getUserId());
                 conn.setAppKey(pbapnsEvent.getAppKey());
                 ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
+            }else{
+                conn.setStatusId(ClientStatus.Online);
             }
 
             logger.info("Client awake and rebuild connection. {}", pbapnsEvent);

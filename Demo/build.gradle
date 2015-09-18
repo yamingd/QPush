@@ -1,7 +1,7 @@
 description = 'demo'
 dependencies {
-    compile project(':qpush.client')
-    compile project(':qpush-gateway')
-    compile project(':qpush-publisher')
+    compile project(':Client')
+    compile project(':Gateway')
+    compile project(':Publisher')
     compile 'mysql:mysql-connector-java:5.1.34'
 }

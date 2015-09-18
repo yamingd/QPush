@@ -1,16 +1,16 @@
 rootProject.name = 'QPush'
-include ':qpush-gateway'
-include ':qpush-publisher'
-include ':qpush-core'
-include ':qpush-pipe'
-include ':qpush.client'
-include ':demo'
-include ':qpush-protobuf'
+include ':Gateway'
+include ':Publisher'
+include ':Core'
+include ':Pipe'
+include ':Client'
+include ':Demo'
+include ':Protobuf'
 
-project(':qpush-gateway').projectDir = "$rootDir/Gateway" as File
-project(':qpush-publisher').projectDir = "$rootDir/Publisher" as File
-project(':qpush-core').projectDir = "$rootDir/Core" as File
-project(':qpush-pipe').projectDir = "$rootDir/Pipe" as File
-project(':qpush.client').projectDir = "$rootDir/Client" as File
-project(':demo').projectDir = "$rootDir/Demo" as File
-project(':qpush-protobuf').projectDir = "$rootDir/Protobuf" as File
+//project(':qpush-gateway').projectDir = "$rootDir/Gateway" as File
+//project(':qpush-publisher').projectDir = "$rootDir/Publisher" as File
+//project(':qpush-core').projectDir = "$rootDir/Core" as File
+//project(':qpush-pipe').projectDir = "$rootDir/Pipe" as File
+//project(':qpush.client').projectDir = "$rootDir/Client" as File
+//project(':demo').projectDir = "$rootDir/Demo" as File
+//project(':qpush-protobuf').projectDir = "$rootDir/Protobuf" as File

@@ -1,9 +1,6 @@
 package com.argo.qpush.gateway.keeper;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientKeeper {
 
-    private static Map<String, ConcurrentHashMap<String, Integer>> mapping = new HashMap<String, ConcurrentHashMap<String, Integer>>();
+    private static ConcurrentHashMap<Integer, Integer> mapping = new ConcurrentHashMap<Integer, Integer>();
 
     public static void init(){
 
@@ -23,11 +20,7 @@ public class ClientKeeper {
      * @param key
      */
     public static void registry(String key){
-        ConcurrentHashMap<String, Integer> m = mapping.get(key);
-        if(m == null){
-            m = new ConcurrentHashMap<String, Integer>();
-            mapping.put(key, m);
-        }
+
     }
 
     /**
@@ -35,7 +28,7 @@ public class ClientKeeper {
      * @param key
      */
     public static void unregistry(String key){
-        mapping.remove(key);
+
     }
 
     /**
@@ -44,11 +37,14 @@ public class ClientKeeper {
      * @param token
      * @param channelId
      */
-    public static void add(String key, String token, Integer channelId){
-        ConcurrentHashMap<String, Integer> m = mapping.get(key);
-        if(m != null){
-            m.put(token, channelId);
-        }
+    public static Integer add(String key, String token, Integer channelId){
+        Integer id = getId(key, token);
+        mapping.put(id, channelId);
+        return id;
+    }
+
+    private static int getId(String key, String token) {
+        return String.format("%s:%s", key, token).hashCode();
     }
 
     /**
@@ -58,12 +54,9 @@ public class ClientKeeper {
      * @return Integer
      */
     public static Integer remove(String key, String token){
-        ConcurrentHashMap<String, Integer> m = mapping.get(key);
-        if(m != null){
-            Integer val = m.remove(token);
-            return val;
-        }
-        return null;
+        Integer id = getId(key, token);
+        Integer val = mapping.remove(id);
+        return val;
     }
 
     /**
@@ -73,36 +66,15 @@ public class ClientKeeper {
      * @return Integer
      */
     public static Integer get(String key, String token){
-        ConcurrentHashMap<String, Integer> m = mapping.get(key);
-        if(m != null){
-            return m.get(token);
-        }
-        return null;
+        Integer id = getId(key, token);
+        return mapping.get(id);
     }
 
-    /**
-     * 获取某产品的所有客户端链接标示
-     * @param key
-     * @return Collection
-     */
-    public static Collection<Integer> gets(String key){
-        ConcurrentHashMap<String, Integer> m = mapping.get(key);
-        if(m != null){
-            return m.values();
-        }
-        return Collections.EMPTY_LIST;
-    }
-
-    /**
-     * 计算某产品的客户端链接总数
-     * @param key
-     * @return Integer
-     */
     public static Integer count(String key){
-        ConcurrentHashMap<String, Integer> m = mapping.get(key);
-        if(m != null){
-            return m.values().size();
-        }
-        return 0;
+        return mapping.size();
+    }
+
+    public static Collection<Integer> getAll(String appKey) {
+        return mapping.values();
     }
 }

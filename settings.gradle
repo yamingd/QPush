@@ -3,7 +3,7 @@ include ':Gateway'
 include ':Publisher'
 include ':Core'
 include ':Pipe'
-include ':Client'
+include ':client'
 include ':Demo'
 include ':Protobuf'
 

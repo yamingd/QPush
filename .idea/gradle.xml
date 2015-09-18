@@ -10,13 +10,13 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Client" />
             <option value="$PROJECT_DIR$/Core" />
             <option value="$PROJECT_DIR$/Demo" />
             <option value="$PROJECT_DIR$/Gateway" />
             <option value="$PROJECT_DIR$/Pipe" />
             <option value="$PROJECT_DIR$/Protobuf" />
             <option value="$PROJECT_DIR$/Publisher" />
+            <option value="$PROJECT_DIR$/client" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,6 +1,6 @@
 description = 'demo'
 dependencies {
-    compile project(':Client')
+    compile project(':client')
     compile project(':Gateway')
     compile project(':Publisher')
     compile 'mysql:mysql-connector-java:5.1.34'

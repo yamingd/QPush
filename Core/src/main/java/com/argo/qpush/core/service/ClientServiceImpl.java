@@ -31,9 +31,10 @@ public class ClientServiceImpl extends BaseService implements ClientService {
     public static final String SQL_findOfflineByType = "select * from client where productId = ? and typeId = ? and lastOnline >= ? and deviceToken is not null order by id limit ?, ?";
     public static final String SQL_countOfflineByType = "select count(1) from client where productId = ? and typeId = ? and lastOnline >= ?";
     public static final String SQL_updateStatus = "update client set lastOnline=?, statusId=? where id = ?";
+    public static final String SQL_updateStatusByUser = "update client set lastOnline=?, statusId=? where userId = ?";
     public static final String SQL_updateBadge = "update client set badge = badge + ? where userId = ?";
     public static final String SQL_updateBadge2 = "update client set badge = IF(badge + ? > 0, badge + ?, 0) where userId = ?";
-    public static final String SQL_updateOfflineTs = "update client set lastSendAt=?, statusId=? where id = ?";
+    public static final String SQL_updateOfflineTs = "update client set lastSendAt=?, statusId=? where userId = ?";
 
     public static ClientService instance;
 
@@ -122,12 +123,13 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     @TxMain
-    public void updateStatus(Client client, int statusId) {
+    public void updateStatus(String userId, int statusId) {
         long ts = EpochTime.now();
-        this.mainJdbc.update(SQL_updateStatus, ts, statusId, client.getId());
-
-        String cacheKey = formatCacheKey(client.getUserId());
-        delCache(cacheKey);
+        int ret = this.mainJdbc.update(SQL_updateStatusByUser, ts, statusId, userId);
+        if (ret > 0) {
+            String cacheKey = formatCacheKey(userId);
+            delCache(cacheKey);
+        }
     }
 
     @Override
@@ -164,11 +166,11 @@ public class ClientServiceImpl extends BaseService implements ClientService {
 
     @Override
     @TxMain
-    public void updateOfflineTs(Client client, int lastSendTs) {
-        String sql = SQL_updateOfflineTs;
-        this.mainJdbc.update(sql, lastSendTs, ClientStatus.Offline, client.getId());
-
-        String cacheKey = formatCacheKey(client.getUserId());
-        delCache(cacheKey);
+    public void updateOfflineTs(String userId, int lastSendTs) {
+        int ret = this.mainJdbc.update(SQL_updateOfflineTs, lastSendTs, ClientStatus.Offline, userId);
+        if (ret > 0) {
+            String cacheKey = formatCacheKey(userId);
+            delCache(cacheKey);
+        }
     }
 }

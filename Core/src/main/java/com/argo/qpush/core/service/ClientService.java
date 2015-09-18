@@ -51,19 +51,19 @@ public interface ClientService {
 
     /**
      *
-     * @param client
+     * @param userId
      * @param lastSendTs
      */
     @TxMain
-    void updateOfflineTs(Client client, int lastSendTs);
+    void updateOfflineTs(String userId, int lastSendTs);
 
     /**
      *
-     * @param client
+     * @param userId
      * @param statusId
      */
     @TxMain
-    void updateStatus(Client client, int statusId);
+    void updateStatus(String userId, int statusId);
 
     /**
      *

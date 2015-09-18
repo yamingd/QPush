@@ -98,22 +98,25 @@ public class ConnectionKeeper {
      * @param productId
      * @param token
      */
-    public static void remove(String productId, String token) {
+    public static Connection remove(String productId, String token) {
         Integer cid = ClientKeeper.remove(productId, token);
         if(cid != null){
             Connection c = pools.remove(cid);
             if (c == null) {
-                return;
+                return c;
             }
             ServerMetrics.decrConnection();
+            return c;
         }
+        return null;
     }
 
-    public static void remove(Integer channelId) {
+    public static Connection remove(Integer channelId) {
         Connection c = pools.remove(channelId);
         if (c == null) {
-            return;
+            return c;
         }
         ServerMetrics.decrConnection();
+        return c;
     }
 }

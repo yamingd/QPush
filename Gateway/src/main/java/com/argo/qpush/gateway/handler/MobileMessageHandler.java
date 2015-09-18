@@ -1,7 +1,6 @@
 package com.argo.qpush.gateway.handler;
 
 import com.argo.qpush.core.MetricBuilder;
-import com.argo.qpush.core.entity.Client;
 import com.argo.qpush.core.entity.ClientStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
 import com.argo.qpush.gateway.Connection;
@@ -116,23 +115,18 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
 
-            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
-                @Override
-                public void run() {
-                    Client c0 = ClientServiceImpl.instance.findByUserId(pbapnsEvent.getUserId());
-                    if (c0 != null) {
-                        ClientServiceImpl.instance.updateStatus(c0, ClientStatus.Sleep);
-                    }
-                }
-            });
-
-            //心跳
-            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            Connection conn = ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (conn != null) {
-                ConnectionKeeper.remove(conn.getAppKey(), conn.getUserId());
                 conn.close();
                 ctx.close();
             }
+
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
+                @Override
+                public void run() {
+                    ClientServiceImpl.instance.updateStatus(pbapnsEvent.getUserId(), ClientStatus.Sleep);
+                }
+            });
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Awake_VALUE){
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
@@ -166,10 +160,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
             //离线
-            final Connection connection = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            final Connection connection = ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (connection != null) {
 
-                ConnectionKeeper.remove(connection.getAppKey(), connection.getUserId());
                 connection.close();
 
                 logger.info("Client disconnect: {}", pbapnsEvent);
@@ -178,10 +171,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
                     @Override
                     public void run() {
-                        Client c0 = ClientServiceImpl.instance.findByUserId(pbapnsEvent.getUserId());
-                        if (c0 != null) {
-                            ClientServiceImpl.instance.updateOfflineTs(c0, connection.getLastOpTime());
-                        }
+                        ClientServiceImpl.instance.updateOfflineTs(pbapnsEvent.getUserId(), connection.getLastOpTime());
                     }
 
                 });
@@ -262,11 +252,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    Client client = ClientServiceImpl.instance.findByUserId(connection.getUserId());
-                    if (null != client){
-                        logger.info("Client offline: {}", client);
-                        ClientServiceImpl.instance.updateOfflineTs(client, connection.getLastOpTime());
-                    }
+                    ClientServiceImpl.instance.updateOfflineTs(connection.getUserId(), connection.getLastOpTime());
                 }
             });
 

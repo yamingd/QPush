@@ -45,8 +45,9 @@ message PBAPNSEvent {
     }
 
     enum DeviceTypes{
-        iOS = 1;
-        Android = 2;
+        iPhone = 1;
+        iPad = 2;
+        Android = 3;
     }
 
     required int32 op = 1;

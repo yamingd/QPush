@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -53,7 +54,8 @@ public class OneSendThread implements Callable<Integer> {
             return 0;
         }
 
-        if (message.getClients() == null || message.getClients().size() == 0){
+        List<String> clients = message.getClients();
+        if (clients == null || clients.size() == 0){
             logger.error("Message Clients is Empty. {}", message);
             if (message.getStatusId().intValue() == PayloadStatus.Pending0) {
                 message.setStatusId(PayloadStatus.Failed);
@@ -73,8 +75,9 @@ public class OneSendThread implements Callable<Integer> {
             PayloadServiceImpl.instance.add(message);
         }
 
-        for (String client : message.getClients()){
-
+        logger.info("OneSendThread. Client Total: {}", clients.size());
+        for (int i = 0; i < clients.size(); i++) {
+            String client = clients.get(i);
             Client cc = ClientServiceImpl.instance.findByUserId(client);
             if (cc == null){
                 //离线
@@ -93,6 +96,7 @@ public class OneSendThread implements Callable<Integer> {
             if(c != null) {
                 if (ClientStatus.Online == cc.getStatusId()){
                     c.send(message);
+                    message.setStatus(client, new PushStatus(PushStatus.TcpSent));
                 }else{
                     sendMessageToOfflineClient(client, cc);
                 }
@@ -103,7 +107,7 @@ public class OneSendThread implements Callable<Integer> {
 
         PayloadServiceImpl.instance.updateSendStatus(message);
 
-        return message.getClients().size();
+        return clients.size();
 
     }
 

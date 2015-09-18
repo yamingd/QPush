@@ -1,5 +1,6 @@
 package com.argo.qpush.core.entity;
 
+import com.argo.qpush.protobuf.PBAPNSMessage;
 import org.msgpack.annotation.MessagePackMessage;
 
 /**
@@ -7,6 +8,8 @@ import org.msgpack.annotation.MessagePackMessage;
  */
 @MessagePackMessage
 public class PushStatus {
+
+    public static final int TcpSent = 0;
 
     public static final int Success = 1;
 
@@ -32,6 +35,8 @@ public class PushStatus {
 
     public static final int WaitOnline = 10;
 
+    public static final int APNSSent = 11;
+
     private int code;
     private String msg;
 
@@ -46,6 +51,34 @@ public class PushStatus {
     public PushStatus(int code, String msg){
         this.code = code;
         this.msg = msg;
+    }
+
+    public int getPayloadStatus(){
+
+        if (this.code == APNSSent || this.code == TcpSent || this.code == Success){
+            return PayloadStatus.Sent;
+        }
+
+        return PayloadStatus.Failed;
+    }
+
+    public int getOnlineMode(int payloadSetting){
+
+        if (getCode() == NoClient
+                || getCode() == NO_DEVICE_TOKEN
+                || getCode() == WaitOnline){
+
+            //离线消息在用户上线时的处理方式
+            if (payloadSetting == PBAPNSMessage.OfflineModes.Ignore_VALUE){
+                return  0; //忽略
+            }else{
+                return  1; //发送
+            }
+        }else {
+
+            return 0;
+
+        }
     }
 
     public int getCode() {

@@ -78,7 +78,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         if (pbapnsEvent.getTypeId() == PBAPNSEvent.DeviceTypes.Android_VALUE){
             MetricBuilder.clientAndroidMeter.mark();
-        }else if (pbapnsEvent.getTypeId() == PBAPNSEvent.DeviceTypes.iOS_VALUE){
+        }else{
             MetricBuilder.clientIOSMeter.mark();
         }
 
@@ -115,8 +115,8 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             ack(ctx, conn, pbapnsEvent, SYNC);
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
-            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
 
+            MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
                     Client c0 = ClientServiceImpl.instance.findByUserId(pbapnsEvent.getUserId());
@@ -124,16 +124,14 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                         ClientServiceImpl.instance.updateStatus(c0, ClientStatus.Sleep);
                     }
                 }
-
             });
 
             //心跳
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (conn != null) {
-                ack(ctx, conn, pbapnsEvent, SYNC);
-
                 ConnectionKeeper.remove(conn.getAppKey(), conn.getUserId());
                 conn.close();
+                ctx.close();
             }
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Awake_VALUE){

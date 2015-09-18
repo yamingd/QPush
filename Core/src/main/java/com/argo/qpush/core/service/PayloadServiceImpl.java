@@ -6,7 +6,6 @@ import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.PayloadHistory;
 import com.argo.qpush.core.entity.PayloadStatus;
 import com.argo.qpush.core.entity.PushStatus;
-import com.argo.qpush.protobuf.PBAPNSMessage;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -217,21 +216,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                         String userId = payload.getClients().get(i);
                         PushStatus error = payload.getStatus().get(userId);
-                        int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
-                        int onlineMode = 0;
-
-                        if (error != null && (error.getCode() == PushStatus.NoClient
-                                || error.getCode() == PushStatus.NO_DEVICE_TOKEN
-                                || error.getCode() == PushStatus.WaitOnline)){
-
-                            //离线消息在用户上线时的处理方式
-                            if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
-                                onlineMode = 0; //忽略
-                            }else{
-                                onlineMode = 1; //发送
-                            }
-
-                        }
+                        int statusId = error.getPayloadStatus();
+                        int onlineMode = error.getOnlineMode(payload.getOfflineMode().intValue());
 
                         preparedStatement.setObject(1, payload.getId());
                         preparedStatement.setObject(2, userId);
@@ -306,21 +292,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
                     String userId = payload.getClients().get(i);
                     PushStatus error = payload.getStatus().get(userId);
-                    int statusId = error != null ? PayloadStatus.Failed : PayloadStatus.Sent;
-                    int onlineMode = 0;
-
-                    if (error != null && (error.getCode() == PushStatus.NoClient
-                            || error.getCode() == PushStatus.NO_DEVICE_TOKEN
-                            || error.getCode() == PushStatus.WaitOnline)){
-
-                        //离线消息在用户上线时的处理方式
-                        if (payload.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
-                            onlineMode = 0; //忽略
-                        }else{
-                            onlineMode = 1; //发送
-                        }
-
-                    }
+                    int statusId = error.getPayloadStatus();
+                    int onlineMode = error.getOnlineMode(payload.getOfflineMode().intValue());
 
                     preparedStatement.setObject(1, statusId);
                     preparedStatement.setObject(2, onlineMode);
@@ -346,7 +319,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
         MetricBuilder.jdbcUpdateMeter.mark(2);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("updateSendStatus OK!");
+            logger.debug("updateSendStatus OK, payloadId={}", payload.getId());
         }
     }
 
@@ -371,27 +344,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
             logger.debug("updateSendStatus, payloadId={}, userId={}", message.getId(), userId);
         }
 
-        int statusId = error.getCode();
-        if (error.getCode() >= 10){
-            statusId = 3;
-        }
-
-
-        int onlineMode = 0;
-
-        if (error != null && (error.getCode() == PushStatus.NoClient
-                || error.getCode() == PushStatus.NO_DEVICE_TOKEN
-                || error.getCode() == PushStatus.WaitOnline)){
-
-            //离线消息在用户上线时的处理方式
-            if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.Ignore_VALUE){
-                onlineMode = 0; //忽略
-            }else{
-                onlineMode = 1; //发送
-            }
-
-        }
-
+        int statusId = error.getPayloadStatus();
+        int onlineMode = error.getOnlineMode(message.getOfflineMode().intValue());
 
         try {
 
@@ -409,7 +363,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
         MetricBuilder.jdbcUpdateMeter.mark(1);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("updateSendStatus OK!");
+            logger.debug("updateSendStatus OK, payloadId={}, userId={}", message.getId(), userId);
         }
     }
 

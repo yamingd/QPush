@@ -26,4 +26,21 @@ public class ApnsDelegateFailedAdapter extends ApnsDelegateAdapter {
         logger.error("connectionClosed. {} {}", messageIdentifier, e);
 
     }
+
+    @Override
+    public void messageSent(ApnsNotification message, boolean resent) {
+        if (logger.isDebugEnabled()){
+            logger.debug("messageSent: {}", message);
+        }
+    }
+
+    @Override
+    public void cacheLengthExceeded(int newCacheLength) {
+
+    }
+
+    @Override
+    public void notificationsResent(int resendCount) {
+
+    }
 }

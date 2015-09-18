@@ -256,31 +256,40 @@ public  final class PBAPNSEvent extends
   public enum DeviceTypes
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>iOS = 1;</code>
+     * <code>iPhone = 1;</code>
      */
-    iOS(0, 1),
+    iPhone(0, 1),
     /**
-     * <code>Android = 2;</code>
+     * <code>iPad = 2;</code>
      */
-    Android(1, 2),
+    iPad(1, 2),
+    /**
+     * <code>Android = 3;</code>
+     */
+    Android(2, 3),
     ;
 
     /**
-     * <code>iOS = 1;</code>
+     * <code>iPhone = 1;</code>
      */
-    public static final int iOS_VALUE = 1;
+    public static final int iPhone_VALUE = 1;
     /**
-     * <code>Android = 2;</code>
+     * <code>iPad = 2;</code>
      */
-    public static final int Android_VALUE = 2;
+    public static final int iPad_VALUE = 2;
+    /**
+     * <code>Android = 3;</code>
+     */
+    public static final int Android_VALUE = 3;
 
 
     public final int getNumber() { return value; }
 
     public static DeviceTypes valueOf(int value) {
       switch (value) {
-        case 1: return iOS;
-        case 2: return Android;
+        case 1: return iPhone;
+        case 2: return iPad;
+        case 3: return Android;
         default: return null;
       }
     }

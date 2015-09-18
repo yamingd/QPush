@@ -172,13 +172,13 @@ void protobuf_AddDesc_pb_5fmessage_2eproto() {
     "UserInfo\022\020\n\010apnsMode\030\004 \001(\005\"9\n\014OfflineMod"
     "es\022\n\n\006Ignore\020\000\022\010\n\004APNS\020\001\022\023\n\017SendAfterOnl"
     "ine\020\002\"\"\n\tAPNSModes\022\007\n\003All\020\000\022\014\n\010Signined\020"
-    "\001\"\350\001\n\013PBAPNSEvent\022\n\n\002op\030\001 \002(\005\022\r\n\005token\030\002"
+    "\001\"\365\001\n\013PBAPNSEvent\022\n\n\002op\030\001 \002(\005\022\r\n\005token\030\002"
     " \002(\t\022\016\n\006appKey\030\003 \002(\t\022\016\n\006userId\030\004 \002(\t\022\016\n\006"
     "typeId\030\005 \002(\005\022\014\n\004read\030\006 \001(\005\"[\n\003Ops\022\n\n\006Onl"
     "ine\020\001\022\r\n\tKeepAlive\020\002\022\013\n\007PushAck\020\003\022\013\n\007Off"
     "line\020\004\022\t\n\005Error\020\000\022\t\n\005Sleep\020\005\022\t\n\005Awake\020\006\""
-    "#\n\013DeviceTypes\022\007\n\003iOS\020\001\022\013\n\007Android\020\002B\033\n\027"
-    "com.argo.qpush.protobufP\001", 625);
+    "0\n\013DeviceTypes\022\n\n\006iPhone\020\001\022\010\n\004iPad\020\002\022\013\n\007"
+    "Android\020\003B\033\n\027com.argo.qpush.protobufP\001", 638);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "pb_message.proto", &protobuf_RegisterTypes);
   PBAPNSUserInfo::default_instance_ = new PBAPNSUserInfo();
@@ -1226,6 +1226,7 @@ bool PBAPNSEvent_DeviceTypes_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -1233,7 +1234,8 @@ bool PBAPNSEvent_DeviceTypes_IsValid(int value) {
 }
 
 #ifndef _MSC_VER
-const PBAPNSEvent_DeviceTypes PBAPNSEvent::iOS;
+const PBAPNSEvent_DeviceTypes PBAPNSEvent::iPhone;
+const PBAPNSEvent_DeviceTypes PBAPNSEvent::iPad;
 const PBAPNSEvent_DeviceTypes PBAPNSEvent::Android;
 const PBAPNSEvent_DeviceTypes PBAPNSEvent::DeviceTypes_MIN;
 const PBAPNSEvent_DeviceTypes PBAPNSEvent::DeviceTypes_MAX;

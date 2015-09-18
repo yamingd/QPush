@@ -103,11 +103,12 @@ inline bool PBAPNSEvent_Ops_Parse(
     PBAPNSEvent_Ops_descriptor(), name, value);
 }
 enum PBAPNSEvent_DeviceTypes {
-  PBAPNSEvent_DeviceTypes_iOS = 1,
-  PBAPNSEvent_DeviceTypes_Android = 2
+  PBAPNSEvent_DeviceTypes_iPhone = 1,
+  PBAPNSEvent_DeviceTypes_iPad = 2,
+  PBAPNSEvent_DeviceTypes_Android = 3
 };
 bool PBAPNSEvent_DeviceTypes_IsValid(int value);
-const PBAPNSEvent_DeviceTypes PBAPNSEvent_DeviceTypes_DeviceTypes_MIN = PBAPNSEvent_DeviceTypes_iOS;
+const PBAPNSEvent_DeviceTypes PBAPNSEvent_DeviceTypes_DeviceTypes_MIN = PBAPNSEvent_DeviceTypes_iPhone;
 const PBAPNSEvent_DeviceTypes PBAPNSEvent_DeviceTypes_DeviceTypes_MAX = PBAPNSEvent_DeviceTypes_Android;
 const int PBAPNSEvent_DeviceTypes_DeviceTypes_ARRAYSIZE = PBAPNSEvent_DeviceTypes_DeviceTypes_MAX + 1;
 
@@ -585,7 +586,8 @@ class PBAPNSEvent : public ::google::protobuf::Message {
   }
 
   typedef PBAPNSEvent_DeviceTypes DeviceTypes;
-  static const DeviceTypes iOS = PBAPNSEvent_DeviceTypes_iOS;
+  static const DeviceTypes iPhone = PBAPNSEvent_DeviceTypes_iPhone;
+  static const DeviceTypes iPad = PBAPNSEvent_DeviceTypes_iPad;
   static const DeviceTypes Android = PBAPNSEvent_DeviceTypes_Android;
   static inline bool DeviceTypes_IsValid(int value) {
     return PBAPNSEvent_DeviceTypes_IsValid(value);

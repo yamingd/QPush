@@ -87,7 +87,7 @@ public class APNSKeeper implements InitializingBean {
                 }else {
                     String json = message.asJson();
                     service.push(cc.getDeviceToken(), json);
-                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Success));
+                    message.setStatus(cc.getUserId(), new PushStatus(PushStatus.APNSSent));
                     ClientServiceImpl.instance.updateBadge(cc.getUserId(), 1);
                 }
             }catch(Exception e){

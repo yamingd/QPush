@@ -10,24 +10,66 @@ import java.util.List;
  */
 public interface ClientService {
 
+    /**
+     *
+     * @param client
+     */
     @TxMain
     void add(Client client);
 
+    /**
+     *
+     * @param userId
+     * @return Client
+     */
     Client findByUserId(String userId);
 
+    /**
+     *
+     * @param productId
+     * @param typeId
+     * @param page
+     * @param limit
+     * @return List
+     */
     List<Client> findOfflineByType(Integer productId, Integer typeId, Integer page, Integer limit);
 
+    /**
+     *
+     * @param productId
+     * @param typeId
+     * @return int
+     */
     int countOfflineByType(Integer productId, Integer typeId);
 
+    /**
+     *
+     * @param client
+     */
     @TxMain
     void updateOnlineTs(Client client);
 
+    /**
+     *
+     * @param client
+     * @param lastSendTs
+     */
     @TxMain
     void updateOfflineTs(Client client, int lastSendTs);
 
+    /**
+     *
+     * @param client
+     * @param statusId
+     */
     @TxMain
     void updateStatus(Client client, int statusId);
 
+    /**
+     *
+     * @param userId
+     * @param count
+     */
     @TxMain
     void updateBadge(String userId, int count);
 }

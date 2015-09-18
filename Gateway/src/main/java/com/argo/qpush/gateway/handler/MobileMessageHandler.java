@@ -117,9 +117,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
 
-            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            Connection conn = ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (conn != null) {
-                conn.setStatusId(ClientStatus.Sleep);
+                conn.close();
             }
 
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
@@ -130,7 +130,6 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                         logger.debug("Client go to sleep and close connection. {}", pbapnsEvent);
                     }
 
-                    ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
                     ClientServiceImpl.instance.updateStatus(pbapnsEvent.getUserId(), ClientStatus.Sleep);
 
                 }

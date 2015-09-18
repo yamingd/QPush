@@ -119,6 +119,9 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             if (conn != null) {
                 conn.close();
                 ctx.close();
+                if (logger.isDebugEnabled()){
+                    logger.debug("Client go to sleep and close connection. {}", pbapnsEvent);
+                }
             }
 
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
@@ -135,6 +138,10 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 conn.setUserId(pbapnsEvent.getUserId());
                 conn.setAppKey(pbapnsEvent.getAppKey());
                 ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
+            }
+
+            if (logger.isDebugEnabled()){
+                logger.debug("Client awake and rebuild connection. {}", pbapnsEvent);
             }
 
             //记录客户端
@@ -158,14 +165,16 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             ack(ctx, conn, pbapnsEvent, SYNC);
 
-        }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Offline_VALUE){
+        }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Offline_VALUE) {
             //离线
             final Connection connection = ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
             if (connection != null) {
 
                 connection.close();
 
-                logger.info("Client disconnect: {}", pbapnsEvent);
+                if (logger.isDebugEnabled()){
+                    logger.debug("Client go offline and close connection. {}", pbapnsEvent);
+                }
 
                 MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
 

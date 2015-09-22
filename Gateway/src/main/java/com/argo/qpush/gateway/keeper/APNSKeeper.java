@@ -62,7 +62,7 @@ public class APNSKeeper implements InitializingBean {
                 builder.withCert(product.getCertPath(), product.getCertPass());
                 builder.withProductionDestination();
             }
-            service = builder.asPool(10).withCacheLength(Integer.MAX_VALUE).withDelegate(delegateAdapter).build();
+            service = builder.asPool(10).withCacheLength(Integer.MAX_VALUE).withDelegate(delegateAdapter).asQueued().build();
             mapping.put(product.getId(), service);
         }
 

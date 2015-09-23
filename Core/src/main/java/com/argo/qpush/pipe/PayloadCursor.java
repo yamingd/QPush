@@ -23,7 +23,7 @@ public class PayloadCursor implements Serializable {
         this.limit = 100;
     }
 
-    public PayloadCursor(Product productKey, long startId, int page, int limit) {
+    public PayloadCursor(Product product, long startId, int page, int limit) {
         this.product = product;
         this.startId = startId;
         this.page = page;

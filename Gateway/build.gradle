@@ -15,7 +15,7 @@ dependencies {
     compile 'org.springframework:spring-context:3.2.11.RELEASE'
     compile 'org.springframework:spring-jdbc:3.2.11.RELEASE'
     compile 'com.codahale.metrics:metrics-core:3.0.1'
-    compile 'com.notnoop.apns:apns:0.2.3'
+    compile 'com.relayrides:pushy:0.4.3'
 }
 
 apply from: "../jarwrap.gradle"

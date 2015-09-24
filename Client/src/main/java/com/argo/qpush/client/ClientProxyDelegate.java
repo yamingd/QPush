@@ -1,25 +1,15 @@
 package com.argo.qpush.client;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.bytes.ByteArrayDecoder;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.NoSuchElementException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by yaming_deng on 14-8-11.
@@ -32,13 +22,11 @@ public class ClientProxyDelegate {
     public static MessagePack messagePack = new MessagePack();
     public static ClientProxyDelegate instance = new ClientProxyDelegate();
 
-    private ConcurrentLinkedDeque<ChannelHandlerContext> channelList = new ConcurrentLinkedDeque<ChannelHandlerContext>();
-    private final Bootstrap b = new Bootstrap(); // (1)
+    private List<ClientConnection> connections = new ArrayList<ClientConnection>();
+
     private NioEventLoopGroup workerGroup;
-    private String host;
-    private Integer port;
+    private int concurrentConnectionMax = 1;
     private volatile boolean stopping = false;
-    private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     static {
 
@@ -63,11 +51,7 @@ public class ClientProxyDelegate {
         }
     }
 
-    public void start() {
-        connect();
-    }
-
-    private void connect(){
+    public synchronized void start() {
 
         if (props == null){
             loadConfig();
@@ -76,89 +60,63 @@ public class ClientProxyDelegate {
             }
         }
 
-        port = Integer.parseInt(props.getProperty("port", "8081"));
-        host = props.getProperty("host", "127.0.0.1");
-        logger.info("QPush server. connecting... host=" + host + "/" + port);
-
-        workerGroup = new NioEventLoopGroup();
-        try {
-            b.group(workerGroup); // (2)
-            b.channel(NioSocketChannel.class); // (3)
-            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-            b.option(ChannelOption.TCP_NODELAY, true);
-            b.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-
-                    ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-                    pipeline.addLast("bytesDecoder",new ByteArrayDecoder());
-
-                    pipeline.addLast("frameEncoder", new LengthFieldPrepender(4, false));
-                    pipeline.addLast("bytesEncoder", new ByteArrayEncoder());
-
-                    pipeline.addLast("handler", new ClientConnectHandler());
-                }
-            });
-
-            // Start the client.
-            for(int i=0; i<workerGroup.executorCount() * 2; i++){
-                ChannelFuture f = newChannel();
-                if (f!=null) {
-                    try {
-                        f.get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-             }
-
-            countDownLatch.countDown();
-
-            logger.info("QPush server. connected. {}:{}", host, port);
-
-        } catch (Exception e){
-            logger.error("QPush server connect error.", e);
-            workerGroup.shutdownGracefully();
+        concurrentConnectionMax = Integer.parseInt(props.getProperty("concurrent_max", "1")) + 1;
+        // Never use more threads than concurrent connections (Netty binds a channel to a single thread, so the
+        // excess threads would always go unused)
+        final int threadCount = Math.min(concurrentConnectionMax, Runtime.getRuntime().availableProcessors() * 2);
+        this.workerGroup = new NioEventLoopGroup(threadCount);
+        // Start the client.
+        for(int i=0; i<concurrentConnectionMax; i++){
+            newConnection();
         }
     }
 
-    public ChannelFuture newChannel(){
-
-        ChannelFuture f = b.connect(host, port); // (5)
-        if(f.cause() != null){
-            logger.error("QPush newChannel.", f.cause());
-            return null;
+    /**
+     * 建立链接
+     */
+    public void newConnection(){
+        synchronized (connections){
+            ClientConnection connection = new ClientConnection(props, this.workerGroup);
+            connection.connect();
+            connections.add(connection);
         }
-
-        return f;
     }
 
-    public void save(ChannelHandlerContext c){
-        channelList.add(c);
+    /**
+     * 移除链接
+     * @param connection
+     */
+    public void removeConnection(ClientConnection connection){
+        synchronized (connections){
+            final boolean flag = connections.remove(connection);
+            assert flag;
+        }
     }
 
+    /**
+     * 获取一个可用的链接
+     * @param task
+     */
     public void get(final ChannelAvailable task){
-        try {
-            ChannelHandlerContext c = channelList.pop();
-            channelList.add(c);
-            task.execute(c);
-        } catch (NoSuchElementException e) {
-            logger.error("No ChannelAvailable");
-            newChannel();
-            task.error(e);
-        }
-    }
-
-    public void remove(ChannelHandlerContext c){
-        channelList.remove(c);
+        ClientConnection clientConnection = connections.get(0);
+        //TODO: check connections is Empty
+        task.execute(clientConnection);
     }
 
     public void close(){
         stopping = true;
-        workerGroup.shutdownGracefully();
+
+        synchronized (this.connections) {
+            for (final ClientConnection connection : this.connections) {
+                connection.shutdown();
+            }
+        }
+
+        try {
+            workerGroup.shutdownGracefully().await();
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     public boolean isStopped(){

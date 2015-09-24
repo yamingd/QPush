@@ -19,13 +19,25 @@ public class ServerConfig implements InitializingBean {
 
     public static ServerConfig current;
 
+    private boolean sandBox  = true;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         current = this;
+
+        Object flag = this.serverConfig.get("apns.sandbox");
+        if (flag != null && !((Boolean)flag)) {
+            this.sandBox = false;
+        }else{
+            this.sandBox = true;
+        }
     }
 
     public Properties get() {
         return serverConfig;
     }
 
+    public boolean isSandBox() {
+        return sandBox;
+    }
 }

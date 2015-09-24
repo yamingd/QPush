@@ -37,6 +37,8 @@ public class PushStatus {
 
     public static final int APNSSent = 11;
 
+    public static final int DeviceTokenInvalid = 12;
+
     private int code;
     private String msg;
 

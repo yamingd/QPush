@@ -12,12 +12,17 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
 
     protected static Logger logger = LoggerFactory.getLogger(ClientConnectHandler.class);
 
+    private ClientConnection clientConnection;
+
+    public ClientConnectHandler(ClientConnection connection){
+        this.clientConnection = connection;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("channelActive: {}", ctx.channel());
         }
-        ClientProxyDelegate.instance.save(ctx);
     }
 
     @Override
@@ -30,17 +35,14 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ClientProxyDelegate.instance.remove(ctx);
         logger.error("Error. ", cause.getCause());
-        ctx.close();
-        reconnect();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         logger.error("channelInactive: {}", ctx.channel());
         ctx.close();
-        ClientProxyDelegate.instance.remove(ctx);
+        ClientProxyDelegate.instance.removeConnection(clientConnection);
         reconnect();
     }
 
@@ -50,7 +52,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         }
 
         logger.info("reconnect....");
-        ClientProxyDelegate.instance.newChannel();
+        ClientProxyDelegate.instance.newConnection();
     }
 
 }

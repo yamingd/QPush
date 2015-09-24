@@ -25,11 +25,11 @@ public class ServerConfig implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         current = this;
 
-        Object flag = this.serverConfig.get("apns.sandbox");
-        if (flag != null && !((Boolean)flag)) {
-            this.sandBox = false;
-        }else{
+        String flag = this.serverConfig.get("apns.sandbox") + "";
+        if (flag.equalsIgnoreCase("true")) {
             this.sandBox = true;
+        }else{
+            this.sandBox = false;
         }
     }
 

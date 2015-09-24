@@ -214,11 +214,11 @@ public class APNSKeeper implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Object flag = this.serverConfig.get("apns.sandbox");
-        if (flag != null && !((Boolean)flag)) {
-            this.sandBox = false;
-        }else{
+        String flag = this.serverConfig.get("apns.sandbox") + "";
+        if (flag.equalsIgnoreCase("true")) {
             this.sandBox = true;
+        }else{
+            this.sandBox = false;
         }
 
         productList = productService.findAll();

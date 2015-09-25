@@ -73,6 +73,10 @@ public class Connection {
         return context.channel().isWritable();
     }
 
+    public boolean isOK(){
+        return context.channel().isOpen() && context.channel().isWritable() && context.channel().isActive();
+    }
+
     /**
      * 发送消息
      * @param message

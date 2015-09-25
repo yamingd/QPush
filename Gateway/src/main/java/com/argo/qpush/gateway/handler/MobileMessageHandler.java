@@ -93,7 +93,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                     logger.error("你已经在线了!. KickOff pbapnsEvent={}, conn={}", pbapnsEvent, conn);
                     ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
                 }else{
-                    if (conn.isWritable()) {
+                    if (conn.isOK()) {
                         conn.setStatusId(ClientStatus.Online);
                         newConnection = false;
                     }else{
@@ -121,7 +121,10 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
 
-            final Connection conn = ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            final Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            if (null != conn){
+                conn.setStatusId(ClientStatus.Sleep);
+            }
 
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
 
@@ -133,10 +136,6 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                     }
 
                     ClientServiceImpl.instance.updateStatus(pbapnsEvent.getUserId(), ClientStatus.Sleep);
-
-                    if (conn != null) {
-                        conn.close();
-                    }
 
                 }
             });

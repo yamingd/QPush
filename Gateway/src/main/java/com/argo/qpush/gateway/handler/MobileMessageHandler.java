@@ -128,15 +128,15 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 @Override
                 public void run() {
 
-                    if (conn != null) {
-                        conn.close();
-                    }
-
                     if (logger.isDebugEnabled()) {
                         logger.debug("Client go to sleep and close connection. {}", pbapnsEvent);
                     }
 
                     ClientServiceImpl.instance.updateStatus(pbapnsEvent.getUserId(), ClientStatus.Sleep);
+
+                    if (conn != null) {
+                        conn.close();
+                    }
 
                 }
             });

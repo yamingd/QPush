@@ -132,10 +132,10 @@ public class OneSendThread implements Callable<Integer> {
             return;
         }
 
-        if (0 == message.getToMode()){
+        if (PBAPNSMessage.APNSModes.All_VALUE == message.getToMode()){
             if (offlineMode == PBAPNSMessage.OfflineModes.APNS_VALUE) {
                 if (PBAPNSMessage.APNSModes.Signined_VALUE == message.getApnsMode()){
-                    if (0 == cc.getStatusId()){
+                    if (ClientStatus.Offline == cc.getStatusId()){
                         // 已退出
                         message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
                     }else{

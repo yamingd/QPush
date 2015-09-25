@@ -93,8 +93,14 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                     logger.error("你已经在线了!. KickOff pbapnsEvent={}, conn={}", pbapnsEvent, conn);
                     ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
                 }else{
-                    conn.setStatusId(ClientStatus.Online);
-                    newConnection = false;
+                    if (conn.isWritable()) {
+                        conn.setStatusId(ClientStatus.Online);
+                        newConnection = false;
+                    }else{
+                        newConnection = true;
+                        ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+                        conn.close();
+                    }
                 }
             }
             if (newConnection) {
@@ -107,9 +113,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             //记录客户端
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(pbapnsEvent));
             ack(ctx, conn, pbapnsEvent, SYNC);
-            if (logger.isDebugEnabled()){
-                logger.debug("Got Online Message and handle DONE. {}", pbapnsEvent);
-            }
+
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
             //心跳
             Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());

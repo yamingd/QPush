@@ -55,7 +55,7 @@ public class Connection {
      */
     public void send(final Payload message){
         // 组装消息包
-        if(context.channel().isWritable()){
+        if(isWritable()){
             try {
                 byte[] msg = message.asAPNSMessage().toByteArray();
                 send(message, msg);
@@ -67,6 +67,10 @@ public class Connection {
             message.setStatus(this.userId, new PushStatus(PushStatus.ChannelClosed, null));
             logger.error("Send Error. Channel is closed. {}, {}", context, message);
         }
+    }
+
+    public boolean isWritable(){
+        return context.channel().isWritable();
     }
 
     /**

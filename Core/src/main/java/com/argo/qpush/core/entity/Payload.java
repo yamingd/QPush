@@ -199,6 +199,9 @@ public class Payload implements Serializable {
     }
 
     public Integer getApnsMode() {
+        if (null == apnsMode){
+            apnsMode = 0;
+        }
         return apnsMode;
     }
 

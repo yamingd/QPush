@@ -9,4 +9,8 @@ ext {
     uploadArchive=true
 }
 
+jar{
+    baseName "qpush-client"
+}
+
 apply from: '../maven_push.gradle'

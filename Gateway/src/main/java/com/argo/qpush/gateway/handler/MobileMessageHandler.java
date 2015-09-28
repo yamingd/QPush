@@ -227,10 +227,6 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 if(cf.cause() != null){
                     logger.error("Send Error.", cf.cause());
                     cc.close();
-                }else{
-                    if (result.equalsIgnoreCase(MULTI_CLIENTS)){
-                        cc.close();
-                    }
                 }
             }
         });

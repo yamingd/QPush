@@ -180,7 +180,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 // 不是同一个Channel的话，就使用新的
                 logger.warn("Client is using different channel. old={}, new={}", conn.getContext().channel(), ctx.channel());
                 ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-                conn.close();
+                //conn.close();
                 conn = null;
                 newOne = true;
             }else{

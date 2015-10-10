@@ -189,7 +189,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
 
         if (newOne){
-            logger.debug("Got Connection from. {}", ctx.channel().remoteAddress());
+            logger.debug("Got Connection from. userId={}, ip={}",  pbapnsEvent.getUserId(), ctx.channel().remoteAddress());
             conn = new Connection(ctx);
             conn.setUserId(pbapnsEvent.getUserId());
             conn.setAppKey(pbapnsEvent.getAppKey());

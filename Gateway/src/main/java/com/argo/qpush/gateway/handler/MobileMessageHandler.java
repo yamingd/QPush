@@ -227,7 +227,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                     logger.error("Send Error.", cf.cause());
                     cc.close();
                 }else{
-                    logger.debug(String.format("Send Response %d to %d[%d] Done", result, event.getUserId(), event.getOp()));
+                    logger.debug(String.format("Send Response %s to %s[%s] Done", result, event.getUserId(), event.getOp()));
                 }
             }
         });

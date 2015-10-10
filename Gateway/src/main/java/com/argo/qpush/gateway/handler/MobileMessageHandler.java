@@ -168,7 +168,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
     private Connection buildConnection(ChannelHandlerContext ctx, PBAPNSEvent pbapnsEvent) {
         Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-        boolean newOne = false;
+        boolean newOne = true;
         if (null != conn){
             if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
                 ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
@@ -183,6 +183,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 conn = null;
                 newOne = true;
             }else{
+                newOne = false;
                 conn.setStatusId(ClientStatus.Online);
             }
         }

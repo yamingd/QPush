@@ -82,46 +82,19 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
 
         if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Online_VALUE){
-
-            boolean newConnection = true;
-            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-            if (null != conn){
-                if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
-                    ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-                    //只有设备标示不一样才算是重复登录
-                    newConnection = true;
-                    logger.error("你已经在线了!. KickOff. current conn={}, conn={}", ctx, conn);
-                    ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
-                }else{
-                    if (conn.isOK()) {
-                        conn.setStatusId(ClientStatus.Online);
-                        newConnection = false;
-                    }else{
-                        newConnection = true;
-                        ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-                        conn.close();
-                    }
-                }
-            }
-            if (newConnection) {
-                conn = new Connection(ctx);
-                conn.setUserId(pbapnsEvent.getUserId());
-                conn.setAppKey(pbapnsEvent.getAppKey());
-                conn.setToken(pbapnsEvent.getToken());
-                ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
-            }
+            Connection conn = buildConnection(ctx, pbapnsEvent);
             //记录客户端
             MessageHandlerPoolTasks.instance.getExecutor().submit(new OnNewlyAddThread(pbapnsEvent));
             ack(ctx, conn, pbapnsEvent, SYNC);
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.KeepAlive_VALUE){
             //心跳
-            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            Connection conn = buildConnection(ctx, pbapnsEvent);
             ack(ctx, conn, pbapnsEvent, SYNC);
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Sleep_VALUE){
 
-            final Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            final Connection conn = buildConnection(ctx, pbapnsEvent);
             if (null != conn){
                 conn.setStatusId(ClientStatus.Sleep);
             }
@@ -141,15 +114,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             });
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Awake_VALUE){
-            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-            if (null == conn){
-                conn = new Connection(ctx);
-                conn.setUserId(pbapnsEvent.getUserId());
-                conn.setAppKey(pbapnsEvent.getAppKey());
-                ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
-            }else{
-                conn.setStatusId(ClientStatus.Online);
-            }
+            Connection conn = buildConnection(ctx, pbapnsEvent);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Client awake and rebuild connection. {}", pbapnsEvent);
@@ -172,7 +137,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
 
             }
 
-            Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+            Connection conn = buildConnection(ctx, pbapnsEvent);
             ack(ctx, conn, pbapnsEvent, SYNC);
 
         }else if(pbapnsEvent.getOp() == PBAPNSEvent.Ops.Offline_VALUE) {
@@ -199,6 +164,39 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             ctx.close();
 
         }
+    }
+
+    private Connection buildConnection(ChannelHandlerContext ctx, PBAPNSEvent pbapnsEvent) {
+        Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+        boolean newOne = false;
+        if (null != conn){
+            if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
+                ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+                //只有设备标示不一样才算是重复登录
+                logger.error("你已经在线了!. KickOff. current conn={}, conn={}", ctx, conn);
+                ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
+                newOne = true;
+            } else if (conn.getContext().channel().hashCode() != ctx.channel().hashCode()){
+                // 不是同一个Channel的话，就使用新的
+                ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+                conn.close();
+                conn = null;
+                newOne = true;
+            }else{
+                conn.setStatusId(ClientStatus.Online);
+            }
+        }
+
+        if (newOne){
+            logger.debug("Got Connection from. {}", ctx.channel().remoteAddress());
+            conn = new Connection(ctx);
+            conn.setUserId(pbapnsEvent.getUserId());
+            conn.setAppKey(pbapnsEvent.getAppKey());
+            conn.setToken(pbapnsEvent.getToken());
+            ConnectionKeeper.add(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId(), conn);
+        }
+
+        return conn;
     }
 
     private void ack(final ChannelHandlerContext ctx, final Connection cc, final PBAPNSEvent event, final String result){

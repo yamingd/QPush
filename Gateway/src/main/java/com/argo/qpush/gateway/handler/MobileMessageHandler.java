@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+
 /**
  * Created by yaming_deng on 14-8-6.
  */
@@ -177,14 +179,18 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
                 newOne = true;
             } else if (conn.getContext().channel().hashCode() != ctx.channel().hashCode()){
-//                // 不是同一个Channel的话，就使用新的
-//                logger.warn("Client is using different channel. old={}, new={}", conn.getContext().channel(), ctx.channel());
-//                ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-//                //conn.close();
-//                conn = null;
-//                newOne = true;
-                newOne = false;
-                conn.setStatusId(ClientStatus.Online);
+                InetSocketAddress ip = (InetSocketAddress)conn.getContext().channel().remoteAddress();
+                InetSocketAddress ip2 = (InetSocketAddress)ctx.channel().remoteAddress();
+                if (ip.getAddress().getHostAddress().equalsIgnoreCase(ip2.getAddress().getHostAddress())){
+                    newOne = false;
+                    conn.setStatusId(ClientStatus.Online);
+                }else{
+                     // 不是同一个IP的话，就使用新的
+                    logger.warn("Client is using different channel. old={}, new={}", ip, ip2);
+                    ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+                    newOne = true;
+                }
+
             }else{
                 newOne = false;
                 conn.setStatusId(ClientStatus.Online);

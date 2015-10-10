@@ -177,12 +177,14 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
                 newOne = true;
             } else if (conn.getContext().channel().hashCode() != ctx.channel().hashCode()){
-                // 不是同一个Channel的话，就使用新的
-                logger.warn("Client is using different channel. old={}, new={}", conn.getContext().channel(), ctx.channel());
-                ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
-                //conn.close();
-                conn = null;
-                newOne = true;
+//                // 不是同一个Channel的话，就使用新的
+//                logger.warn("Client is using different channel. old={}, new={}", conn.getContext().channel(), ctx.channel());
+//                ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+//                //conn.close();
+//                conn = null;
+//                newOne = true;
+                newOne = false;
+                conn.setStatusId(ClientStatus.Online);
             }else{
                 newOne = false;
                 conn.setStatusId(ClientStatus.Online);

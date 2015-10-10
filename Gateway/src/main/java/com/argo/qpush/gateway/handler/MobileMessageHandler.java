@@ -201,7 +201,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void ack(final ChannelHandlerContext ctx, final Connection cc, PBAPNSEvent event, final String result){
+    private void ack(final ChannelHandlerContext ctx, final Connection cc, final PBAPNSEvent event, final String result){
         if (cc==null || cc.getContext() == null){
             return;
         }
@@ -227,6 +227,8 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 if(cf.cause() != null){
                     logger.error("Send Error.", cf.cause());
                     cc.close();
+                }else{
+                    logger.debug(String.format("Send Response %d to %d[%d] Done", result, event.getUserId(), event.getOp()));
                 }
             }
         });

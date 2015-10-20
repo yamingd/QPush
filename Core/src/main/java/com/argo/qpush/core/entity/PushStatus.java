@@ -35,9 +35,9 @@ public class PushStatus {
 
     public static final int WaitOnline = 10;
 
-    public static final int APNSSent = 11;
+    public static final int APNSSent = 20;
 
-    public static final int DeviceTokenInvalid = 12;
+    public static final int DeviceTokenInvalid = 21;
 
     private int code;
     private String msg;

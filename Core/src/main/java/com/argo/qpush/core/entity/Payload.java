@@ -229,7 +229,9 @@ public class Payload implements Serializable {
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("badge", this.badge);
         map.put("alert", this.title);
-        map.put("sound", this.sound);
+        if (null != this.sound) {
+            map.put("sound", this.sound);
+        }
         builder.put("aps", map);
 
         if (StringUtils.isNotBlank(this.extras)){

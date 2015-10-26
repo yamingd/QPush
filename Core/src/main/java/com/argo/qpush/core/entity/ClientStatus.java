@@ -6,9 +6,11 @@ package com.argo.qpush.core.entity;
  */
 public interface ClientStatus {
 
-    final int Offline = 0;
+    int Offline = 0;
 
-    final int Online = 1;
+    int Online = 1;
 
-    final int Sleep = 2;
+    int Sleep = 2;
+
+    int Lost = 3;
 }

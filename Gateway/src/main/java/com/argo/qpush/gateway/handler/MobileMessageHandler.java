@@ -277,7 +277,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
             MessageHandlerPoolTasks.instance.getExecutor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    ClientServiceImpl.instance.updateOfflineTs(connection.getUserId(), connection.getLastOpTime());
+                    ClientServiceImpl.instance.updateStatus(connection.getUserId(), ClientStatus.Lost);
                 }
             });
 

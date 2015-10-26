@@ -53,9 +53,14 @@ public class PayloadMessage {
     public Integer toMode;
 
     /**
-     *
+     * 通过APNS发送到端
      */
     public Integer apnsMode;
+
+    /**
+     * 震动
+     */
+    public boolean vibrate;
 
     @Override
     public String toString() {
@@ -70,6 +75,7 @@ public class PayloadMessage {
                 .add("offlineMode", offlineMode)
                 .add("toMode", toMode)
                 .add("apnsMode", apnsMode)
+                .add("vibrate", vibrate)
                 .toString();
     }
 }

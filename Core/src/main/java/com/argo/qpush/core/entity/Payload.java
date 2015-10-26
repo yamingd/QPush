@@ -246,6 +246,11 @@ public class Payload implements Serializable {
     }
 
     public Payload(PayloadMessage message){
+        if (null == message.ext){
+            message.ext = Maps.newHashMap();
+        }
+        message.ext.put("vibrate", message.vibrate ? "1" : "0");
+
         this.title = message.title;
         this.badge = message.badge;
         this.sound = message.sound;

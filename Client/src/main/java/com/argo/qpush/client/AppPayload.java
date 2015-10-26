@@ -61,6 +61,11 @@ public class AppPayload implements Serializable {
      */
     public Integer apnsMode = APNSMode.All.ordinal();
 
+    /**
+     * 震动
+     */
+    public boolean vibrate;
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -74,6 +79,7 @@ public class AppPayload implements Serializable {
                 .add("offlineMode", offlineMode)
                 .add("apnsMode", apnsMode)
                 .add("toMode", toMode)
+                .add("vibrate", vibrate)
                 .toString();
     }
 }

@@ -74,15 +74,20 @@ public class OneSendThread implements Callable<Integer> {
             message.setTotalUsers(0);
             PayloadServiceImpl.instance.add(message);
         }
-
-        logger.info("OneSendThread. Client Total: {}", clients.size());
+        if (logger.isDebugEnabled()) {
+            logger.debug("OneSendThread. Message:{}, Client Total: {}", message.getId(), clients.size());
+        }
         for (int i = 0; i < clients.size(); i++) {
             String client = clients.get(i);
             Client cc = ClientServiceImpl.instance.findByUserId(client);
             if (cc == null){
                 //离线
-                logger.error("Client not found. client={}", client);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Client not found. Message:{}, client={}", message.getId(), client);
+                }
                 if (message.getOfflineMode().intValue() == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                    message.setStatus(client, new PushStatus(PushStatus.WaitOnline));
+                }else{
                     message.setStatus(client, new PushStatus(PushStatus.NoClient));
                 }
 
@@ -112,14 +117,19 @@ public class OneSendThread implements Callable<Integer> {
     }
 
     private void sendMessageToOfflineClient(String client, Client cc) {
+        int offlineMode = message.getOfflineMode().intValue();
+
         if (!cc.supportAPNS()){
             //不是iOS, 可以不继续跑
             logger.error("Client is not iOS. client={}, ", client);
-            message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NoConnections));
+            if (offlineMode == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                message.setStatus(client, new PushStatus(PushStatus.WaitOnline));
+            }else{
+                message.setStatus(client, new PushStatus(PushStatus.NoConnections));
+            }
             return;
         }
 
-        int offlineMode = message.getOfflineMode().intValue();
         if (StringUtils.isBlank(cc.getDeviceToken()) || NULL.equalsIgnoreCase(cc.getDeviceToken())){
             logger.error("Client's deviceToken not found. client={},", client);
 
@@ -134,9 +144,11 @@ public class OneSendThread implements Callable<Integer> {
 
         if (PBAPNSMessage.APNSModes.All_VALUE == message.getToMode()){
             if (offlineMode == PBAPNSMessage.OfflineModes.APNS_VALUE) {
+                //离线时通过APNS发送
                 if (PBAPNSMessage.APNSModes.Signined_VALUE == message.getApnsMode()){
+                    //需要APNS发送时，仅发送给没注销的用户
                     if (ClientStatus.Offline == cc.getStatusId()){
-                        // 已退出
+                        // 已注销登录，则等待上线
                         message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
                     }else{
                         APNSKeeper.instance.push(this.product, cc, message);
@@ -145,9 +157,14 @@ public class OneSendThread implements Callable<Integer> {
                     APNSKeeper.instance.push(this.product, cc, message);
                 }
             }else if (offlineMode == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
+                //离线时等待上线后再推送
                 message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
+            }else{
+                //直接忽略
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
             }
         }else{
+            //直接忽略
             message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
         }
     }

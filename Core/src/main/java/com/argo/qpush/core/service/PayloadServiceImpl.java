@@ -18,7 +18,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -138,7 +137,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                     preparedStatement.setObject(2, payload.getClients().get(i));
                     preparedStatement.setObject(3, payload.getProductId());
                     preparedStatement.setObject(4, 0);
-                    preparedStatement.setObject(5, new Date().getTime()/1000);
+                    preparedStatement.setObject(5, System.currentTimeMillis()/1000);
                 }
 
                 @Override
@@ -223,7 +222,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
                         preparedStatement.setObject(2, userId);
                         preparedStatement.setObject(3, payload.getProductId());
                         preparedStatement.setObject(4, statusId);
-                        preparedStatement.setObject(5, new Date().getTime()/1000);
+                        preparedStatement.setObject(5, System.currentTimeMillis()/1000);
                         preparedStatement.setObject(6, onlineMode);
                         preparedStatement.setObject(7, error != null ? error.getCode() : null);
                         preparedStatement.setObject(8, error != null ? error.getMsg() : null);
@@ -281,7 +280,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
         int total = payload.getStatus().size();
 
-        mainJdbc.update(SQL_UPDATE_PAYLOAD_STATUS, PayloadStatus.Sent, total, new Date().getTime() / 1000, payload.getId());
+        mainJdbc.update(SQL_UPDATE_PAYLOAD_STATUS, PayloadStatus.Sent, total, System.currentTimeMillis() / 1000, payload.getId());
 
         try {
 

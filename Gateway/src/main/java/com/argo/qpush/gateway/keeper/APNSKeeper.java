@@ -28,6 +28,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -208,9 +209,15 @@ public class APNSKeeper implements InitializingBean {
             return null;
         }
 
-        SimpleApnsPushNotification notification = new SimpleApnsPushNotification(token, message.asJson());
+        Date expireDate = new Date(System.currentTimeMillis() + expireTime);
+        SimpleApnsPushNotification notification = new SimpleApnsPushNotification(token, message.asJson(), expireDate);
         return notification;
     }
+
+    /**
+     * Message离线过期时间
+     */
+    private long expireTime = 7 * 86400 * 1000; // 一周内
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -219,6 +226,12 @@ public class APNSKeeper implements InitializingBean {
             this.sandBox = true;
         }else{
             this.sandBox = false;
+        }
+
+        Object val = this.serverConfig.get("apns.expire");
+        if (null != val){
+            int days = Integer.parseInt(val + "");
+            expireTime = days * 86400 * 1000;
         }
 
         productList = productService.findAll();

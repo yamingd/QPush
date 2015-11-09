@@ -23,7 +23,7 @@ public class QPushClient {
     }
 
     /**
-     * &#x53d1;&#x9001;Payload
+     * Payload
      * @param appKey
      * @param payload
      * @return boolean

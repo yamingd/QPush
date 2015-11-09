@@ -120,7 +120,8 @@ public class ClientConnection {
 
     /**
      * 发送消息
-     * @param bytes
+     * @param bytes 数据
+     * @param listener 发送回调
      */
     public void send(final byte[] bytes, final GenericFutureListener<? extends Future<? super Void>> listener){
 

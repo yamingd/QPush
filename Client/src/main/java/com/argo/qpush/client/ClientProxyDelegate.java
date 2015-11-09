@@ -95,7 +95,7 @@ public class ClientProxyDelegate {
 
     /**
      * 获取一个可用的链接
-     * @param task
+     * @param task 目标逻辑
      */
     public void get(final ChannelAvailable task){
         ClientConnection clientConnection = connections.get(0);

@@ -24,10 +24,10 @@ public class QPushClient {
 
     /**
      * Payload
-     * @param appKey
-     * @param payload
-     * @return boolean
-     * @throws IOException
+     * @param appKey 应用标示
+     * @param payload 数据
+     * @return boolean 是否发送成功
+     * @throws IOException IO异常
      */
     public static boolean sendPayload(final String appKey, final AppPayload payload) throws IOException {
 
@@ -46,10 +46,10 @@ public class QPushClient {
 
     /**
      * 发送Topic操作
-     * @param appKey
-     * @param payload
-     * @return
-     * @throws IOException
+     * @param appKey 应用标示
+     * @param payload 数据
+     * @return boolean 是否发送成功
+     * @throws IOException IO异常
      */
     public static boolean sendTopic(final String appKey, int typeId, final AppTopic payload) throws IOException {
 

@@ -32,6 +32,7 @@ public class ClientConnection {
     private String host;
     private Integer port;
     private ChannelFuture connectFuture;
+    private Bootstrap bootstrap;
 
     public ClientConnection(Properties config, NioEventLoopGroup loopGroup) {
         this.config = config;
@@ -47,17 +48,17 @@ public class ClientConnection {
      */
     public synchronized void connect(){
 
-        Bootstrap b = new Bootstrap();
+        bootstrap = new Bootstrap();
         final ClientConnection clientConnection = this;
 
-        b.group(this.nioEventLoopGroup); // (2)
-        b.channel(NioSocketChannel.class); // (3)
-        b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-        b.option(ChannelOption.TCP_NODELAY, true);
-        b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-        b.option(ChannelOption.AUTO_CLOSE, false);
+        bootstrap.group(this.nioEventLoopGroup); // (2)
+        bootstrap.channel(NioSocketChannel.class); // (3)
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+        bootstrap.option(ChannelOption.TCP_NODELAY, true);
+        bootstrap.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+        bootstrap.option(ChannelOption.AUTO_CLOSE, false);
 
-        b.handler(new ChannelInitializer<SocketChannel>() {
+        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
 
             @Override
             public void initChannel(SocketChannel ch) throws Exception {
@@ -73,14 +74,38 @@ public class ClientConnection {
             }
         });
 
-        logger.info("QPush server. connecting... host=" + host + "/" + port);
-        this.connectFuture = b.connect(this.host, this.port);
+        logger.info("QPush server. connecting... {}", this);
+        doConnect();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ClientConnection{");
+        sb.append("host='").append(host).append('\'');
+        sb.append(", port=").append(port);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    private void doConnect() {
+        final ClientConnection clientConnection = this;
+        this.connectFuture = bootstrap.connect(this.host, this.port);
         this.connectFuture.addListener(new GenericFutureListener<ChannelFuture>() {
 
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()){
                     logger.error("Connect Error.", future.cause());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+
+                    }
+
+                    doConnect();
+
+                }else{
+                    logger.info("Connect Success. {}", clientConnection);
                 }
             }
         });

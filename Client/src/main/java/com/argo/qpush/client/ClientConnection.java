@@ -112,6 +112,13 @@ public class ClientConnection {
     }
 
     /**
+     *
+     */
+    public synchronized void reconnect(){
+        doConnect();
+    }
+
+    /**
      * 发送消息
      * @param bytes
      */

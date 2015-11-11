@@ -42,7 +42,6 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         logger.error("channelInactive: {}", ctx.channel());
         ctx.close();
-        ClientProxyDelegate.instance.removeConnection(clientConnection);
         reconnect();
     }
 
@@ -52,7 +51,7 @@ public class ClientConnectHandler extends ChannelInboundHandlerAdapter {
         }
 
         logger.info("reconnect....");
-        ClientProxyDelegate.instance.newConnection();
+        clientConnection.reconnect();
     }
 
 }

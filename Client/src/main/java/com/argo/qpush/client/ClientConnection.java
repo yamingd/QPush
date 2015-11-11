@@ -75,7 +75,7 @@ public class ClientConnection {
         });
 
         logger.info("QPush server. connecting... {}", this);
-        doConnect();
+        doConnect(false);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ClientConnection {
         return sb.toString();
     }
 
-    private void doConnect() {
+    private void doConnect(boolean reconnect) {
         final ClientConnection clientConnection = this;
         this.connectFuture = bootstrap.connect(this.host, this.port);
         this.connectFuture.addListener(new GenericFutureListener<ChannelFuture>() {
@@ -95,14 +95,17 @@ public class ClientConnection {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()){
-                    logger.error("Connect Error.", future.cause());
+                    if (!reconnect) {
+                        logger.error("Connect Error.", future.cause());
+                    }
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
 
                     }
 
-                    doConnect();
+                    logger.info("Reconnect QPush Server. {}", clientConnection);
+                    doConnect(true);
 
                 }else{
                     logger.info("Connect Success. {}", clientConnection);
@@ -115,7 +118,7 @@ public class ClientConnection {
      *
      */
     public synchronized void reconnect(){
-        doConnect();
+        doConnect(true);
     }
 
     /**

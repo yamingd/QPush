@@ -2,7 +2,7 @@ allprojects {
     apply plugin: 'maven'
 
     group = 'com.github.yamingd.qpush'
-    version = '1.5'
+    version = '1.7'
 }
 
 subprojects {

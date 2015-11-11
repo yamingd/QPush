@@ -337,6 +337,38 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
 
     }
 
+    @Override
+    @TxMain
+    public void updateSendStatus(final Long payloadId, final String userId, final PushStatus error) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSendStatus, payloadId={}, userId={}", payloadId, userId);
+        }
+
+        int statusId = error.getPayloadStatus();
+        int onlineMode = error.getOnlineMode(0);
+
+        try {
+
+            mainJdbc.update(SQL_UPDATE_PAYLOAD_CLIENT_STATUS,
+                    statusId, onlineMode,
+                    error != null ? error.getCode() : null,
+                    error != null ? error.getMsg() : null,
+                    payloadId,
+                    userId);
+
+        } catch (DataAccessException e) {
+            logger.error("UpdateSendStatus Error.", e);
+        }
+
+        MetricBuilder.jdbcUpdateMeter.mark(1);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSendStatus OK, payloadId={}, userId={}", payloadId, userId);
+        }
+
+    }
+
     @TxMain
     private void postUpdateSendStatus(Payload message, String userId, PushStatus error) {
         if (logger.isDebugEnabled()) {

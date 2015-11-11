@@ -5,6 +5,7 @@ import com.argo.qpush.core.entity.Payload;
 import com.argo.qpush.core.entity.Product;
 import com.argo.qpush.core.entity.PushStatus;
 import com.argo.qpush.core.service.ClientServiceImpl;
+import com.argo.qpush.core.service.PayloadServiceImpl;
 import com.argo.qpush.core.service.ProductService;
 import com.google.common.collect.Maps;
 import com.relayrides.pushy.apns.*;
@@ -112,6 +113,8 @@ public class APNSKeeper implements InitializingBean {
 
             logger.error("[{}] {} was rejected with rejection reason {}\n", pushManager.getName(), notification, reason);
 
+            SimpleApnsPushNotificationWithId item = (SimpleApnsPushNotificationWithId)notification;
+            PayloadServiceImpl.instance.updateSendStatus(item.paylodId, item.getUserId(), new PushStatus(PushStatus.APNSTokenInvalid));
         }
     }
 
@@ -214,7 +217,7 @@ public class APNSKeeper implements InitializingBean {
 
                     SimpleApnsPushNotificationWithId e = wrapPayload(cc, message);
                     if (e == null){
-                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.DeviceTokenInvalid));
+                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.APNSTokenInvalid));
                     }else {
                         service.getQueue().put(e);
                         message.setStatus(cc.getUserId(), new PushStatus(PushStatus.APNSSent));

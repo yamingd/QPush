@@ -80,6 +80,10 @@ public interface PayloadService {
      * @param pushStatus
      */
     void updateSendStatus(Payload message, String userId, PushStatus pushStatus);
+
+    @TxMain
+    void updateSendStatus(Long payloadId, String userId, PushStatus error);
+
     /**
      * 读取离线消息
      * @param productId

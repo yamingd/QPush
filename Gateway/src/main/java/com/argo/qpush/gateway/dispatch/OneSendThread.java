@@ -95,11 +95,11 @@ public class OneSendThread implements Callable<Integer> {
             }
 
             //显示在客户端
-            if (0 == cc.getStatusId()){
-                message.setBadge(0);
-            }else {
-                message.setBadge(cc.getBadge() + 1);
-            }
+//            if (0 == cc.getStatusId()){
+//                message.setBadge(0);
+//            }else {
+//                message.setBadge(cc.getBadge() + 1);
+//            }
 
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {
@@ -138,9 +138,9 @@ public class OneSendThread implements Callable<Integer> {
             logger.error("Client's deviceToken not found. client={},", client);
 
             if (offlineMode == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
-                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline, "Wait online"));
             }else{
-                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN, "Offline and No DeviceToken"));
             }
 
             return;
@@ -153,7 +153,7 @@ public class OneSendThread implements Callable<Integer> {
                     //需要APNS发送时，仅发送给没注销的用户
                     if (ClientStatus.Offline == cc.getStatusId()){
                         // 已注销登录，则等待上线
-                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
+                        message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline, "Wait online"));
                     }else{
                         APNSKeeper.instance.push(this.product, cc, message);
                     }
@@ -162,14 +162,14 @@ public class OneSendThread implements Callable<Integer> {
                 }
             }else if (offlineMode == PBAPNSMessage.OfflineModes.SendAfterOnline_VALUE){
                 //离线时等待上线后再推送
-                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline));
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.WaitOnline, "Wait online"));
             }else{
                 //直接忽略
-                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
+                message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore, "Client says ignore."));
             }
         }else{
             //直接忽略
-            message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore));
+            message.setStatus(cc.getUserId(), new PushStatus(PushStatus.Ignore, "Message to online user only"));
         }
     }
 

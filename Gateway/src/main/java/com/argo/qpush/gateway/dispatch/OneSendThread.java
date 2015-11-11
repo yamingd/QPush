@@ -95,7 +95,11 @@ public class OneSendThread implements Callable<Integer> {
             }
 
             //显示在客户端
-            message.setBadge(cc.getBadge() + 1);
+            if (0 == cc.getStatusId()){
+                message.setBadge(0);
+            }else {
+                message.setBadge(cc.getBadge() + 1);
+            }
 
             Connection c = ConnectionKeeper.get(product.getAppKey(), client);
             if(c != null) {

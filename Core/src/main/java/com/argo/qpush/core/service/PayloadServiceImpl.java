@@ -275,7 +275,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     @TxMain
     private void postUpdateSendStatus(final Payload payload) {
         if (logger.isDebugEnabled()) {
-            logger.debug("updateSendStatus, payloadId={}", payload.getId());
+            logger.debug("updateSendStatus, payloadId={}, status={}", payload.getId(), payload.getStatus());
         }
 
         int total = payload.getStatus().size();

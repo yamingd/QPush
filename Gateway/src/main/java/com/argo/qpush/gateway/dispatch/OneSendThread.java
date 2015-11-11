@@ -75,7 +75,7 @@ public class OneSendThread implements Callable<Integer> {
             PayloadServiceImpl.instance.add(message);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("OneSendThread. Message:{}, Client Total: {}", message.getId(), clients.size());
+            logger.debug("OneSendThread. Message:{}, Client Total: {}", message, clients.size());
         }
         for (int i = 0; i < clients.size(); i++) {
             String client = clients.get(i);

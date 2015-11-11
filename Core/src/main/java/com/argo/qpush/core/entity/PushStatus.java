@@ -91,4 +91,12 @@ public class PushStatus {
         return msg;
     }
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("PushStatus{");
+        sb.append("code=").append(code);
+        sb.append(", msg='").append(msg).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

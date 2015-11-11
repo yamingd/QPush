@@ -62,7 +62,7 @@ public class APNSKeeper implements InitializingBean {
                 final SimpleApnsPushNotification notification,
                 final RejectedNotificationReason reason) {
 
-            logger.error("[%s] %s was rejected with rejection reason %s\n", pushManager.getName(), notification, reason);
+            logger.error("[{}] {} was rejected with rejection reason {}\n", pushManager.getName(), notification, reason);
 
         }
     }
@@ -139,16 +139,6 @@ public class APNSKeeper implements InitializingBean {
             pushManager.registerFailedConnectionListener(new PushFailedConnectionListener());
 
             pushManager.start();
-
-//             ApnsServiceBuilder builder =  APNS.newService();
-//            if (sandBox){
-//                builder.withCert(product.getDevCertPath(), product.getDevCertPass());
-//                builder.withSandboxDestination();
-//            }else{
-//                builder.withCert(product.getCertPath(), product.getCertPass());
-//                builder.withProductionDestination();
-//            }
-//            service = builder.asPool(10).withCacheLength(Integer.MAX_VALUE).withDelegate(delegateAdapter).asQueued().build();
 
             mapping.put(product.getId(), pushManager);
             service = pushManager;

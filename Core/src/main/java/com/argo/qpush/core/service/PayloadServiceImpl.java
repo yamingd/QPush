@@ -340,33 +340,17 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     @Override
     @TxMain
     public void updateSendStatus(final Long payloadId, final String userId, final PushStatus error) {
+        jdbcExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("updateSendStatus, payloadId={}, userId={}", payloadId, userId);
-        }
+                Payload message = get(payloadId);
+                if (null != message) {
+                    postUpdateSendStatus(message, userId, error);
+                }
 
-        int statusId = error.getPayloadStatus();
-        int onlineMode = error.getOnlineMode(0);
-
-        try {
-
-            mainJdbc.update(SQL_UPDATE_PAYLOAD_CLIENT_STATUS,
-                    statusId, onlineMode,
-                    error != null ? error.getCode() : null,
-                    error != null ? error.getMsg() : null,
-                    payloadId,
-                    userId);
-
-        } catch (DataAccessException e) {
-            logger.error("UpdateSendStatus Error.", e);
-        }
-
-        MetricBuilder.jdbcUpdateMeter.mark(1);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("updateSendStatus OK, payloadId={}, userId={}", payloadId, userId);
-        }
-
+            }
+        });
     }
 
     @TxMain
@@ -406,6 +390,8 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
         calendar.set(Calendar.MINUTE, 0);
 
         long ts = calendar.getTime().getTime() / 1000;
+
+        logger.info("findLatestToOfflineClients: {}", calendar);
 
         List<Long> list = this.mainJdbc.queryForList(SQL_FIND_LATEST_OFFLINE_LIST, Long.class, productId, userId, 1, ts);
         return list;

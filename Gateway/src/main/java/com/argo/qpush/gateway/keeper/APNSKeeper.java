@@ -54,6 +54,54 @@ public class APNSKeeper implements InitializingBean {
     private List<Product> productList;
     private boolean sandBox = true;
 
+    class SimpleApnsPushNotificationWithId extends SimpleApnsPushNotification{
+
+        private long paylodId;
+        private String userId;
+
+        public SimpleApnsPushNotificationWithId(byte[] token, String payload) {
+            super(token, payload);
+        }
+
+        public SimpleApnsPushNotificationWithId(byte[] token, String payload, Date invalidationTime) {
+            super(token, payload, invalidationTime);
+        }
+
+        public SimpleApnsPushNotificationWithId(byte[] token, String payload, DeliveryPriority priority) {
+            super(token, payload, priority);
+        }
+
+        public SimpleApnsPushNotificationWithId(byte[] token, String payload, Date invalidationTime, DeliveryPriority priority) {
+            super(token, payload, invalidationTime, priority);
+        }
+
+        public long getPaylodId() {
+            return paylodId;
+        }
+
+        public void setPaylodId(long paylodId) {
+            this.paylodId = paylodId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("SimpleApnsPushNotificationWithId{");
+            sb.append(super.toString());
+            sb.append("paylodId=").append(paylodId);
+            sb.append(", userId=").append(userId);
+            sb.append('}');
+            return sb.toString();
+        }
+    }
+
     class PushRejectedNotificationListener implements RejectedNotificationListener<SimpleApnsPushNotification> {
 
         @Override
@@ -164,7 +212,7 @@ public class APNSKeeper implements InitializingBean {
                     message.setStatus(cc.getUserId(), new PushStatus(PushStatus.NO_DEVICE_TOKEN));
                 }else {
 
-                    SimpleApnsPushNotification e = wrapPayload(cc, message);
+                    SimpleApnsPushNotificationWithId e = wrapPayload(cc, message);
                     if (e == null){
                         message.setStatus(cc.getUserId(), new PushStatus(PushStatus.DeviceTokenInvalid));
                     }else {
@@ -189,7 +237,7 @@ public class APNSKeeper implements InitializingBean {
      * @param message
      * @return
      */
-    private SimpleApnsPushNotification wrapPayload(Client cc, Payload message){
+    private SimpleApnsPushNotificationWithId wrapPayload(Client cc, Payload message){
 
         final byte[] token;
         try {
@@ -200,7 +248,10 @@ public class APNSKeeper implements InitializingBean {
         }
 
         Date expireDate = new Date(System.currentTimeMillis() + expireTime);
-        SimpleApnsPushNotification notification = new SimpleApnsPushNotification(token, message.asJson(), expireDate);
+        SimpleApnsPushNotificationWithId notification = new SimpleApnsPushNotificationWithId(token, message.asJson(), expireDate);
+        notification.setPaylodId(message.getId());
+        notification.setUserId(cc.getUserId());
+
         return notification;
     }
 

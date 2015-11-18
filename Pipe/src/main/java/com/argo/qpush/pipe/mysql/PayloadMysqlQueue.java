@@ -1,6 +1,7 @@
 package com.argo.qpush.pipe.mysql;
 
 import com.argo.qpush.core.entity.Payload;
+import com.argo.qpush.core.entity.PayloadStatus;
 import com.argo.qpush.core.service.PayloadService;
 import com.argo.qpush.pipe.PayloadCursor;
 import com.argo.qpush.pipe.PayloadQueue;
@@ -39,6 +40,8 @@ public class PayloadMysqlQueue implements PayloadQueue {
 
     @Override
     public void add(Payload payload) {
+        payload.setStatusId(PayloadStatus.Pending);
+        payload.setTotalUsers(0);
         payloadService.add(payload);
     }
 }

@@ -3,7 +3,7 @@
 cd /home/jetty/source
 
 target="QPush"
-VERSION="1.3"
+VERSION="1.7"
 
 if [ ! -d "$target" ]; then
   git clone https://github.com/yamingd/QPush.git

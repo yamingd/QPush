@@ -172,7 +172,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
         Connection conn = ConnectionKeeper.get(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
         boolean newOne = true;
         if (null != conn){
-            if (!conn.getToken().equalsIgnoreCase(pbapnsEvent.getToken())) {
+            if (conn.getDeviceType() != pbapnsEvent.getTypeId()) {
                 ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
                 //只有设备标示不一样才算是重复登录
                 logger.error("你已经在线了!. KickOff. current conn={}, conn={}", ctx, conn);

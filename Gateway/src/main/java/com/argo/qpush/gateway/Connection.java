@@ -30,6 +30,7 @@ public class Connection {
     private String token;
     private int lastOpTime;
     private int statusId;
+    private int deviceType;
 
     public Connection(ChannelHandlerContext context) {
         this.context = context;
@@ -147,6 +148,14 @@ public class Connection {
 
     public void close(){
         context.close();
+    }
+
+    public int getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(int deviceType) {
+        this.deviceType = deviceType;
     }
 
     public ChannelHandlerContext getContext() {

@@ -182,8 +182,17 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 InetSocketAddress ip = (InetSocketAddress)conn.getContext().channel().remoteAddress();
                 InetSocketAddress ip2 = (InetSocketAddress)ctx.channel().remoteAddress();
                 if (ip.getAddress().getHostAddress().equalsIgnoreCase(ip2.getAddress().getHostAddress())){
-                    newOne = false;
-                    conn.setStatusId(ClientStatus.Online);
+                    if (pbapnsEvent.getOp() == PBAPNSEvent.Ops.Online_VALUE){
+                        // 新操作是登录, 就使用新的
+                        logger.warn("Client is using same network. old={}, new={}", ip, ip);
+                        ack(ctx, conn, pbapnsEvent, MULTI_CLIENTS);
+                        newOne = true;
+                    }else {
+                        // 使用最新的
+                        ConnectionKeeper.remove(pbapnsEvent.getAppKey(), pbapnsEvent.getUserId());
+                        newOne = true;
+                    }
+
                 }else{
                      // 不是同一个IP的话，就使用新的
                     logger.warn("Client is using different channel. old={}, new={}", ip, ip2);

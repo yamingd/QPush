@@ -24,7 +24,7 @@ public class Client {
      */
     private String userId;
     /**
-     * 设备令牌
+     * 设备推送令牌(Apple Push等)
      */
     private String deviceToken;
     /**
@@ -49,6 +49,11 @@ public class Client {
     private Long lastOnline;
 
     private Integer badge;
+
+    /**
+     * 手机唯一标示
+     */
+    private String deviceId;
 
     public Long getId() {
         return id;
@@ -146,19 +151,30 @@ public class Client {
         this.badge = badge;
     }
 
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
     @Override
     public String toString() {
-        return "Client{" +
-                "id=" + id +
-                ", productId=" + productId +
-                ", userId='" + userId + '\'' +
-                ", deviceToken='" + deviceToken + '\'' +
-                ", createAt=" + createAt +
-                ", statusId=" + statusId +
-                ", typeId=" + typeId +
-                ", lastSendAt=" + lastSendAt +
-                ", lastOnline=" + lastOnline +
-                '}';
+        final StringBuffer sb = new StringBuffer("Client{");
+        sb.append("id=").append(id);
+        sb.append(", productId=").append(productId);
+        sb.append(", userId='").append(userId).append('\'');
+        sb.append(", deviceToken='").append(deviceToken).append('\'');
+        sb.append(", createAt=").append(createAt);
+        sb.append(", statusId=").append(statusId);
+        sb.append(", typeId=").append(typeId);
+        sb.append(", lastSendAt=").append(lastSendAt);
+        sb.append(", lastOnline=").append(lastOnline);
+        sb.append(", badge=").append(badge);
+        sb.append(", deviceId='").append(deviceId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     public boolean supportAPNS() {

@@ -6,9 +6,10 @@ package com.argo.qpush.protobuf;
 /**
  * Protobuf type {@code message.PBAPNSBody}
  */
-public  final class PBAPNSBody extends
-    com.google.protobuf.GeneratedMessage
-    implements PBAPNSBodyOrBuilder {
+public final class PBAPNSBody extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:message.PBAPNSBody)
+    PBAPNSBodyOrBuilder {
   // Use PBAPNSBody.newBuilder() to construct.
   private PBAPNSBody(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -55,13 +56,15 @@ public  final class PBAPNSBody extends
             break;
           }
           case 10: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000001;
-            alert_ = input.readBytes();
+            alert_ = bs;
             break;
           }
           case 18: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            sound_ = input.readBytes();
+            sound_ = bs;
             break;
           }
           case 24: {
@@ -109,7 +112,6 @@ public  final class PBAPNSBody extends
   }
 
   private int bitField0_;
-  // optional string alert = 1;
   public static final int ALERT_FIELD_NUMBER = 1;
   private java.lang.Object alert_;
   /**
@@ -152,7 +154,6 @@ public  final class PBAPNSBody extends
     }
   }
 
-  // optional string sound = 2;
   public static final int SOUND_FIELD_NUMBER = 2;
   private java.lang.Object sound_;
   /**
@@ -195,7 +196,6 @@ public  final class PBAPNSBody extends
     }
   }
 
-  // optional int32 badge = 3;
   public static final int BADGE_FIELD_NUMBER = 3;
   private int badge_;
   /**
@@ -219,7 +219,8 @@ public  final class PBAPNSBody extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -340,8 +341,9 @@ public  final class PBAPNSBody extends
    * Protobuf type {@code message.PBAPNSBody}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements com.argo.qpush.protobuf.PBAPNSBodyOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:message.PBAPNSBody)
+      com.argo.qpush.protobuf.PBAPNSBodyOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.argo.qpush.protobuf.PbMessage.internal_static_message_PBAPNSBody_descriptor;
@@ -476,7 +478,6 @@ public  final class PBAPNSBody extends
     }
     private int bitField0_;
 
-    // optional string alert = 1;
     private java.lang.Object alert_ = "";
     /**
      * <code>optional string alert = 1;</code>
@@ -490,9 +491,12 @@ public  final class PBAPNSBody extends
     public java.lang.String getAlert() {
       java.lang.Object ref = alert_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        alert_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          alert_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -550,7 +554,6 @@ public  final class PBAPNSBody extends
       return this;
     }
 
-    // optional string sound = 2;
     private java.lang.Object sound_ = "";
     /**
      * <code>optional string sound = 2;</code>
@@ -564,9 +567,12 @@ public  final class PBAPNSBody extends
     public java.lang.String getSound() {
       java.lang.Object ref = sound_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        sound_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          sound_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -624,7 +630,6 @@ public  final class PBAPNSBody extends
       return this;
     }
 
-    // optional int32 badge = 3;
     private int badge_ ;
     /**
      * <code>optional int32 badge = 3;</code>

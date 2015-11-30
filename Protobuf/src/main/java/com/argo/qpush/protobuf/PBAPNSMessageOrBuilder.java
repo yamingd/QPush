@@ -3,10 +3,10 @@
 
 package com.argo.qpush.protobuf;
 
-public interface PBAPNSMessageOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface PBAPNSMessageOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:message.PBAPNSMessage)
+    com.google.protobuf.MessageOrBuilder {
 
-  // optional int32 offlineMode = 1;
   /**
    * <code>optional int32 offlineMode = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface PBAPNSMessageOrBuilder
    */
   int getOfflineMode();
 
-  // required .message.PBAPNSBody aps = 2;
   /**
    * <code>required .message.PBAPNSBody aps = 2;</code>
    */
@@ -30,7 +29,6 @@ public interface PBAPNSMessageOrBuilder
    */
   com.argo.qpush.protobuf.PBAPNSBodyOrBuilder getApsOrBuilder();
 
-  // repeated .message.PBAPNSUserInfo userInfo = 3;
   /**
    * <code>repeated .message.PBAPNSUserInfo userInfo = 3;</code>
    */
@@ -55,7 +53,6 @@ public interface PBAPNSMessageOrBuilder
   com.argo.qpush.protobuf.PBAPNSUserInfoOrBuilder getUserInfoOrBuilder(
       int index);
 
-  // optional int32 apnsMode = 4;
   /**
    * <code>optional int32 apnsMode = 4;</code>
    */

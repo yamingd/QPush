@@ -6,9 +6,10 @@ package com.argo.qpush.protobuf;
 /**
  * Protobuf type {@code message.PBAPNSEvent}
  */
-public  final class PBAPNSEvent extends
-    com.google.protobuf.GeneratedMessage
-    implements PBAPNSEventOrBuilder {
+public final class PBAPNSEvent extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:message.PBAPNSEvent)
+    PBAPNSEventOrBuilder {
   // Use PBAPNSEvent.newBuilder() to construct.
   private PBAPNSEvent(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -60,18 +61,21 @@ public  final class PBAPNSEvent extends
             break;
           }
           case 18: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000002;
-            token_ = input.readBytes();
+            token_ = bs;
             break;
           }
           case 26: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000004;
-            appKey_ = input.readBytes();
+            appKey_ = bs;
             break;
           }
           case 34: {
+            com.google.protobuf.ByteString bs = input.readBytes();
             bitField0_ |= 0x00000008;
-            userId_ = input.readBytes();
+            userId_ = bs;
             break;
           }
           case 40: {
@@ -82,6 +86,12 @@ public  final class PBAPNSEvent extends
           case 48: {
             bitField0_ |= 0x00000020;
             read_ = input.readInt32();
+            break;
+          }
+          case 58: {
+            com.google.protobuf.ByteString bs = input.readBytes();
+            bitField0_ |= 0x00000040;
+            deviceId_ = bs;
             break;
           }
         }
@@ -342,7 +352,6 @@ public  final class PBAPNSEvent extends
   }
 
   private int bitField0_;
-  // required int32 op = 1;
   public static final int OP_FIELD_NUMBER = 1;
   private int op_;
   /**
@@ -358,7 +367,6 @@ public  final class PBAPNSEvent extends
     return op_;
   }
 
-  // required string token = 2;
   public static final int TOKEN_FIELD_NUMBER = 2;
   private java.lang.Object token_;
   /**
@@ -401,7 +409,6 @@ public  final class PBAPNSEvent extends
     }
   }
 
-  // required string appKey = 3;
   public static final int APPKEY_FIELD_NUMBER = 3;
   private java.lang.Object appKey_;
   /**
@@ -444,7 +451,6 @@ public  final class PBAPNSEvent extends
     }
   }
 
-  // required string userId = 4;
   public static final int USERID_FIELD_NUMBER = 4;
   private java.lang.Object userId_;
   /**
@@ -487,7 +493,6 @@ public  final class PBAPNSEvent extends
     }
   }
 
-  // required int32 typeId = 5;
   public static final int TYPEID_FIELD_NUMBER = 5;
   private int typeId_;
   /**
@@ -503,7 +508,6 @@ public  final class PBAPNSEvent extends
     return typeId_;
   }
 
-  // optional int32 read = 6;
   public static final int READ_FIELD_NUMBER = 6;
   private int read_;
   /**
@@ -519,6 +523,48 @@ public  final class PBAPNSEvent extends
     return read_;
   }
 
+  public static final int DEVICEID_FIELD_NUMBER = 7;
+  private java.lang.Object deviceId_;
+  /**
+   * <code>optional string deviceId = 7;</code>
+   */
+  public boolean hasDeviceId() {
+    return ((bitField0_ & 0x00000040) == 0x00000040);
+  }
+  /**
+   * <code>optional string deviceId = 7;</code>
+   */
+  public java.lang.String getDeviceId() {
+    java.lang.Object ref = deviceId_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      if (bs.isValidUtf8()) {
+        deviceId_ = s;
+      }
+      return s;
+    }
+  }
+  /**
+   * <code>optional string deviceId = 7;</code>
+   */
+  public com.google.protobuf.ByteString
+      getDeviceIdBytes() {
+    java.lang.Object ref = deviceId_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      deviceId_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private void initFields() {
     op_ = 0;
     token_ = "";
@@ -526,11 +572,13 @@ public  final class PBAPNSEvent extends
     userId_ = "";
     typeId_ = 0;
     read_ = 0;
+    deviceId_ = "";
   }
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     if (!hasOp()) {
       memoizedIsInitialized = 0;
@@ -577,6 +625,9 @@ public  final class PBAPNSEvent extends
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       output.writeInt32(6, read_);
     }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      output.writeBytes(7, getDeviceIdBytes());
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -609,6 +660,10 @@ public  final class PBAPNSEvent extends
     if (((bitField0_ & 0x00000020) == 0x00000020)) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(6, read_);
+    }
+    if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBytesSize(7, getDeviceIdBytes());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSerializedSize = size;
@@ -692,8 +747,9 @@ public  final class PBAPNSEvent extends
    * Protobuf type {@code message.PBAPNSEvent}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements com.argo.qpush.protobuf.PBAPNSEventOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:message.PBAPNSEvent)
+      com.argo.qpush.protobuf.PBAPNSEventOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.argo.qpush.protobuf.PbMessage.internal_static_message_PBAPNSEvent_descriptor;
@@ -738,6 +794,8 @@ public  final class PBAPNSEvent extends
       bitField0_ = (bitField0_ & ~0x00000010);
       read_ = 0;
       bitField0_ = (bitField0_ & ~0x00000020);
+      deviceId_ = "";
+      bitField0_ = (bitField0_ & ~0x00000040);
       return this;
     }
 
@@ -790,6 +848,10 @@ public  final class PBAPNSEvent extends
         to_bitField0_ |= 0x00000020;
       }
       result.read_ = read_;
+      if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+        to_bitField0_ |= 0x00000040;
+      }
+      result.deviceId_ = deviceId_;
       result.bitField0_ = to_bitField0_;
       onBuilt();
       return result;
@@ -829,6 +891,11 @@ public  final class PBAPNSEvent extends
       }
       if (other.hasRead()) {
         setRead(other.getRead());
+      }
+      if (other.hasDeviceId()) {
+        bitField0_ |= 0x00000040;
+        deviceId_ = other.deviceId_;
+        onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
       return this;
@@ -877,7 +944,6 @@ public  final class PBAPNSEvent extends
     }
     private int bitField0_;
 
-    // required int32 op = 1;
     private int op_ ;
     /**
      * <code>required int32 op = 1;</code>
@@ -910,7 +976,6 @@ public  final class PBAPNSEvent extends
       return this;
     }
 
-    // required string token = 2;
     private java.lang.Object token_ = "";
     /**
      * <code>required string token = 2;</code>
@@ -924,9 +989,12 @@ public  final class PBAPNSEvent extends
     public java.lang.String getToken() {
       java.lang.Object ref = token_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        token_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          token_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -984,7 +1052,6 @@ public  final class PBAPNSEvent extends
       return this;
     }
 
-    // required string appKey = 3;
     private java.lang.Object appKey_ = "";
     /**
      * <code>required string appKey = 3;</code>
@@ -998,9 +1065,12 @@ public  final class PBAPNSEvent extends
     public java.lang.String getAppKey() {
       java.lang.Object ref = appKey_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        appKey_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          appKey_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -1058,7 +1128,6 @@ public  final class PBAPNSEvent extends
       return this;
     }
 
-    // required string userId = 4;
     private java.lang.Object userId_ = "";
     /**
      * <code>required string userId = 4;</code>
@@ -1072,9 +1141,12 @@ public  final class PBAPNSEvent extends
     public java.lang.String getUserId() {
       java.lang.Object ref = userId_;
       if (!(ref instanceof java.lang.String)) {
-        java.lang.String s = ((com.google.protobuf.ByteString) ref)
-            .toStringUtf8();
-        userId_ = s;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          userId_ = s;
+        }
         return s;
       } else {
         return (java.lang.String) ref;
@@ -1132,7 +1204,6 @@ public  final class PBAPNSEvent extends
       return this;
     }
 
-    // required int32 typeId = 5;
     private int typeId_ ;
     /**
      * <code>required int32 typeId = 5;</code>
@@ -1165,7 +1236,6 @@ public  final class PBAPNSEvent extends
       return this;
     }
 
-    // optional int32 read = 6;
     private int read_ ;
     /**
      * <code>optional int32 read = 6;</code>
@@ -1194,6 +1264,82 @@ public  final class PBAPNSEvent extends
     public Builder clearRead() {
       bitField0_ = (bitField0_ & ~0x00000020);
       read_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object deviceId_ = "";
+    /**
+     * <code>optional string deviceId = 7;</code>
+     */
+    public boolean hasDeviceId() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional string deviceId = 7;</code>
+     */
+    public java.lang.String getDeviceId() {
+      java.lang.Object ref = deviceId_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          deviceId_ = s;
+        }
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>optional string deviceId = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeviceIdBytes() {
+      java.lang.Object ref = deviceId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deviceId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>optional string deviceId = 7;</code>
+     */
+    public Builder setDeviceId(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+      deviceId_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string deviceId = 7;</code>
+     */
+    public Builder clearDeviceId() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      deviceId_ = getDefaultInstance().getDeviceId();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>optional string deviceId = 7;</code>
+     */
+    public Builder setDeviceIdBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+      deviceId_ = value;
       onChanged();
       return this;
     }

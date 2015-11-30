@@ -3,10 +3,10 @@
 
 package com.argo.qpush.protobuf;
 
-public interface PBAPNSEventOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface PBAPNSEventOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:message.PBAPNSEvent)
+    com.google.protobuf.MessageOrBuilder {
 
-  // required int32 op = 1;
   /**
    * <code>required int32 op = 1;</code>
    */
@@ -16,7 +16,6 @@ public interface PBAPNSEventOrBuilder
    */
   int getOp();
 
-  // required string token = 2;
   /**
    * <code>required string token = 2;</code>
    */
@@ -31,7 +30,6 @@ public interface PBAPNSEventOrBuilder
   com.google.protobuf.ByteString
       getTokenBytes();
 
-  // required string appKey = 3;
   /**
    * <code>required string appKey = 3;</code>
    */
@@ -46,7 +44,6 @@ public interface PBAPNSEventOrBuilder
   com.google.protobuf.ByteString
       getAppKeyBytes();
 
-  // required string userId = 4;
   /**
    * <code>required string userId = 4;</code>
    */
@@ -61,7 +58,6 @@ public interface PBAPNSEventOrBuilder
   com.google.protobuf.ByteString
       getUserIdBytes();
 
-  // required int32 typeId = 5;
   /**
    * <code>required int32 typeId = 5;</code>
    */
@@ -71,7 +67,6 @@ public interface PBAPNSEventOrBuilder
    */
   int getTypeId();
 
-  // optional int32 read = 6;
   /**
    * <code>optional int32 read = 6;</code>
    */
@@ -80,4 +75,18 @@ public interface PBAPNSEventOrBuilder
    * <code>optional int32 read = 6;</code>
    */
   int getRead();
+
+  /**
+   * <code>optional string deviceId = 7;</code>
+   */
+  boolean hasDeviceId();
+  /**
+   * <code>optional string deviceId = 7;</code>
+   */
+  java.lang.String getDeviceId();
+  /**
+   * <code>optional string deviceId = 7;</code>
+   */
+  com.google.protobuf.ByteString
+      getDeviceIdBytes();
 }

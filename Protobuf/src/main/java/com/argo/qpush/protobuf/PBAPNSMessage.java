@@ -6,9 +6,10 @@ package com.argo.qpush.protobuf;
 /**
  * Protobuf type {@code message.PBAPNSMessage}
  */
-public  final class PBAPNSMessage extends
-    com.google.protobuf.GeneratedMessage
-    implements PBAPNSMessageOrBuilder {
+public final class PBAPNSMessage extends
+    com.google.protobuf.GeneratedMessage implements
+    // @@protoc_insertion_point(message_implements:message.PBAPNSMessage)
+    PBAPNSMessageOrBuilder {
   // Use PBAPNSMessage.newBuilder() to construct.
   private PBAPNSMessage(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
@@ -301,7 +302,6 @@ public  final class PBAPNSMessage extends
   }
 
   private int bitField0_;
-  // optional int32 offlineMode = 1;
   public static final int OFFLINEMODE_FIELD_NUMBER = 1;
   private int offlineMode_;
   /**
@@ -317,7 +317,6 @@ public  final class PBAPNSMessage extends
     return offlineMode_;
   }
 
-  // required .message.PBAPNSBody aps = 2;
   public static final int APS_FIELD_NUMBER = 2;
   private com.argo.qpush.protobuf.PBAPNSBody aps_;
   /**
@@ -339,7 +338,6 @@ public  final class PBAPNSMessage extends
     return aps_;
   }
 
-  // repeated .message.PBAPNSUserInfo userInfo = 3;
   public static final int USERINFO_FIELD_NUMBER = 3;
   private java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> userInfo_;
   /**
@@ -375,7 +373,6 @@ public  final class PBAPNSMessage extends
     return userInfo_.get(index);
   }
 
-  // optional int32 apnsMode = 4;
   public static final int APNSMODE_FIELD_NUMBER = 4;
   private int apnsMode_;
   /**
@@ -400,7 +397,8 @@ public  final class PBAPNSMessage extends
   private byte memoizedIsInitialized = -1;
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized != -1) return isInitialized == 1;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     if (!hasAps()) {
       memoizedIsInitialized = 0;
@@ -538,8 +536,9 @@ public  final class PBAPNSMessage extends
    * Protobuf type {@code message.PBAPNSMessage}
    */
   public static final class Builder extends
-      com.google.protobuf.GeneratedMessage.Builder<Builder>
-     implements com.argo.qpush.protobuf.PBAPNSMessageOrBuilder {
+      com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+      // @@protoc_insertion_point(builder_implements:message.PBAPNSMessage)
+      com.argo.qpush.protobuf.PBAPNSMessageOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.argo.qpush.protobuf.PbMessage.internal_static_message_PBAPNSMessage_descriptor;
@@ -731,7 +730,6 @@ public  final class PBAPNSMessage extends
     }
     private int bitField0_;
 
-    // optional int32 offlineMode = 1;
     private int offlineMode_ ;
     /**
      * <code>optional int32 offlineMode = 1;</code>
@@ -764,7 +762,6 @@ public  final class PBAPNSMessage extends
       return this;
     }
 
-    // required .message.PBAPNSBody aps = 2;
     private com.argo.qpush.protobuf.PBAPNSBody aps_ = com.argo.qpush.protobuf.PBAPNSBody.getDefaultInstance();
     private com.google.protobuf.SingleFieldBuilder<
         com.argo.qpush.protobuf.PBAPNSBody, com.argo.qpush.protobuf.PBAPNSBody.Builder, com.argo.qpush.protobuf.PBAPNSBodyOrBuilder> apsBuilder_;
@@ -873,7 +870,7 @@ public  final class PBAPNSMessage extends
       if (apsBuilder_ == null) {
         apsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
             com.argo.qpush.protobuf.PBAPNSBody, com.argo.qpush.protobuf.PBAPNSBody.Builder, com.argo.qpush.protobuf.PBAPNSBodyOrBuilder>(
-                aps_,
+                getAps(),
                 getParentForChildren(),
                 isClean());
         aps_ = null;
@@ -881,7 +878,6 @@ public  final class PBAPNSMessage extends
       return apsBuilder_;
     }
 
-    // repeated .message.PBAPNSUserInfo userInfo = 3;
     private java.util.List<com.argo.qpush.protobuf.PBAPNSUserInfo> userInfo_ =
       java.util.Collections.emptyList();
     private void ensureUserInfoIsMutable() {
@@ -1023,7 +1019,8 @@ public  final class PBAPNSMessage extends
         java.lang.Iterable<? extends com.argo.qpush.protobuf.PBAPNSUserInfo> values) {
       if (userInfoBuilder_ == null) {
         ensureUserInfoIsMutable();
-        super.addAll(values, userInfo_);
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, userInfo_);
         onChanged();
       } else {
         userInfoBuilder_.addAllMessages(values);
@@ -1121,7 +1118,6 @@ public  final class PBAPNSMessage extends
       return userInfoBuilder_;
     }
 
-    // optional int32 apnsMode = 4;
     private int apnsMode_ ;
     /**
      * <code>optional int32 apnsMode = 4;</code>

@@ -100,7 +100,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @TxMain
-    private void postAddPayload(final Payload payload) {
+    public void postAddPayload(final Payload payload) {
         mainJdbc.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(
@@ -171,7 +171,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @TxMain
-    private void postSaveAfterSent(final Payload payload) {
+    public void postSaveAfterSent(final Payload payload) {
         try {
             mainJdbc.update(new PreparedStatementCreator() {
                 @Override
@@ -273,7 +273,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @TxMain
-    private void postUpdateSendStatus(final Payload payload) {
+    public void postUpdateSendStatus(final Payload payload) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateSendStatus, payloadId={}, status={}", payload.getId(), payload.getStatus());
         }
@@ -338,7 +338,6 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @Override
-    @TxMain
     public void updateSendStatus(final Long payloadId, final String userId, final PushStatus error) {
         jdbcExecutor.submit(new Runnable() {
             @Override
@@ -354,7 +353,7 @@ public class PayloadServiceImpl extends BaseService implements PayloadService {
     }
 
     @TxMain
-    private void postUpdateSendStatus(Payload message, String userId, PushStatus error) {
+    public void postUpdateSendStatus(Payload message, String userId, PushStatus error) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateSendStatus, payloadId={}, userId={}", message.getId(), userId);
         }

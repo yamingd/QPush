@@ -27,7 +27,7 @@ public class Connection {
     private final ChannelHandlerContext context;
     private String appKey;
     private String userId;
-    private String token;
+    private String deviceId;
     private int lastOpTime;
     private int statusId;
     private int deviceType;
@@ -130,12 +130,12 @@ public class Connection {
         this.userId = userId;
     }
 
-    public String getToken() {
-        return token;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public int getStatusId() {
@@ -164,16 +164,19 @@ public class Connection {
 
     @Override
     public int hashCode() {
-        return 31 * userId.hashCode() * token.hashCode();
+        return 31 * userId.hashCode() * deviceId.hashCode();
     }
 
     @Override
     public String toString() {
-        return "Connection{" +
-                "context=" + context +
-                ", appKey='" + appKey + '\'' +
-                ", userId='" + userId + '\'' +
-                ", lastOpTime=" + lastOpTime +
-                '}';
+        final StringBuffer sb = new StringBuffer("Connection{");
+        sb.append("appKey='").append(appKey).append('\'');
+        sb.append(", userId='").append(userId).append('\'');
+        sb.append(", deviceId='").append(deviceId).append('\'');
+        sb.append(", lastOpTime=").append(lastOpTime);
+        sb.append(", statusId=").append(statusId);
+        sb.append(", deviceType=").append(deviceType);
+        sb.append('}');
+        return sb.toString();
     }
 }

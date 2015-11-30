@@ -36,6 +36,7 @@ public class OnNewlyAddThread implements Callable<Boolean> {
             client.setUserId(cc.getUserId());
             client.setTypeId(cc.getTypeId()); //
             client.setDeviceToken(cc.getToken());
+            client.setDeviceId(cc.getDeviceId());
             try {
                 ClientServiceImpl.instance.add(client);
             } catch (Exception e) {

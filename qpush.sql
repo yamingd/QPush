@@ -36,6 +36,7 @@ CREATE TABLE `client` (
   `lastSendAt` int(11) DEFAULT NULL COMMENT '最后发送日期',
   `lastOnline` int(11) DEFAULT NULL COMMENT '最后在线日期',
   `badge` int(11) NOT NULL DEFAULT '0' COMMENT '提醒小红点',
+  `deviceId` varchar(255) DEFAULT NULL COMMENT '设备id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_client_userId` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='客户端信息表';

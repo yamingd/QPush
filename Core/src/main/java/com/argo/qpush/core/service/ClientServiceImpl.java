@@ -26,7 +26,7 @@ import java.util.List;
 public class ClientServiceImpl extends BaseService implements ClientService {
 
     public static final String SQL_findByUserId = "select * from client where userId = ?";
-    public static final String SQL_addClient = "insert into client(productId, userId, deviceToken, createAt, statusId, typeId)values(?, ?, ?, ?, ?, ?)";
+    public static final String SQL_addClient = "insert into client(productId, userId, deviceToken, createAt, statusId, typeId, deviceId)values(?, ?, ?, ?, ?, ?, ?)";
     public static final String SQL_updateOnlineTs = "update client set lastOnline=?, statusId=?, typeId=?, deviceToken=? where id = ?";
     public static final String SQL_findOfflineByType = "select * from client where productId = ? and typeId = ? and lastOnline >= ? and deviceToken is not null order by id limit ?, ?";
     public static final String SQL_countOfflineByType = "select count(1) from client where productId = ? and typeId = ? and lastOnline >= ?";
@@ -68,6 +68,7 @@ public class ClientServiceImpl extends BaseService implements ClientService {
                 ps.setObject(4, new Date());
                 ps.setObject(5, ClientStatus.Online);
                 ps.setObject(6, client.getTypeId());
+                ps.setObject(7, client.getDeviceId());
 
                 return ps;
             }

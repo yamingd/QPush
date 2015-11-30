@@ -8,22 +8,22 @@ public final class PbMessage {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_message_PBAPNSUserInfo_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_message_PBAPNSUserInfo_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_message_PBAPNSBody_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_message_PBAPNSBody_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_message_PBAPNSMessage_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_message_PBAPNSMessage_fieldAccessorTable;
-  static com.google.protobuf.Descriptors.Descriptor
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_message_PBAPNSEvent_descriptor;
   static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -46,50 +46,51 @@ public final class PbMessage {
       "UserInfo\022\020\n\010apnsMode\030\004 \001(\005\"9\n\014OfflineMod" +
       "es\022\n\n\006Ignore\020\000\022\010\n\004APNS\020\001\022\023\n\017SendAfterOnl" +
       "ine\020\002\"\"\n\tAPNSModes\022\007\n\003All\020\000\022\014\n\010Signined\020" +
-      "\001\"\365\001\n\013PBAPNSEvent\022\n\n\002op\030\001 \002(\005\022\r\n\005token\030\002",
+      "\001\"\207\002\n\013PBAPNSEvent\022\n\n\002op\030\001 \002(\005\022\r\n\005token\030\002",
       " \002(\t\022\016\n\006appKey\030\003 \002(\t\022\016\n\006userId\030\004 \002(\t\022\016\n\006" +
-      "typeId\030\005 \002(\005\022\014\n\004read\030\006 \001(\005\"[\n\003Ops\022\n\n\006Onl" +
-      "ine\020\001\022\r\n\tKeepAlive\020\002\022\013\n\007PushAck\020\003\022\013\n\007Off" +
-      "line\020\004\022\t\n\005Error\020\000\022\t\n\005Sleep\020\005\022\t\n\005Awake\020\006\"" +
-      "0\n\013DeviceTypes\022\n\n\006iPhone\020\001\022\010\n\004iPad\020\002\022\013\n\007" +
-      "Android\020\003B\033\n\027com.argo.qpush.protobufP\001"
+      "typeId\030\005 \002(\005\022\014\n\004read\030\006 \001(\005\022\020\n\010deviceId\030\007" +
+      " \001(\t\"[\n\003Ops\022\n\n\006Online\020\001\022\r\n\tKeepAlive\020\002\022\013" +
+      "\n\007PushAck\020\003\022\013\n\007Offline\020\004\022\t\n\005Error\020\000\022\t\n\005S" +
+      "leep\020\005\022\t\n\005Awake\020\006\"0\n\013DeviceTypes\022\n\n\006iPho" +
+      "ne\020\001\022\010\n\004iPad\020\002\022\013\n\007Android\020\003B\033\n\027com.argo." +
+      "qpush.protobufP\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_message_PBAPNSUserInfo_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_message_PBAPNSUserInfo_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_message_PBAPNSUserInfo_descriptor,
-              new java.lang.String[] { "Key", "Value", });
-          internal_static_message_PBAPNSBody_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_message_PBAPNSBody_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_message_PBAPNSBody_descriptor,
-              new java.lang.String[] { "Alert", "Sound", "Badge", });
-          internal_static_message_PBAPNSMessage_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_message_PBAPNSMessage_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_message_PBAPNSMessage_descriptor,
-              new java.lang.String[] { "OfflineMode", "Aps", "UserInfo", "ApnsMode", });
-          internal_static_message_PBAPNSEvent_descriptor =
-            getDescriptor().getMessageTypes().get(3);
-          internal_static_message_PBAPNSEvent_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_message_PBAPNSEvent_descriptor,
-              new java.lang.String[] { "Op", "Token", "AppKey", "UserId", "TypeId", "Read", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_message_PBAPNSUserInfo_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_message_PBAPNSUserInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_message_PBAPNSUserInfo_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_message_PBAPNSBody_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_message_PBAPNSBody_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_message_PBAPNSBody_descriptor,
+        new java.lang.String[] { "Alert", "Sound", "Badge", });
+    internal_static_message_PBAPNSMessage_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_message_PBAPNSMessage_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_message_PBAPNSMessage_descriptor,
+        new java.lang.String[] { "OfflineMode", "Aps", "UserInfo", "ApnsMode", });
+    internal_static_message_PBAPNSEvent_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_message_PBAPNSEvent_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_message_PBAPNSEvent_descriptor,
+        new java.lang.String[] { "Op", "Token", "AppKey", "UserId", "TypeId", "Read", "DeviceId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

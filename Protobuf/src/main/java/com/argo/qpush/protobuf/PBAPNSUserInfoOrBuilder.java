@@ -3,10 +3,10 @@
 
 package com.argo.qpush.protobuf;
 
-public interface PBAPNSUserInfoOrBuilder
-    extends com.google.protobuf.MessageOrBuilder {
+public interface PBAPNSUserInfoOrBuilder extends
+    // @@protoc_insertion_point(interface_extends:message.PBAPNSUserInfo)
+    com.google.protobuf.MessageOrBuilder {
 
-  // required string key = 1;
   /**
    * <code>required string key = 1;</code>
    */
@@ -21,7 +21,6 @@ public interface PBAPNSUserInfoOrBuilder
   com.google.protobuf.ByteString
       getKeyBytes();
 
-  // required string value = 2;
   /**
    * <code>required string value = 2;</code>
    */

@@ -201,7 +201,7 @@ public class MobileMessageHandler extends ChannelInboundHandlerAdapter {
                 }
 
             }else{
-                newOne = false;
+                newOne = true;
                 conn.setStatusId(ClientStatus.Online);
             }
         }

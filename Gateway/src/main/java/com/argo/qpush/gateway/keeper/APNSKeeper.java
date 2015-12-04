@@ -16,6 +16,7 @@ import com.relayrides.pushy.apns.util.TokenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,16 +30,13 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by yaming_deng on 14-8-13.
  */
 @Component
-public class APNSKeeper implements InitializingBean {
+public class APNSKeeper implements InitializingBean, DisposableBean {
 
     protected static Logger logger = LoggerFactory.getLogger(APNSKeeper.class);
 
@@ -54,6 +52,25 @@ public class APNSKeeper implements InitializingBean {
 
     private List<Product> productList;
     private boolean sandBox = true;
+
+    @Override
+    public void destroy() throws Exception {
+        logger.info("{}. destroy. mapping={}", APNSKeeper.class.getSimpleName(), mapping);
+        Iterator<Integer> iter = mapping.keySet().iterator();
+        while (iter.hasNext()) {
+            Integer productId = iter.next();
+            PushManager<SimpleApnsPushNotification> pm = mapping.get(productId);
+            try {
+                logger.info("{}. destroy. 准备shutdown PushManager... pm={}", APNSKeeper.class.getSimpleName(), pm);
+                long start = System.currentTimeMillis();
+                pm.shutdown();
+                long end = System.currentTimeMillis();
+                logger.info("{}. destroy. 结束shutdown PushManager. pm=={}, duration={}", APNSKeeper.class.getSimpleName(), pm, (end-start));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
 
     class SimpleApnsPushNotificationWithId extends SimpleApnsPushNotification{
 
